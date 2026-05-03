@@ -764,16 +764,21 @@ function BarChart() {
 
 function StandardBanner() {
   return (
-    <section className="px-6 pb-12">
+    <section className="px-4 py-6 md:px-6 md:py-8">
       <div
-        className="mx-auto max-w-6xl overflow-hidden rounded-[28px] px-8 py-16 text-center text-white"
+        className="relative mx-auto max-w-[1400px] overflow-hidden rounded-[28px] px-6 py-24 text-center md:rounded-[32px] md:px-10 md:py-36 lg:py-40"
         style={{
-          background:
-            "radial-gradient(120% 100% at 50% 0%, #1a3d27 0%, #0e2a18 70%, #06140a 100%)",
+          background: [
+            "radial-gradient(70% 95% at 18% 50%, rgba(190, 235, 130, 0.22), transparent 60%)",
+            "radial-gradient(55% 90% at 90% 55%, rgba(190, 235, 130, 0.14), transparent 60%)",
+            "repeating-linear-gradient(90deg, rgba(0,0,0,0.32) 0%, rgba(0,0,0,0.32) 0.45%, rgba(0,0,0,0) 1.6%, rgba(255,255,255,0.07) 4.16%, rgba(0,0,0,0) 6.7%, rgba(0,0,0,0.32) 7.88%, rgba(0,0,0,0.32) 8.33%)",
+            "linear-gradient(180deg, rgba(255,255,255,0.04) 0%, transparent 30%, transparent 70%, rgba(0,0,0,0.28) 100%)",
+            "linear-gradient(180deg, #1d4528 0%, #0c2516 100%)",
+          ].join(", "),
         }}
       >
         <FadeIn>
-          <p className="mx-auto max-w-xl text-[16px] leading-relaxed text-white/85">
+          <p className="mx-auto max-w-2xl text-[18px] leading-[1.55] text-lime md:text-[20px]">
             Setting the standard for business valuation. With Capstak, we make
             the valuation process easy and accessible, whether you&rsquo;re a
             first-time user or a seasoned professional.
@@ -788,51 +793,59 @@ function StandardBanner() {
 
 function CTASection() {
   return (
-    <section id="contact" className="px-6 pb-24">
-      <div className="mx-auto grid max-w-6xl grid-cols-1 gap-5 md:grid-cols-2">
-        <FadeIn>
-          <div
-            className="relative flex aspect-[5/4] items-center justify-center overflow-hidden rounded-[28px]"
-            style={{
-              background:
-                "linear-gradient(150deg, #e0d7be 0%, #c8c19f 60%, #8a8665 100%)",
-            }}
-          >
+    <section id="contact" className="px-4 pb-16 md:px-6">
+      <div className="mx-auto grid max-w-[1400px] grid-cols-1 gap-5 md:grid-cols-2">
+        <FadeIn className="h-full">
+          <div className="relative h-full min-h-[600px] overflow-hidden rounded-[28px] md:rounded-[32px]">
             <CkLogoArt />
           </div>
         </FadeIn>
 
-        <FadeIn delay={120}>
-          <div className="flex h-full flex-col justify-center rounded-[28px] bg-cream px-10 py-14">
-            <span className="mb-5 inline-flex h-8 w-8 items-center justify-center rounded-md bg-lime text-xs font-semibold text-green">
-              ✦
-            </span>
-            <h2 className="max-w-md text-[32px] leading-tight tracking-tight md:text-[36px]">
-              Join the Future of{" "}
-              <span className="serif-italic">Business Valuation.</span>
+        <FadeIn delay={120} className="h-full">
+          <div
+            className="relative flex h-full min-h-[600px] flex-col items-center overflow-hidden rounded-[28px] px-8 py-14 text-center md:rounded-[32px] md:px-12"
+            style={{
+              background: [
+                "radial-gradient(55% 70% at 95% 45%, rgba(120, 200, 130, 0.42), transparent 65%)",
+                "radial-gradient(80% 60% at 0% 0%, rgba(255, 255, 255, 0.55), transparent 60%)",
+                "linear-gradient(180deg, #efeede 0%, #e6e7d0 100%)",
+              ].join(", "),
+            }}
+          >
+            <div className="relative mt-2">
+              <span
+                aria-hidden
+                className="absolute -inset-2 rounded-full bg-lime/45 blur-[3px]"
+              />
+              <span className="relative flex h-10 w-10 items-center justify-center rounded-full bg-green text-lime">
+                <ContactCardIcon />
+              </span>
+            </div>
+            <h2 className="mt-12 max-w-md text-[24px] font-medium leading-tight tracking-tight text-ink md:text-[26px]">
+              Join the Future of Business Valuation.
             </h2>
-            <p className="mt-4 max-w-md text-[14px] leading-relaxed text-ink/70">
+            <p className="mt-3 max-w-md text-[13.5px] leading-relaxed text-ink/65">
               Be the first to know when we go live. Sign up now to receive
               updates and stay ahead with accurate, easy valuations.
             </p>
-            <form className="mt-8 flex max-w-md items-center gap-2 rounded-full border border-ink/10 bg-cream-soft p-1.5 pl-5">
+            <form className="mt-10 flex w-full max-w-md items-stretch rounded-[14px] bg-cream-soft p-1.5">
               <input
                 type="email"
                 placeholder="Enter your email..."
                 aria-label="Email address"
-                className="flex-1 bg-transparent text-sm text-ink placeholder:text-ink/40 focus:outline-none"
+                className="flex-1 bg-transparent px-4 py-3 text-[14px] text-ink placeholder:text-[#9c9c9c] focus:outline-none"
               />
               <button
                 type="submit"
-                className="rounded-full bg-lime px-5 py-2.5 text-sm font-medium text-ink transition-transform hover:scale-[1.02]"
+                className="rounded-[10px] bg-cream px-5 py-3 text-[14px] font-medium text-ink transition-colors hover:bg-cream-deep"
               >
                 Get Notified
               </button>
             </form>
-            <div className="mt-6 flex items-center gap-3">
+            <div className="mt-10 flex items-center gap-3">
               <SocialIcon label="LinkedIn" />
               <SocialIcon label="Instagram" />
-              <SocialIcon label="X" />
+              <SocialIcon label="Twitter" />
             </div>
           </div>
         </FadeIn>
@@ -841,44 +854,45 @@ function CTASection() {
   );
 }
 
+function ContactCardIcon() {
+  return (
+    <svg viewBox="0 0 16 16" className="h-4 w-4" aria-hidden>
+      <rect x="2" y="3.5" width="12" height="9" rx="1.5" fill="currentColor" />
+      <circle cx="6" cy="7" r="1.4" fill="var(--green)" />
+      <rect x="9" y="6.2" width="3.2" height="0.8" rx="0.4" fill="var(--green)" />
+      <rect x="9" y="7.8" width="3.2" height="0.8" rx="0.4" fill="var(--green)" />
+      <rect x="4" y="9.5" width="4" height="0.8" rx="0.4" fill="var(--green)" />
+    </svg>
+  );
+}
+
 function CkLogoArt() {
   return (
-    <div className="relative flex items-center">
-      <svg viewBox="0 0 220 200" className="h-44 w-44" aria-hidden>
-        <text
-          x="0"
-          y="160"
-          fontSize="200"
-          fontWeight="600"
-          fill="#0e2a18"
-          letterSpacing="-6"
-        >
-          Ck
-        </text>
-        <path
-          d="M170 70 L130 110 M132 70 L132 110 L172 110"
-          stroke="#c8e043"
-          strokeWidth="10"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          fill="none"
-        />
-      </svg>
-      {/* vertical streaks like in reference */}
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-0"
-        style={{
-          background:
-            "repeating-linear-gradient(180deg, rgba(255,255,255,0.05) 0 3px, transparent 3px 14px)",
-          mixBlendMode: "overlay",
-        }}
-      />
-    </div>
+    <img
+      src="/cta-curtain.png"
+      alt="Capstak Ck logomark on a cream curtain backdrop"
+      className="absolute inset-0 block h-full w-full object-cover object-center"
+      draggable={false}
+    />
   );
 }
 
 function SocialIcon({ label }: { label: string }) {
+  const icons: Record<string, React.ReactNode> = {
+    LinkedIn: (
+      <path d="M4.98 3.5c0 1.38-1.11 2.5-2.49 2.5S0 4.88 0 3.5C0 2.13 1.12 1 2.49 1c1.38 0 2.49 1.13 2.49 2.5zM.18 8h4.6v14H.18V8zM7.65 8h4.42v1.92h.06c.62-1.17 2.13-2.4 4.39-2.4 4.7 0 5.56 3.09 5.56 7.11V22h-4.6v-6.36c0-1.52-.03-3.47-2.11-3.47-2.11 0-2.43 1.65-2.43 3.36V22h-4.59V8z" />
+    ),
+    Instagram: (
+      <>
+        <path d="M12 2.16c3.2 0 3.58.01 4.85.07 1.17.05 1.81.25 2.23.41.56.22.96.48 1.38.9.42.42.68.82.9 1.38.16.42.36 1.06.41 2.23.06 1.27.07 1.65.07 4.85s-.01 3.58-.07 4.85c-.05 1.17-.25 1.81-.41 2.23-.22.56-.48.96-.9 1.38-.42.42-.82.68-1.38.9-.42.16-1.06.36-2.23.41-1.27.06-1.65.07-4.85.07s-3.58-.01-4.85-.07c-1.17-.05-1.81-.25-2.23-.41a3.7 3.7 0 0 1-1.38-.9 3.7 3.7 0 0 1-.9-1.38c-.16-.42-.36-1.06-.41-2.23C2.17 15.58 2.16 15.2 2.16 12s.01-3.58.07-4.85c.05-1.17.25-1.81.41-2.23.22-.56.48-.96.9-1.38.42-.42.82-.68 1.38-.9.42-.16 1.06-.36 2.23-.41C8.42 2.17 8.8 2.16 12 2.16M12 0C8.74 0 8.33.01 7.05.07 5.78.13 4.91.33 4.15.63a5.86 5.86 0 0 0-2.13 1.39A5.86 5.86 0 0 0 .63 4.15c-.3.76-.5 1.63-.56 2.9C.01 8.33 0 8.74 0 12s.01 3.67.07 4.95c.06 1.27.26 2.14.56 2.9.31.79.73 1.46 1.39 2.13.67.66 1.34 1.08 2.13 1.39.76.3 1.63.5 2.9.56C8.33 23.99 8.74 24 12 24s3.67-.01 4.95-.07c1.27-.06 2.14-.26 2.9-.56a5.86 5.86 0 0 0 2.13-1.39 5.86 5.86 0 0 0 1.39-2.13c.3-.76.5-1.63.56-2.9.06-1.28.07-1.69.07-4.95s-.01-3.67-.07-4.95c-.06-1.27-.26-2.14-.56-2.9a5.86 5.86 0 0 0-1.39-2.13A5.86 5.86 0 0 0 19.85.63c-.76-.3-1.63-.5-2.9-.56C15.67.01 15.26 0 12 0z" />
+        <path d="M12 5.84A6.16 6.16 0 0 0 5.84 12 6.16 6.16 0 0 0 12 18.16 6.16 6.16 0 0 0 18.16 12 6.16 6.16 0 0 0 12 5.84zm0 10.16a4 4 0 1 1 0-8 4 4 0 0 1 0 8z" />
+        <circle cx="18.41" cy="5.59" r="1.44" />
+      </>
+    ),
+    Twitter: (
+      <path d="M22.46 6c-.77.35-1.6.58-2.46.69.88-.53 1.56-1.37 1.88-2.38-.83.5-1.75.85-2.72 1.05A4.28 4.28 0 0 0 16 4c-2.35 0-4.27 1.92-4.27 4.29 0 .34.04.67.11.98C8.28 9.09 5.11 7.38 3 4.79c-.37.63-.58 1.37-.58 2.15 0 1.49.75 2.81 1.91 3.56-.71 0-1.37-.2-1.95-.5v.03c0 2.08 1.48 3.82 3.44 4.21a4.22 4.22 0 0 1-1.93.07 4.28 4.28 0 0 0 4 2.98 8.521 8.521 0 0 1-5.33 1.84c-.34 0-.68-.02-1.02-.06A12.06 12.06 0 0 0 8.12 21C16 21 20.33 14.46 20.33 8.79c0-.19 0-.37-.01-.56.84-.6 1.56-1.36 2.14-2.23z" />
+    ),
+  };
   return (
     <a
       href="#"
@@ -886,7 +900,7 @@ function SocialIcon({ label }: { label: string }) {
       className="flex h-9 w-9 items-center justify-center rounded-md bg-green text-lime transition-colors hover:bg-green-mid"
     >
       <svg viewBox="0 0 24 24" className="h-4 w-4" fill="currentColor" aria-hidden>
-        <rect x="4" y="4" width="16" height="16" rx="3" />
+        {icons[label]}
       </svg>
     </a>
   );
