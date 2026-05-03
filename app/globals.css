@@ -1,0 +1,124 @@
+@import "tailwindcss";
+
+:root {
+  --background: #f3e8d3;
+  --foreground: #0c1d12;
+  --cream: #f3e8d3;
+  --cream-soft: #faf2e2;
+  --cream-deep: #ecdcc1;
+  --ink: #0c1d12;
+  --green: #102b1a;
+  --green-deep: #0a1d12;
+  --green-mid: #163a23;
+  --lime: #c8e043;
+  --lime-soft: #dbe97a;
+  --highlight: #d9eb59;
+  --peach: #f7e0c9;
+  --pink: #f0d2db;
+  --mint: #d8eed1;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-cream: var(--cream);
+  --color-cream-soft: var(--cream-soft);
+  --color-cream-deep: var(--cream-deep);
+  --color-ink: var(--ink);
+  --color-green: var(--green);
+  --color-green-deep: var(--green-deep);
+  --color-green-mid: var(--green-mid);
+  --color-lime: var(--lime);
+  --color-lime-soft: var(--lime-soft);
+  --color-highlight: var(--highlight);
+  --color-peach: var(--peach);
+  --color-pink: var(--pink);
+  --color-mint: var(--mint);
+  --font-sans: var(--font-geist-sans);
+  --font-serif: var(--font-instrument-serif);
+  --font-mono: var(--font-geist-mono);
+}
+
+html {
+  scroll-behavior: smooth;
+  background: var(--cream-soft);
+}
+
+body {
+  background: url('/site-bg.png') no-repeat center top;
+  background-size: 100% 100%;
+  background-color: var(--cream-soft);
+  color: var(--ink);
+  font-family: var(--font-geist-sans), system-ui, -apple-system, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+.serif-italic {
+  font-family: var(--font-instrument-serif), Georgia, serif;
+  font-style: italic;
+  font-weight: 400;
+}
+
+/* When the italic phrase is also a highlight (heading accent), make it
+   visibly larger than the surrounding sans-serif text. Keep its own
+   line-height tight so the highlight box stays within the heading's
+   line-height and doesn't collide with neighbouring lines. */
+.serif-italic.highlight-mark {
+  font-size: 1.08em;
+  line-height: 1;
+  letter-spacing: -0.01em;
+}
+
+/* Soft on-load fade for the whole page */
+@keyframes pageFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.page-load {
+  animation: pageFadeIn 900ms ease-out both;
+}
+
+/* IntersectionObserver-driven fade */
+.fade-in-on-scroll {
+  opacity: 0;
+  transform: translateY(14px);
+  transition:
+    opacity 1100ms cubic-bezier(0.22, 1, 0.36, 1),
+    transform 1100ms cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: opacity, transform;
+}
+
+.fade-in-on-scroll.is-visible {
+  opacity: 1;
+  transform: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  .page-load,
+  .fade-in-on-scroll {
+    animation: none;
+    transition: none;
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* Highlight box behind italic word */
+.highlight-mark {
+  background: var(--highlight);
+  padding: 0.04em 0.2em 0.06em;
+  border-radius: 0.18em;
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
+}
