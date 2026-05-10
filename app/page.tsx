@@ -89,7 +89,7 @@ function Hero() {
         <div className="entrance-card-text h-full">
           <div className="relative flex h-full min-h-[460px] flex-col justify-center rounded-[24px] bg-white px-8 py-8 md:px-10 md:py-10 lg:px-12 lg:py-12">
             <div className="mx-auto w-full max-w-[600px]">
-              <h1 className="font-normal leading-[1.28] tracking-[-0.02em] text-ink text-[30px] sm:text-[36px] md:text-[42px] lg:text-[48px] xl:text-[54px]">
+              <h1 className="entrance-heading font-normal leading-[1.28] tracking-[-0.02em] text-ink text-[30px] sm:text-[36px] md:text-[42px] lg:text-[48px] xl:text-[54px]">
                 Effortless
                 <br />
                 <span className="whitespace-nowrap">
@@ -99,14 +99,14 @@ function Hero() {
                 <br />
                 Accurate Results.
               </h1>
-              <p className="mt-5 max-w-[28rem] text-[14px] leading-[1.5] text-ink/70 md:text-[15px]">
+              <p className="entrance-body mt-5 max-w-[28rem] text-[14px] leading-[1.5] text-ink/70 md:text-[15px]">
                 Unlock your business&rsquo;s true value with ease and
                 confidence. Get started with a free, streamlined valuation
                 today.
               </p>
               <form
                 id="waitlist"
-                className="mt-9 flex w-full max-w-[420px] items-stretch rounded-[14px] bg-cream-soft p-1.5"
+                className="entrance-form mt-9 flex w-full max-w-[420px] items-stretch rounded-[14px] bg-cream-soft p-1.5"
               >
                 <input
                   type="email"

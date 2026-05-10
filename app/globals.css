@@ -70,14 +70,14 @@ body {
   letter-spacing: -0.01em;
 }
 
-/* Staged page entrance, sequenced after the loading screen finishes.
-   Loader timeline ends at 3600ms; loader fade-out is 500ms.
-   Nav starts as the loader begins fading; card 1 starts at nav 80%;
-   card 2 starts at card 1's 95%. All shift upward as they fade in. */
+/* Staged page entrance, sequenced after the loading screen finishes
+   (loader timeline ends at 3600ms; loader fade-out is 500ms).
+   Each element overlaps the previous to create a flowing rhythm rather
+   than a strictly serial reveal. All shift gently upward as they fade in. */
 @keyframes entranceUp {
   from {
     opacity: 0;
-    transform: translateY(14px);
+    transform: translateY(16px);
   }
   to {
     opacity: 1;
@@ -87,21 +87,50 @@ body {
 
 .entrance-nav,
 .entrance-card-text,
-.entrance-card-image {
+.entrance-card-image,
+.entrance-heading,
+.entrance-body,
+.entrance-form {
   opacity: 0;
   will-change: opacity, transform;
+  animation-fill-mode: forwards;
+  animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .entrance-nav {
-  animation: entranceUp 700ms cubic-bezier(0.22, 1, 0.36, 1) 3600ms forwards;
+  animation-name: entranceUp;
+  animation-duration: 800ms;
+  animation-delay: 3600ms;
 }
 
 .entrance-card-text {
-  animation: entranceUp 700ms cubic-bezier(0.22, 1, 0.36, 1) 4160ms forwards;
+  animation-name: entranceUp;
+  animation-duration: 800ms;
+  animation-delay: 3700ms;
 }
 
 .entrance-card-image {
-  animation: entranceUp 700ms cubic-bezier(0.22, 1, 0.36, 1) 4825ms forwards;
+  animation-name: entranceUp;
+  animation-duration: 900ms;
+  animation-delay: 3850ms;
+}
+
+.entrance-heading {
+  animation-name: entranceUp;
+  animation-duration: 750ms;
+  animation-delay: 4000ms;
+}
+
+.entrance-body {
+  animation-name: entranceUp;
+  animation-duration: 650ms;
+  animation-delay: 4200ms;
+}
+
+.entrance-form {
+  animation-name: entranceUp;
+  animation-duration: 650ms;
+  animation-delay: 4400ms;
 }
 
 /* IntersectionObserver-driven fade */
@@ -126,7 +155,10 @@ body {
   .fade-in-on-scroll,
   .entrance-nav,
   .entrance-card-text,
-  .entrance-card-image {
+  .entrance-card-image,
+  .entrance-heading,
+  .entrance-body,
+  .entrance-form {
     animation: none;
     transition: none;
     opacity: 1;
