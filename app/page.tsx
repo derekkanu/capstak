@@ -26,40 +26,29 @@ function Logo({
   tone?: "ink" | "white";
   size?: number;
 }) {
-  const text = tone === "white" ? "text-white" : "text-ink";
+  const aspect = 1078 / 356;
   return (
-    <div className={`flex items-center gap-2 ${className}`}>
-      <span
-        className={`font-bold leading-none tracking-[-0.025em] ${text}`}
-        style={{ fontSize: `${size}px` }}
-      >
-        Capstack
-      </span>
-      <svg
-        viewBox="0 0 16 16"
-        className="-translate-y-[1px]"
-        style={{ width: size * 0.55, height: size * 0.55 }}
-        aria-hidden
-      >
-        <path
-          d="M12 4 L4 12 M4 6 L4 12 L10 12"
-          stroke="var(--lime)"
-          strokeWidth="2.6"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          fill="none"
-        />
-      </svg>
+    <div className={`flex items-center ${className}`}>
+      <img
+        src="/logo-capstack.png"
+        alt="Capstack"
+        draggable={false}
+        style={{
+          height: `${size}px`,
+          width: `${size * aspect}px`,
+          filter: tone === "white" ? "brightness(0) invert(1)" : undefined,
+        }}
+      />
     </div>
   );
 }
 
 function Header() {
   return (
-    <header className="w-full px-6 pt-5">
+    <header className="entrance-nav w-full px-6 pt-5">
       <div className="mx-auto flex max-w-[1400px] items-center justify-between rounded-[20px] bg-white px-7 py-3 md:px-9 md:py-4">
         <a href="#" aria-label="Capstack home" className="flex items-center">
-          <Logo size={24} />
+          <Logo size={54} />
         </a>
         <nav className="hidden items-center gap-10 text-[14px] text-ink/85 md:flex">
           <a href="#how" className="transition-colors hover:text-ink">
@@ -97,7 +86,7 @@ function Hero() {
       <div
         className="mx-auto grid max-w-[1400px] grid-cols-1 gap-5 md:h-[calc(100svh-130px)] md:min-h-[520px] md:grid-cols-2"
       >
-        <FadeIn className="h-full">
+        <div className="entrance-card-text h-full">
           <div className="relative flex h-full min-h-[460px] flex-col justify-center rounded-[24px] bg-white px-8 py-8 md:px-10 md:py-10 lg:px-12 lg:py-12">
             <div className="mx-auto w-full max-w-[600px]">
               <h1 className="font-normal leading-[1.28] tracking-[-0.02em] text-ink text-[30px] sm:text-[36px] md:text-[42px] lg:text-[48px] xl:text-[54px]">
@@ -134,11 +123,11 @@ function Hero() {
               </form>
             </div>
           </div>
-        </FadeIn>
+        </div>
 
-        <FadeIn delay={120} className="h-full">
+        <div className="entrance-card-image h-full">
           <HeroVisual />
-        </FadeIn>
+        </div>
       </div>
     </section>
   );
@@ -945,7 +934,7 @@ function Footer() {
         className="pointer-events-none absolute -bottom-12 left-0 right-0 select-none text-center font-semibold leading-none tracking-tight text-white/[0.04]"
         style={{ fontSize: "min(28vw, 320px)" }}
       >
-        Capstak
+        Capstack
       </div>
     </footer>
   );
