@@ -1,4 +1,5 @@
 import FadeIn from "./components/FadeIn";
+import WaitlistForm from "./components/WaitlistForm";
 
 export default function Home() {
   return (
@@ -26,17 +27,18 @@ function Logo({
   tone?: "ink" | "white";
   size?: number;
 }) {
-  const aspect = 1078 / 356;
+  const src =
+    tone === "white" ? "/logo-capstack-cream.png" : "/logo-capstack.png";
+  const aspect = tone === "white" ? 1694 / 516 : 1078 / 356;
   return (
     <div className={`flex items-center ${className}`}>
       <img
-        src="/logo-capstack.png"
+        src={src}
         alt="Capstack"
         draggable={false}
         style={{
           height: `${size}px`,
           width: `${size * aspect}px`,
-          filter: tone === "white" ? "brightness(0) invert(1)" : undefined,
         }}
       />
     </div>
@@ -104,23 +106,10 @@ function Hero() {
                 confidence. Get started with a free, streamlined valuation
                 today.
               </p>
-              <form
+              <WaitlistForm
                 id="waitlist"
-                className="entrance-form mt-9 flex w-full max-w-[420px] items-stretch rounded-[14px] bg-cream-soft p-1.5"
-              >
-                <input
-                  type="email"
-                  placeholder="Enter your email..."
-                  aria-label="Email address"
-                  className="flex-1 bg-transparent px-4 py-3 text-[14px] text-ink placeholder:text-[#9c9c9c] focus:outline-none"
-                />
-                <button
-                  type="submit"
-                  className="rounded-[10px] bg-cream px-5 py-3 text-[14px] font-medium text-ink transition-colors hover:bg-cream-deep"
-                >
-                  Get Notified
-                </button>
-              </form>
+                className="entrance-form mt-9 max-w-[420px]"
+              />
             </div>
           </div>
         </div>
@@ -817,20 +806,7 @@ function CTASection() {
               Be the first to know when we go live. Sign up now to receive
               updates and stay ahead with accurate, easy valuations.
             </p>
-            <form className="mt-10 flex w-full max-w-md items-stretch rounded-[14px] bg-cream-soft p-1.5">
-              <input
-                type="email"
-                placeholder="Enter your email..."
-                aria-label="Email address"
-                className="flex-1 bg-transparent px-4 py-3 text-[14px] text-ink placeholder:text-[#9c9c9c] focus:outline-none"
-              />
-              <button
-                type="submit"
-                className="rounded-[10px] bg-cream px-5 py-3 text-[14px] font-medium text-ink transition-colors hover:bg-cream-deep"
-              >
-                Get Notified
-              </button>
-            </form>
+            <WaitlistForm className="mt-10 max-w-md" />
             <div className="mt-10 flex items-center gap-3">
               <SocialIcon label="LinkedIn" />
               <SocialIcon label="Instagram" />
@@ -908,7 +884,7 @@ function Footer() {
     >
       <div className="relative z-10 mx-auto grid max-w-6xl grid-cols-1 gap-10 md:grid-cols-3">
         <div>
-          <Logo tone="white" />
+          <Logo tone="white" size={42} />
         </div>
         <div className="flex flex-col gap-3 text-[14px]">
           <span className="mb-1 text-white/55">Links</span>
