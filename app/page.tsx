@@ -1,5 +1,6 @@
 import FadeIn from "./components/FadeIn";
 import WaitlistForm from "./components/WaitlistForm";
+import DemoLauncher from "./components/DemoLauncher";
 
 export default function Home() {
   return (
@@ -62,19 +63,9 @@ function Header() {
           <a href="#contact" className="transition-colors hover:text-ink">
             Contact
           </a>
-          <a
-            href="#waitlist"
-            className="rounded-[10px] bg-green px-5 py-2.5 text-[14px] font-medium text-lime transition-transform hover:scale-[1.02]"
-          >
-            Join the waitlist
-          </a>
+          <DemoLauncher variant="nav" />
         </nav>
-        <a
-          href="#waitlist"
-          className="rounded-[10px] bg-green px-4 py-2 text-[13px] font-medium text-lime md:hidden"
-        >
-          Join
-        </a>
+        <DemoLauncher variant="compact" className="md:hidden" />
       </div>
     </header>
   );
