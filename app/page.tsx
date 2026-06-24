@@ -142,21 +142,23 @@ function HeroArrowBadge() {
 }
 
 function HeroDevice() {
+  // Placeholder for a fullscreen 4K (16:9) product video. The phone mockup is
+  // temporary art — swap this card's contents for the <video> when ready.
   return (
     <div
-      className="relative flex items-center justify-center overflow-hidden rounded-[20px] md:rounded-[24px]"
+      className="relative aspect-[16/9] w-full overflow-hidden rounded-[20px] md:rounded-[24px]"
       style={{
         background:
           "radial-gradient(120% 120% at 30% 0%, #ded6cd 0%, #cdc1b4 55%, #bdb0a2 100%)",
       }}
     >
-      <div className="flex min-h-[280px] w-full items-center justify-center py-12 md:min-h-[440px]">
+      <div className="absolute inset-0 flex items-center justify-center">
         <div className="relative" style={{ transform: "rotate(-22deg)" }}>
           <div
             aria-hidden
             className="absolute inset-x-[-30px] bottom-3 h-10 rounded-full bg-black/25 blur-2xl"
           />
-          <div className="relative h-[300px] w-[150px] rounded-[30px] bg-[#1b1b1d] p-[7px] shadow-[0_45px_70px_-25px_rgba(0,0,0,0.55)] md:h-[360px] md:w-[178px]">
+          <div className="relative h-[300px] w-[150px] rounded-[30px] bg-[#1b1b1d] p-[7px] shadow-[0_45px_70px_-25px_rgba(0,0,0,0.55)] md:h-[400px] md:w-[198px] lg:h-[460px] lg:w-[228px]">
             <div className="relative h-full w-full overflow-hidden rounded-[24px] bg-white">
               <span className="absolute left-1/2 top-2 h-1.5 w-12 -translate-x-1/2 rounded-full bg-[#1b1b1d]" />
             </div>
