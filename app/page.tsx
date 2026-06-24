@@ -519,19 +519,59 @@ function PillIcon({ name }: { name: PillIconName }) {
 
 function About() {
   return (
-    <section
-      id="about"
-      className="px-4 py-6 md:px-6 md:py-8"
-    >
+    <section id="about" className="px-4 py-6 md:px-6 md:py-8">
       <FadeIn className="mx-auto max-w-[1400px]">
-        <img
-          src="/about-visual.png"
-          alt="About Capstak — our mission to make business valuation simple, transparent, and accessible"
-          className="block h-auto w-full rounded-[28px] md:rounded-[32px]"
-          draggable={false}
-        />
+        <div
+          className="rounded-[28px] px-6 py-12 md:rounded-[32px] md:px-12 md:py-16 lg:px-16 lg:py-20"
+          style={{ background: "#34c759" }}
+        >
+          <h2 className="text-[30px] font-medium tracking-[-0.01em] text-green md:text-[40px] lg:text-[44px]">
+            About Capstack.
+          </h2>
+          <div className="mt-12 grid grid-cols-1 items-center gap-10 md:mt-16 md:grid-cols-2 md:gap-14">
+            <div className="flex justify-center">
+              <ReceiptIcon />
+            </div>
+            <div className="max-w-[480px] space-y-5 text-[14px] leading-[1.65] text-green/90 md:text-[15px]">
+              <p>
+                In the world of entrepreneurship and investment, understanding
+                your business&rsquo;s true value is crucial. Yet, the current
+                valuation processes can be cumbersome, complex, and intimidating
+                for business owners, investors, and brokers alike.
+              </p>
+              <p>
+                At Capstack, we&rsquo;re on a mission to transform this
+                experience. We believe that getting a business valuation should
+                be straightforward, transparent, and accessible to everyone. Our
+                platform is designed to simplify the process, ensuring accuracy
+                and ease, and making it the go-to destination for all your
+                valuation needs. With Capstack, you can confidently navigate the
+                complexities of business valuation and focus on what truly
+                matters: growing your business.
+              </p>
+            </div>
+          </div>
+        </div>
       </FadeIn>
     </section>
+  );
+}
+
+function ReceiptIcon() {
+  return (
+    <svg
+      viewBox="0 0 200 240"
+      className="h-[190px] w-auto md:h-[240px]"
+      role="img"
+      aria-label="Capstack valuation receipt"
+    >
+      <path
+        d="M55 65 Q70 48 85 65 Q100 48 115 65 Q130 48 145 65 L145 185 Q130 202 115 185 Q100 202 85 185 Q70 202 55 185 Z"
+        fill="var(--green)"
+      />
+      <rect x="72" y="110" width="56" height="15" rx="7.5" fill="#34c759" />
+      <rect x="72" y="138" width="56" height="15" rx="7.5" fill="#34c759" />
+    </svg>
   );
 }
 
