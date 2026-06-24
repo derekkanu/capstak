@@ -113,7 +113,7 @@ export default function AboutScroller() {
                   // gradually with scroll position.
                   opacity: on ? 1 : 0,
                   transform: on ? "translateY(0)" : "translateY(14px)",
-                  transition: "opacity 360ms ease, transform 360ms ease",
+                  transition: "opacity 650ms ease, transform 650ms ease",
                   pointerEvents: on ? "auto" : "none",
                   willChange: "opacity, transform",
                 }}
