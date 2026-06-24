@@ -100,8 +100,12 @@ export default function AboutScroller() {
         >
           {PANELS.map((p, i) => {
             const d = progress - i;
-            const opacity = Math.max(0, 1 - Math.abs(d));
-            const translate = Math.max(-1, Math.min(1, d)) * -36;
+            // Each panel is only visible within |d| < 0.5, so the outgoing
+            // panel fades fully to 0 before the incoming one appears — a clean
+            // sequential fade rather than an overlapping crossfade.
+            const t = Math.max(0, 1 - Math.abs(d) / 0.5);
+            const opacity = t * t * (3 - 2 * t); // smoothstep for soft easing
+            const translate = -Math.sign(d) * (1 - opacity) * 10;
             const active = Math.round(progress) === i;
             return (
               <div
