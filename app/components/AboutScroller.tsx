@@ -33,7 +33,7 @@ const PANELS: { title: string; Icon: () => React.ReactElement }[] = [
 
 export default function AboutScroller() {
   const wrapRef = useRef<HTMLDivElement>(null);
-  const [progress, setProgress] = useState(0); // 0 .. PANELS.length - 1
+  const [active, setActive] = useState(0); // index of the visible panel
   const [reduced, setReduced] = useState(false);
 
   useEffect(() => {
@@ -52,7 +52,9 @@ export default function AboutScroller() {
       const travel = el.offsetHeight - window.innerHeight;
       const scrolled = Math.min(Math.max(-rect.top, 0), Math.max(travel, 1));
       const p = travel > 0 ? scrolled / travel : 0;
-      setProgress(p * (PANELS.length - 1));
+      // Discrete bands: scroll crosses a boundary -> snap to the next panel.
+      const idx = Math.min(PANELS.length - 1, Math.max(0, Math.floor(p * PANELS.length)));
+      setActive((prev) => (prev === idx ? prev : idx));
     };
     const onScroll = () => {
       if (!raf) raf = requestAnimationFrame(update);
@@ -99,23 +101,20 @@ export default function AboutScroller() {
           style={{ background: CARD_GREEN }}
         >
           {PANELS.map((p, i) => {
-            const d = progress - i;
-            // Each panel is only visible within |d| < 0.5, so the outgoing
-            // panel fades fully to 0 before the incoming one appears — a clean
-            // sequential fade rather than an overlapping crossfade.
-            const t = Math.max(0, 1 - Math.abs(d) / 0.5);
-            const opacity = t * t * (3 - 2 * t); // smoothstep for soft easing
-            const translate = -Math.sign(d) * (1 - opacity) * 10;
-            const active = Math.round(progress) === i;
+            const on = i === active;
             return (
               <div
                 key={p.title}
-                aria-hidden={!active}
+                aria-hidden={!on}
                 className="absolute inset-0"
                 style={{
-                  opacity,
-                  transform: `translateY(${translate}px)`,
-                  pointerEvents: active ? "auto" : "none",
+                  // Snap-switch: the active panel animates 0 -> 100% quickly
+                  // when scroll crosses into its band, instead of fading
+                  // gradually with scroll position.
+                  opacity: on ? 1 : 0,
+                  transform: on ? "translateY(0)" : "translateY(14px)",
+                  transition: "opacity 360ms ease, transform 360ms ease",
+                  pointerEvents: on ? "auto" : "none",
                   willChange: "opacity, transform",
                 }}
               >
