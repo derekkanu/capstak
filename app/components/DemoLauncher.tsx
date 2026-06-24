@@ -20,7 +20,7 @@ export default function DemoLauncher({ variant = "nav", className = "" }: Props)
   return (
     <>
       <button type="button" onClick={() => setOpen(true)} className={`${base} ${sizing} ${className}`}>
-        Try our Demo
+        Try a Demo
       </button>
       <DemoModal open={open} onClose={() => setOpen(false)} />
     </>

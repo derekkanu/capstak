@@ -119,10 +119,10 @@ export default function DemoModal({ open, onClose }: Props) {
           <ValuationReport input={report.input} result={report.result} onRestart={reset} />
         </div>
       ) : (
-        <div className="grid flex-1 grid-cols-1 overflow-hidden md:grid-cols-[minmax(320px,2fr)_3fr]">
+        <div className="flex min-h-0 flex-1 flex-col overflow-hidden md:grid md:grid-cols-[minmax(320px,2fr)_3fr]">
           <InfoPanel />
           {/* Chat */}
-          <div className="flex min-h-0 flex-col bg-cream-soft">
+          <div className="flex min-h-0 flex-1 flex-col bg-cream-soft">
             <div ref={scrollRef} className="flex-1 space-y-4 overflow-y-auto px-5 py-6 md:px-8">
               {messages.map((m, i) => (
                 <Bubble key={i} role={m.role} text={m.content} />
@@ -138,7 +138,7 @@ export default function DemoModal({ open, onClose }: Props) {
                   onKeyDown={onKeyDown}
                   rows={1}
                   placeholder="Type your answer…"
-                  className="max-h-32 flex-1 resize-none bg-transparent px-3 py-2.5 text-[14px] text-ink placeholder:text-ink/40 focus:outline-none"
+                  className="max-h-32 flex-1 resize-none bg-transparent px-3 py-2.5 text-[16px] text-ink placeholder:text-ink/40 focus:outline-none md:text-[14px]"
                 />
                 <button
                   type="button"
@@ -164,7 +164,7 @@ export default function DemoModal({ open, onClose }: Props) {
 
 function InfoPanel() {
   return (
-    <div className="hidden flex-col justify-center overflow-y-auto border-r border-ink/10 px-8 py-10 md:flex lg:px-12"
+    <div className="flex max-h-[40vh] shrink-0 flex-col justify-center overflow-y-auto border-b border-ink/10 px-5 py-5 md:max-h-none md:shrink md:border-b-0 md:border-r md:px-8 md:py-10 lg:px-12"
       style={{
         background: [
           "radial-gradient(70% 60% at 15% 10%, rgba(200, 224, 67, 0.18), transparent 60%)",
@@ -173,21 +173,21 @@ function InfoPanel() {
         ].join(", "),
       }}
     >
-      <div className="max-w-[420px]">
+      <div className="mx-auto w-full max-w-[420px]">
         <span className="inline-flex items-center gap-2 rounded-full bg-green/8 px-3 py-1 text-[12px] font-medium text-green">
           <SparkIcon /> No expertise required
         </span>
-        <h2 className="mt-5 text-[28px] font-normal leading-[1.2] tracking-[-0.01em] text-ink lg:text-[32px]">
+        <h2 className="mt-4 text-[22px] font-normal leading-[1.2] tracking-[-0.01em] text-ink md:mt-5 md:text-[28px] lg:text-[32px]">
           You don&rsquo;t need to be a{" "}
           <span className="serif-italic highlight-mark">finance pro.</span>
         </h2>
-        <p className="mt-4 text-[14px] leading-relaxed text-ink/65">
+        <p className="mt-3 text-[13px] leading-relaxed text-ink/65 md:mt-4 md:text-[14px]">
           Just answer in plain words, the way you&rsquo;d describe your business
           to a friend. Stuck on a question? Ask the assistant to explain — that
           &rsquo;s what it&rsquo;s here for.
         </p>
 
-        <ul className="mt-8 space-y-4">
+        <ul className="mt-6 hidden space-y-4 sm:block md:mt-8">
           <InfoPoint title="Ask anything, anytime">
             If a question doesn&rsquo;t make sense, just ask. The assistant will
             explain it simply and pick up where you left off.

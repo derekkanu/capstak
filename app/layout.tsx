@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Geist, Instrument_Serif } from "next/font/google";
 import "./globals.css";
 import LoadingScreen from "./components/LoadingScreen";
@@ -19,6 +19,14 @@ export const metadata: Metadata = {
   title: "Capstak — Effortless Business Valuations",
   description:
     "Unlock your business's true value with ease and confidence. A free, streamlined valuation today.",
+};
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
+  viewportFit: "cover",
 };
 
 export default function RootLayout({
