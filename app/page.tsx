@@ -519,16 +519,16 @@ function PillIcon({ name }: { name: PillIconName }) {
 
 function About() {
   return (
-    <section id="about" className="px-4 py-6 md:px-6 md:py-8">
+    <section id="about" className="px-4 py-4 md:px-6">
       <FadeIn className="mx-auto max-w-[1400px]">
         <div
-          className="rounded-[28px] px-6 py-12 md:rounded-[32px] md:px-12 md:py-16 lg:px-16 lg:py-20"
+          className="flex min-h-[calc(100svh-2rem)] flex-col rounded-[28px] px-6 py-12 md:rounded-[32px] md:px-12 md:py-16 lg:px-16"
           style={{ background: "#34c759" }}
         >
           <h2 className="text-[30px] font-medium tracking-[-0.01em] text-green md:text-[40px] lg:text-[44px]">
             About Capstack.
           </h2>
-          <div className="mt-12 grid grid-cols-1 items-center gap-10 md:mt-16 md:grid-cols-2 md:gap-14">
+          <div className="grid flex-1 grid-cols-1 items-center gap-10 py-10 md:grid-cols-2 md:gap-14">
             <div className="flex justify-center">
               <ReceiptIcon />
             </div>
@@ -561,16 +561,18 @@ function ReceiptIcon() {
   return (
     <svg
       viewBox="0 0 200 240"
-      className="h-[190px] w-auto md:h-[240px]"
+      className="h-[220px] w-auto md:h-[300px]"
       role="img"
       aria-label="Capstack valuation receipt"
     >
+      {/* receipt: straight sides, scalloped top and bottom edges */}
       <path
-        d="M55 65 Q70 48 85 65 Q100 48 115 65 Q130 48 145 65 L145 185 Q130 202 115 185 Q100 202 85 185 Q70 202 55 185 Z"
+        d="M52 50 Q76 74 100 50 Q124 74 148 50 L148 190 Q124 166 100 190 Q76 166 52 190 Z"
         fill="var(--green)"
       />
-      <rect x="72" y="110" width="56" height="15" rx="7.5" fill="#34c759" />
-      <rect x="72" y="138" width="56" height="15" rx="7.5" fill="#34c759" />
+      {/* bold equals mark */}
+      <rect x="70" y="103" width="60" height="17" rx="8.5" fill="#34c759" />
+      <rect x="70" y="132" width="60" height="17" rx="8.5" fill="#34c759" />
     </svg>
   );
 }
