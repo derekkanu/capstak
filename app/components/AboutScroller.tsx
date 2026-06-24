@@ -155,97 +155,20 @@ function PanelContent({
 
 /* ---------------- Icons ---------------- */
 
-const ICON_CLASS = "h-[200px] w-auto md:h-[280px]";
+const ICON_CLASS = "h-[180px] w-auto md:h-[240px]";
 
 function ReceiptIcon() {
-  return (
-    <svg viewBox="0 0 200 240" className={ICON_CLASS} role="img" aria-label="Receipt">
-      <path
-        d="M52 50 Q76 74 100 50 Q124 74 148 50 L148 190 Q124 166 100 190 Q76 166 52 190 Z"
-        fill="var(--green)"
-      />
-      <rect x="70" y="103" width="60" height="17" rx="8.5" fill={CARD_GREEN} />
-      <rect x="70" y="132" width="60" height="17" rx="8.5" fill={CARD_GREEN} />
-    </svg>
-  );
+  return <img src="/about-receipt.png" alt="" draggable={false} className={ICON_CLASS} />;
 }
 
 function CollectIcon() {
-  return (
-    <svg viewBox="0 0 200 240" className={ICON_CLASS} role="img" aria-label="Add data">
-      {/* handle loop, top-right */}
-      <path
-        d="M150 70 h6 a22 22 0 0 1 22 22 v6 a22 22 0 0 1 -22 22 h-6"
-        fill="none"
-        stroke="var(--green)"
-        strokeWidth="20"
-      />
-      {/* note body with scalloped bottom */}
-      <path
-        d="M46 66 Q46 50 62 50 L138 50 Q154 50 154 66 L154 190 Q130 166 108 190 Q86 166 64 190 Q46 174 46 174 Z"
-        fill="var(--green)"
-      />
-      {/* plus */}
-      <rect x="92" y="92" width="16" height="56" rx="8" fill={CARD_GREEN} />
-      <rect x="72" y="112" width="56" height="16" rx="8" fill={CARD_GREEN} />
-    </svg>
-  );
+  return <img src="/about-collect.png" alt="" draggable={false} className={ICON_CLASS} />;
 }
 
 function RobotIcon() {
-  return (
-    <svg viewBox="0 0 200 240" className={ICON_CLASS} role="img" aria-label="AI robot">
-      {/* antenna */}
-      <rect x="96" y="40" width="8" height="20" rx="4" fill="var(--green)" />
-      <circle cx="100" cy="38" r="9" fill="var(--green)" />
-      {/* ears */}
-      <rect x="40" y="118" width="16" height="42" rx="8" fill="var(--green)" />
-      <rect x="144" y="118" width="16" height="42" rx="8" fill="var(--green)" />
-      {/* head */}
-      <rect x="54" y="62" width="92" height="92" rx="28" fill="var(--green)" />
-      {/* eyes */}
-      <circle cx="80" cy="102" r="9" fill={CARD_GREEN} />
-      <circle cx="120" cy="102" r="9" fill={CARD_GREEN} />
-      {/* smile */}
-      <path
-        d="M78 122 Q100 140 122 122"
-        fill="none"
-        stroke={CARD_GREEN}
-        strokeWidth="9"
-        strokeLinecap="round"
-      />
-      {/* speech tail */}
-      <path d="M64 154 L64 178 L88 154 Z" fill="var(--green)" />
-    </svg>
-  );
+  return <img src="/about-robot.png" alt="" draggable={false} className={ICON_CLASS} />;
 }
 
 function ChartIcon() {
-  return (
-    <svg viewBox="0 0 200 240" className={ICON_CLASS} role="img" aria-label="Report chart">
-      {/* rounded app tile */}
-      <rect x="40" y="60" width="120" height="120" rx="30" fill="var(--green)" />
-      {/* bars */}
-      <rect x="60" y="128" width="15" height="30" rx="4" fill={CARD_GREEN} />
-      <rect x="92" y="112" width="15" height="46" rx="4" fill={CARD_GREEN} />
-      <rect x="124" y="92" width="15" height="66" rx="4" fill={CARD_GREEN} />
-      {/* trend arrow */}
-      <path
-        d="M60 116 L96 96 L132 80"
-        fill="none"
-        stroke={CARD_GREEN}
-        strokeWidth="8"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-      <path
-        d="M114 80 L132 80 L132 98"
-        fill="none"
-        stroke={CARD_GREEN}
-        strokeWidth="8"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </svg>
-  );
+  return <img src="/about-chart.png" alt="" draggable={false} className={ICON_CLASS} />;
 }

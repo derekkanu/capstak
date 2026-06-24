@@ -79,8 +79,8 @@ function Hero() {
     <section className="px-4 pb-5 pt-5 md:px-6">
       <div className="entrance-card-text mx-auto max-w-[1400px] rounded-[24px] bg-white px-6 py-8 md:px-10 md:py-10 lg:px-12 lg:py-12">
         <div className="grid grid-cols-1 items-center gap-8 md:grid-cols-[minmax(0,1fr)_auto] md:gap-10">
-          <div className="w-full max-w-[640px]">
-            <h1 className="entrance-heading font-normal leading-[1.18] tracking-[-0.02em] text-ink text-[34px] sm:text-[42px] md:text-[48px] lg:text-[56px] xl:text-[62px]">
+          <div className="w-full max-w-[860px]">
+            <h1 className="entrance-heading font-normal leading-[1.14] tracking-[-0.02em] text-ink text-[32px] sm:text-[40px] md:text-[46px] lg:text-[54px] xl:text-[60px]">
               Effortless <span className="serif-italic">Valuations,</span>
               <br />
               Business Accurate Results.
@@ -109,63 +109,26 @@ function Hero() {
 }
 
 function HeroArrowBadge() {
-  const points = 14;
-  const inner = 80;
-  const outer = 99;
-  const c = 100;
-  const scallop = Array.from({ length: points * 2 }, (_, i) => {
-    const angle = (i / (points * 2)) * Math.PI * 2;
-    const r = i % 2 === 0 ? outer : inner;
-    const x = c + Math.cos(angle) * r;
-    const y = c + Math.sin(angle) * r;
-    return `${i === 0 ? "M" : "L"} ${x.toFixed(2)} ${y.toFixed(2)}`;
-  }).join(" ");
   return (
-    <svg
-      viewBox="0 0 200 200"
+    <img
+      src="/hero-badge.png"
+      alt="Capstack mark"
+      draggable={false}
       className="h-[170px] w-[170px] md:h-[230px] md:w-[230px] lg:h-[260px] lg:w-[260px]"
-      role="img"
-      aria-label="Capstack mark"
-    >
-      <path d={`${scallop} Z`} fill="var(--lime)" />
-      <g
-        stroke="var(--green)"
-        strokeWidth="22"
-        strokeLinecap="square"
-        strokeLinejoin="miter"
-        fill="none"
-      >
-        <path d="M126 126 L82 82" />
-        <path d="M82 116 L82 82 L116 82" />
-      </g>
-    </svg>
+    />
   );
 }
 
 function HeroDevice() {
-  // Placeholder for a fullscreen 4K (16:9) product video. The phone mockup is
-  // temporary art — swap this card's contents for the <video> when ready.
+  // Placeholder image for the fullscreen 4K (16:9) product video to come.
   return (
-    <div
-      className="relative aspect-[16/9] w-full overflow-hidden rounded-[20px] md:rounded-[24px]"
-      style={{
-        background:
-          "radial-gradient(120% 120% at 30% 0%, #ded6cd 0%, #cdc1b4 55%, #bdb0a2 100%)",
-      }}
-    >
-      <div className="absolute inset-0 flex items-center justify-center">
-        <div className="relative" style={{ transform: "rotate(-22deg)" }}>
-          <div
-            aria-hidden
-            className="absolute inset-x-[-30px] bottom-3 h-10 rounded-full bg-black/25 blur-2xl"
-          />
-          <div className="relative h-[300px] w-[150px] rounded-[30px] bg-[#1b1b1d] p-[7px] shadow-[0_45px_70px_-25px_rgba(0,0,0,0.55)] md:h-[400px] md:w-[198px] lg:h-[460px] lg:w-[228px]">
-            <div className="relative h-full w-full overflow-hidden rounded-[24px] bg-white">
-              <span className="absolute left-1/2 top-2 h-1.5 w-12 -translate-x-1/2 rounded-full bg-[#1b1b1d]" />
-            </div>
-          </div>
-        </div>
-      </div>
+    <div className="relative aspect-[16/9] w-full overflow-hidden rounded-[20px] md:rounded-[24px]">
+      <img
+        src="/hero-video.png"
+        alt="Capstack product preview"
+        draggable={false}
+        className="absolute inset-0 block h-full w-full object-cover object-center"
+      />
     </div>
   );
 }
