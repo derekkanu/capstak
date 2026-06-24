@@ -7,8 +7,8 @@ export default function Home() {
     <main className="flex flex-col text-ink">
       <Header />
       <Hero />
-      <Pricing />
       <About />
+      <Pricing />
       <WhyMatters />
       <StandardBanner />
       <CTASection />
@@ -75,53 +75,94 @@ function Header() {
 
 function Hero() {
   return (
-    <section className="px-6 pb-5 pt-5">
-      <div
-        className="mx-auto grid max-w-[1400px] grid-cols-1 gap-5 md:h-[calc(100svh-130px)] md:min-h-[520px] md:grid-cols-2"
-      >
-        <div className="entrance-card-text h-full">
-          <div className="relative flex h-full min-h-[460px] flex-col justify-center rounded-[24px] bg-white px-8 py-8 md:px-10 md:py-10 lg:px-12 lg:py-12">
-            <div className="mx-auto w-full max-w-[600px]">
-              <h1 className="entrance-heading font-normal leading-[1.28] tracking-[-0.02em] text-ink text-[30px] sm:text-[36px] md:text-[42px] lg:text-[48px] xl:text-[54px]">
-                Effortless
-                <br />
-                <span className="whitespace-nowrap">
-                  Business{" "}
-                  <span className="serif-italic highlight-mark">Valuations,</span>
-                </span>
-                <br />
-                Accurate Results.
-              </h1>
-              <p className="entrance-body mt-5 max-w-[28rem] text-[14px] leading-[1.5] text-ink/70 md:text-[15px]">
-                Unlock your business&rsquo;s true value with ease and
-                confidence. Get started with a free, streamlined valuation
-                today.
-              </p>
-              <WaitlistForm
-                id="waitlist"
-                className="entrance-form mt-9 max-w-[420px]"
-              />
-            </div>
+    <section className="px-4 pb-5 pt-5 md:px-6">
+      <div className="entrance-card-text mx-auto max-w-[1400px] rounded-[24px] bg-white px-6 py-8 md:px-10 md:py-10 lg:px-12 lg:py-12">
+        <div className="grid grid-cols-1 items-center gap-8 md:grid-cols-[minmax(0,1fr)_auto] md:gap-10">
+          <div className="w-full max-w-[640px]">
+            <h1 className="entrance-heading font-normal leading-[1.18] tracking-[-0.02em] text-ink text-[34px] sm:text-[42px] md:text-[48px] lg:text-[56px] xl:text-[62px]">
+              Effortless <span className="serif-italic">Valuations,</span>
+              <br />
+              Business Accurate Results.
+            </h1>
+            <p className="entrance-body mt-5 max-w-[30rem] text-[14px] leading-[1.5] text-ink/70 md:text-[15px]">
+              Unlock your business&rsquo;s true value with ease and confidence.
+              Get started with a free, streamlined valuation today.
+            </p>
+            <WaitlistForm
+              id="waitlist"
+              className="entrance-form mt-8 max-w-[460px]"
+            />
+          </div>
+
+          <div className="flex justify-center md:justify-end md:pr-4 lg:pr-10">
+            <HeroArrowBadge />
           </div>
         </div>
 
-        <div className="entrance-card-image h-full">
-          <HeroVisual />
+        <div className="entrance-card-image mt-8 md:mt-10">
+          <HeroDevice />
         </div>
       </div>
     </section>
   );
 }
 
-function HeroVisual() {
+function HeroArrowBadge() {
+  const points = 14;
+  const inner = 80;
+  const outer = 99;
+  const c = 100;
+  const scallop = Array.from({ length: points * 2 }, (_, i) => {
+    const angle = (i / (points * 2)) * Math.PI * 2;
+    const r = i % 2 === 0 ? outer : inner;
+    const x = c + Math.cos(angle) * r;
+    const y = c + Math.sin(angle) * r;
+    return `${i === 0 ? "M" : "L"} ${x.toFixed(2)} ${y.toFixed(2)}`;
+  }).join(" ");
   return (
-    <div className="relative h-full min-h-[460px] overflow-hidden rounded-[24px] bg-green">
-      <img
-        src="/hero-visual.png"
-        alt="Capstack folder with DrinkSanCo valuation report"
-        className="absolute inset-0 block h-full w-full object-cover object-center"
-        draggable={false}
-      />
+    <svg
+      viewBox="0 0 200 200"
+      className="h-[170px] w-[170px] md:h-[230px] md:w-[230px] lg:h-[260px] lg:w-[260px]"
+      role="img"
+      aria-label="Capstack mark"
+    >
+      <path d={`${scallop} Z`} fill="var(--lime)" />
+      <g
+        stroke="var(--green)"
+        strokeWidth="22"
+        strokeLinecap="square"
+        strokeLinejoin="miter"
+        fill="none"
+      >
+        <path d="M126 126 L82 82" />
+        <path d="M82 116 L82 82 L116 82" />
+      </g>
+    </svg>
+  );
+}
+
+function HeroDevice() {
+  return (
+    <div
+      className="relative flex items-center justify-center overflow-hidden rounded-[20px] md:rounded-[24px]"
+      style={{
+        background:
+          "radial-gradient(120% 120% at 30% 0%, #ded6cd 0%, #cdc1b4 55%, #bdb0a2 100%)",
+      }}
+    >
+      <div className="flex min-h-[280px] w-full items-center justify-center py-12 md:min-h-[440px]">
+        <div className="relative" style={{ transform: "rotate(-22deg)" }}>
+          <div
+            aria-hidden
+            className="absolute inset-x-[-30px] bottom-3 h-10 rounded-full bg-black/25 blur-2xl"
+          />
+          <div className="relative h-[300px] w-[150px] rounded-[30px] bg-[#1b1b1d] p-[7px] shadow-[0_45px_70px_-25px_rgba(0,0,0,0.55)] md:h-[360px] md:w-[178px]">
+            <div className="relative h-full w-full overflow-hidden rounded-[24px] bg-white">
+              <span className="absolute left-1/2 top-2 h-1.5 w-12 -translate-x-1/2 rounded-full bg-[#1b1b1d]" />
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
