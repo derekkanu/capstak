@@ -120,13 +120,17 @@ function HeroArrowBadge() {
 }
 
 function HeroDevice() {
-  // Placeholder image for the fullscreen 4K (16:9) product video to come.
   return (
     <div className="relative aspect-[4/6] w-full overflow-hidden rounded-[20px] md:aspect-[16/9] md:rounded-[24px]">
-      <img
-        src="/hero-video.png"
-        alt="Capstack product preview"
-        draggable={false}
+      <video
+        src="/hero.mp4"
+        poster="/hero-video.png"
+        autoPlay
+        muted
+        loop
+        playsInline
+        preload="metadata"
+        aria-label="Capstack product preview"
         className="absolute inset-0 block h-full w-full object-cover object-center"
       />
     </div>
