@@ -138,18 +138,19 @@ export default function AboutScroller() {
         >
           {PANELS.map((p, i) => {
             const on = i === active;
+            // Relative position drives the direction of travel: panels already
+            // passed drift upward as they fade out, upcoming panels wait below
+            // and rise into place. This gives a soft, scroll-up transition.
+            const offset = i === active ? 0 : i < active ? -56 : 56;
             return (
               <div
                 key={p.key}
                 aria-hidden={!on}
                 className="absolute inset-0"
                 style={{
-                  // Snap-switch: the active panel animates 0 -> 100% quickly
-                  // when scroll crosses into its band, instead of fading
-                  // gradually with scroll position.
                   opacity: on ? 1 : 0,
-                  transform: on ? "translateY(0)" : "translateY(14px)",
-                  transition: "opacity 1000ms ease, transform 1000ms ease",
+                  transform: `translateY(${offset}px)`,
+                  transition: "opacity 900ms ease, transform 900ms cubic-bezier(0.22, 1, 0.36, 1)",
                   pointerEvents: on ? "auto" : "none",
                   willChange: "opacity, transform",
                 }}
