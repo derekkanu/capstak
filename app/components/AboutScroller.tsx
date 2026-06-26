@@ -12,6 +12,8 @@ type Panel = {
   sub: string | string[];
   visualSide: "left" | "right";
   Visual: () => React.ReactElement;
+  // Extra horizontal breathing room around the copy on web.
+  roomy?: boolean;
 };
 
 // Each panel mirrors one of the reference designs: its own card colour,
@@ -34,6 +36,7 @@ const PANELS: Panel[] = [
     key: "collect",
     eyebrow: "Seamless Data Collection",
     Icon: CollectIcon,
+    roomy: true,
     bg: "#edb4e6",
     headline:
       "Answer simple, everyday questions, and let Capstack gather the data effortlessly.",
@@ -57,6 +60,7 @@ const PANELS: Panel[] = [
     key: "report",
     eyebrow: "Report Personalization",
     Icon: ReportIcon,
+    roomy: true,
     bg: "#d3e88a",
     headline: "Receive beautifully designed reports tailored to your business’s story.",
     sub: "After your valuation, download a personalized report filled with clear visuals and insights. It’s designed to make complex data easy to understand and share with investors or partners.",
@@ -198,9 +202,14 @@ export default function AboutScroller() {
 }
 
 function PanelContent({ panel }: { panel: Panel }) {
-  const { eyebrow, eyebrowNote, Icon, headline, sub, visualSide, Visual } = panel;
+  const { eyebrow, eyebrowNote, Icon, headline, sub, visualSide, Visual, roomy } = panel;
   return (
-    <div className="flex h-full flex-col justify-center px-6 py-8 md:px-12 md:py-14 lg:px-16">
+    <div
+      className={`flex h-full flex-col justify-center px-6 py-8 md:py-14 ${
+        // Double the web horizontal padding for roomy panels (mobile unchanged).
+        roomy ? "md:px-24 lg:px-32" : "md:px-12 lg:px-16"
+      }`}
+    >
       <div className="grid flex-1 grid-cols-1 items-center gap-6 md:grid-cols-2 md:gap-14">
         {/* Visual */}
         <div
@@ -244,64 +253,31 @@ function PanelContent({ panel }: { panel: Panel }) {
 }
 
 /* ---------------- Eyebrow icons ---------------- */
-// Each section's eyebrow icon, coloured to match the reference designs.
+// Each section's eyebrow icon, from the supplied design assets. Fixed height
+// with auto width preserves each icon's aspect ratio.
+
+function EyebrowIcon({ src, className = "h-5 w-auto md:h-6" }: { src: string; className?: string }) {
+  return <img src={src} alt="" draggable={false} className={className} />;
+}
 
 // About: pale-lime north-west arrow.
 function AboutIcon() {
-  return (
-    <svg viewBox="0 0 24 24" className="h-5 w-5 md:h-6 md:w-6" fill="#cfe98f" aria-hidden>
-      <path d="M5 5v10h2V8.41L18.59 20 20 18.59 8.41 7H15V5z" />
-    </svg>
-  );
+  return <EyebrowIcon src="/icon-about-arrow.png" />;
 }
 
-// Seamless Data Collection: cream bookmark with a plus.
+// Seamless Data Collection: cream chat bubble with a plus.
 function CollectIcon() {
-  return (
-    <svg viewBox="0 0 24 24" className="h-5 w-5 md:h-6 md:w-6" fill="#f5efd9" aria-hidden>
-      <path d="M7 2h10a2 2 0 0 1 2 2v17l-7-3.2L5 21V4a2 2 0 0 1 2-2zm6 5h-2v2H9v2h2v2h2v-2h2V9h-2V7z" />
-    </svg>
-  );
+  return <EyebrowIcon src="/icon-about-chat.png" />;
 }
 
-// AI-Powered Valuation: white robot head.
+// AI-Powered Valuation: white robot head. Bumped up to visually match the others.
 function AiIcon() {
-  return (
-    <svg viewBox="0 0 24 24" className="h-5 w-5 md:h-6 md:w-6" fill="#ffffff" aria-hidden>
-      <path d="M20 9V7c0-1.1-.9-2-2-2h-3c0-1.66-1.34-3-3-3S9 3.34 9 5H6c-1.1 0-2 .9-2 2v2c-1.66 0-3 1.34-3 3s1.34 3 3 3v4c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2v-4c1.66 0 3-1.34 3-3s-1.34-3-3-3zM7.5 11.5c0-.83.67-1.5 1.5-1.5s1.5.67 1.5 1.5S9.83 13 9 13s-1.5-.67-1.5-1.5zM16 17H8v-2h8v2zm-1-4c-.83 0-1.5-.67-1.5-1.5S14.17 10 15 10s1.5.67 1.5 1.5S15.83 13 15 13z" />
-    </svg>
-  );
+  return <EyebrowIcon src="/icon-about-ai.png" className="h-6 w-auto md:h-7" />;
 }
 
-// Report Personalization: green badge with a pale trending-up bar chart.
+// Report Personalization: green badge with a trending-up bar chart. Bumped up to match.
 function ReportIcon() {
-  return (
-    <svg viewBox="0 0 24 24" className="h-5 w-5 md:h-6 md:w-6" aria-hidden>
-      <rect x="2.5" y="2.5" width="19" height="19" rx="5.5" fill="#5cbf7a" />
-      <path
-        d="M7 16.6v-2.7M12 16.6v-4.7M17 16.6v-6.6"
-        stroke="#edf7cc"
-        strokeWidth="2.1"
-        strokeLinecap="round"
-      />
-      <path
-        d="M6.8 12.3 11.4 8.9l2.4 1.4 4.4-3.2"
-        fill="none"
-        stroke="#edf7cc"
-        strokeWidth="1.7"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-      <path
-        d="M15.1 7.1h3.1v3"
-        fill="none"
-        stroke="#edf7cc"
-        strokeWidth="1.7"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </svg>
-  );
+  return <EyebrowIcon src="/icon-about-report.png" className="h-6 w-auto md:h-7" />;
 }
 
 /* ---------------- Visuals ---------------- */
