@@ -200,8 +200,8 @@ export default function AboutScroller() {
 function PanelContent({ panel }: { panel: Panel }) {
   const { eyebrow, eyebrowNote, Icon, headline, sub, visualSide, Visual } = panel;
   return (
-    <div className="flex h-full flex-col justify-center px-6 py-10 md:px-12 md:py-14 lg:px-16">
-      <div className="grid flex-1 grid-cols-1 items-center gap-10 md:grid-cols-2 md:gap-14">
+    <div className="flex h-full flex-col justify-center px-6 py-8 md:px-12 md:py-14 lg:px-16">
+      <div className="grid flex-1 grid-cols-1 items-center gap-6 md:grid-cols-2 md:gap-14">
         {/* Visual */}
         <div
           className={`flex justify-center ${
@@ -309,7 +309,7 @@ function ReportIcon() {
 // Each section's visual is a finished design render, shown as a rounded card.
 function ImageVisual({ src, alt }: { src: string; alt: string }) {
   return (
-    <div className="relative aspect-[361/440] w-full max-w-[340px] overflow-hidden rounded-[28px] shadow-[0_24px_60px_-24px_rgba(0,0,0,0.45)]">
+    <div className="relative aspect-[361/440] w-full max-w-[250px] overflow-hidden rounded-[28px] shadow-[0_24px_60px_-24px_rgba(0,0,0,0.45)] md:max-w-[400px] lg:max-w-[440px]">
       <img
         src={src}
         alt={alt}
