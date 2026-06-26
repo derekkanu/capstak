@@ -745,6 +745,9 @@ function StandardBanner() {
             the valuation process easy and accessible, whether you&rsquo;re a
             first-time user or a seasoned professional.
           </p>
+          <div className="mt-8 flex justify-center">
+            <DemoLauncher variant="banner" />
+          </div>
         </FadeIn>
       </div>
     </section>

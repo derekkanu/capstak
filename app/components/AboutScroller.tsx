@@ -6,10 +6,10 @@ type Panel = {
   key: string;
   eyebrow: string;
   eyebrowNote?: string;
-  eyebrowIcon: string;
+  Icon: () => React.ReactElement;
   bg: string;
   headline: string;
-  sub: string;
+  sub: string | string[];
   visualSide: "left" | "right";
   Visual: () => React.ReactElement;
 };
@@ -20,18 +20,20 @@ const PANELS: Panel[] = [
   {
     key: "about",
     eyebrow: "About Capstack",
-    eyebrowIcon: "/about-receipt.png",
+    Icon: AboutIcon,
     bg: "#34c759",
-    headline:
-      "Capstack is a guided business valuation platform designed to make understanding your company’s value effortless and accessible.",
-    sub: "We believe every business owner should have a clear grasp of their worth. Capstack uses conversational AI to guide you step-by-step, removing the complexity from business valuation.",
+    headline: "Capstack is a guided business valuation platform.",
+    sub: [
+      "It’s designed to make understanding your company’s value effortless and accessible.",
+      "We believe every business owner should have a clear grasp of their worth. Capstack uses conversational AI to guide you step-by-step, removing the complexity from business valuation.",
+    ],
     visualSide: "left",
     Visual: AboutVisual,
   },
   {
     key: "collect",
     eyebrow: "Seamless Data Collection",
-    eyebrowIcon: "/about-collect.png",
+    Icon: CollectIcon,
     bg: "#edb4e6",
     headline:
       "Answer simple, everyday questions, and let Capstack gather the data effortlessly.",
@@ -43,7 +45,7 @@ const PANELS: Panel[] = [
     key: "ai",
     eyebrow: "AI-Powered Valuation",
     eyebrowNote: "(Coming Soon)",
-    eyebrowIcon: "/about-robot.png",
+    Icon: AiIcon,
     bg: "#a7efce",
     headline:
       "Unlock advanced AI that elevates your valuation with deep data analysis and comparisons.",
@@ -54,7 +56,7 @@ const PANELS: Panel[] = [
   {
     key: "report",
     eyebrow: "Report Personalization",
-    eyebrowIcon: "/about-chart.png",
+    Icon: ReportIcon,
     bg: "#d3e88a",
     headline: "Receive beautifully designed reports tailored to your business’s story.",
     sub: "After your valuation, download a personalized report filled with clear visuals and insights. It’s designed to make complex data easy to understand and share with investors or partners.",
@@ -63,8 +65,13 @@ const PANELS: Panel[] = [
   },
 ];
 
+// How small the card starts before it grows into full width on reveal.
+// A more pronounced shrink so the grow-in is clearly visible.
+const MIN_SCALE = 0.85;
+
 export default function AboutScroller() {
   const wrapRef = useRef<HTMLDivElement>(null);
+  const cardRef = useRef<HTMLDivElement>(null);
   const [active, setActive] = useState(0); // index of the visible panel
   const [reduced, setReduced] = useState(false);
 
@@ -87,6 +94,17 @@ export default function AboutScroller() {
       // Discrete bands: scroll crosses a boundary -> snap to the next panel.
       const idx = Math.min(PANELS.length - 1, Math.max(0, Math.floor(p * PANELS.length)));
       setActive((prev) => (prev === idx ? prev : idx));
+
+      // Entry "grow" effect: while the section rises into the pinned position
+      // (rect.top travels from one viewport height down to 0) the card scales
+      // up from slightly smaller to full size, so it grows to fill the space
+      // as it is revealed. Once pinned (rect.top <= 0) it stays at full scale.
+      const vh = window.innerHeight || 1;
+      const reveal = Math.min(1, Math.max(0, (vh - rect.top) / vh));
+      const scale = MIN_SCALE + (1 - MIN_SCALE) * reveal;
+      if (cardRef.current) {
+        cardRef.current.style.transform = `scale(${scale.toFixed(4)})`;
+      }
     };
     const onScroll = () => {
       if (!raf) raf = requestAnimationFrame(update);
@@ -129,19 +147,33 @@ export default function AboutScroller() {
     >
       <div className="sticky top-0 flex h-[100svh] items-center px-4 md:px-6">
         <div
+          ref={cardRef}
           className="relative mx-auto h-[calc(100svh-2rem)] w-full max-w-[1400px] overflow-hidden rounded-[28px] md:rounded-[32px]"
           style={{
             // The whole card recolours to the active panel as you scroll.
             background: PANELS[active].bg,
             transition: "background 1000ms ease",
+            // Starts slightly smaller and grows to full scale on reveal
+            // (driven imperatively from the scroll handler).
+            transform: `scale(${MIN_SCALE})`,
+            transformOrigin: "center",
+            willChange: "transform",
           }}
         >
           {PANELS.map((p, i) => {
             const on = i === active;
-            // Relative position drives the direction of travel: panels already
-            // passed drift upward as they fade out, upcoming panels wait below
-            // and rise into place. This gives a soft, scroll-up transition.
-            const offset = i === active ? 0 : i < active ? -56 : 56;
+            // Three roles drive the motion:
+            //  - outgoing (already passed): lift up a few px, then fade. The
+            //    opacity fade is delayed so the panel visibly rises before it
+            //    disappears.
+            //  - incoming (still ahead): wait below and rise into position while
+            //    fading in, so it animates into place rather than popping in.
+            const role = i === active ? "active" : i < active ? "out" : "in";
+            const offset = role === "active" ? 0 : role === "out" ? -8 : 18;
+            const transition =
+              role === "out"
+                ? "transform 650ms cubic-bezier(0.4, 0, 0.2, 1), opacity 520ms ease 150ms"
+                : "transform 850ms cubic-bezier(0.22, 1, 0.36, 1), opacity 700ms ease";
             return (
               <div
                 key={p.key}
@@ -150,7 +182,7 @@ export default function AboutScroller() {
                 style={{
                   opacity: on ? 1 : 0,
                   transform: `translateY(${offset}px)`,
-                  transition: "opacity 900ms ease, transform 900ms cubic-bezier(0.22, 1, 0.36, 1)",
+                  transition,
                   pointerEvents: on ? "auto" : "none",
                   willChange: "opacity, transform",
                 }}
@@ -166,7 +198,7 @@ export default function AboutScroller() {
 }
 
 function PanelContent({ panel }: { panel: Panel }) {
-  const { eyebrow, eyebrowNote, eyebrowIcon, headline, sub, visualSide, Visual } = panel;
+  const { eyebrow, eyebrowNote, Icon, headline, sub, visualSide, Visual } = panel;
   return (
     <div className="flex h-full flex-col justify-center px-6 py-10 md:px-12 md:py-14 lg:px-16">
       <div className="grid flex-1 grid-cols-1 items-center gap-10 md:grid-cols-2 md:gap-14">
@@ -186,7 +218,7 @@ function PanelContent({ panel }: { panel: Panel }) {
           }`}
         >
           <p className="flex items-center gap-2 text-[20px] text-green md:text-[24px]">
-            <img src={eyebrowIcon} alt="" className="h-5 w-5 md:h-6 md:w-6" draggable={false} />
+            <Icon />
             <span className="serif-italic">{eyebrow}</span>
             {eyebrowNote ? (
               <span className="serif-italic text-[15px] text-green/70 md:text-[17px]">
@@ -197,122 +229,113 @@ function PanelContent({ panel }: { panel: Panel }) {
           <h2 className="mt-6 text-[26px] font-medium leading-[1.18] tracking-[-0.01em] md:text-[34px] lg:text-[40px]">
             {headline}
           </h2>
-          <p className="mt-6 max-w-[440px] text-[13px] leading-[1.65] text-green/70 md:text-[15px]">
-            {sub}
-          </p>
+          {(Array.isArray(sub) ? sub : [sub]).map((para, i) => (
+            <p
+              key={i}
+              className="mt-6 max-w-[440px] text-[13px] leading-[1.65] text-green/70 md:text-[15px]"
+            >
+              {para}
+            </p>
+          ))}
         </div>
       </div>
     </div>
+  );
+}
+
+/* ---------------- Eyebrow icons ---------------- */
+// Each section's eyebrow icon, coloured to match the reference designs.
+
+// About: pale-lime north-west arrow.
+function AboutIcon() {
+  return (
+    <svg viewBox="0 0 24 24" className="h-5 w-5 md:h-6 md:w-6" fill="#cfe98f" aria-hidden>
+      <path d="M5 5v10h2V8.41L18.59 20 20 18.59 8.41 7H15V5z" />
+    </svg>
+  );
+}
+
+// Seamless Data Collection: cream bookmark with a plus.
+function CollectIcon() {
+  return (
+    <svg viewBox="0 0 24 24" className="h-5 w-5 md:h-6 md:w-6" fill="#f5efd9" aria-hidden>
+      <path d="M7 2h10a2 2 0 0 1 2 2v17l-7-3.2L5 21V4a2 2 0 0 1 2-2zm6 5h-2v2H9v2h2v2h2v-2h2V9h-2V7z" />
+    </svg>
+  );
+}
+
+// AI-Powered Valuation: white robot head.
+function AiIcon() {
+  return (
+    <svg viewBox="0 0 24 24" className="h-5 w-5 md:h-6 md:w-6" fill="#ffffff" aria-hidden>
+      <path d="M20 9V7c0-1.1-.9-2-2-2h-3c0-1.66-1.34-3-3-3S9 3.34 9 5H6c-1.1 0-2 .9-2 2v2c-1.66 0-3 1.34-3 3s1.34 3 3 3v4c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2v-4c1.66 0 3-1.34 3-3s-1.34-3-3-3zM7.5 11.5c0-.83.67-1.5 1.5-1.5s1.5.67 1.5 1.5S9.83 13 9 13s-1.5-.67-1.5-1.5zM16 17H8v-2h8v2zm-1-4c-.83 0-1.5-.67-1.5-1.5S14.17 10 15 10s1.5.67 1.5 1.5S15.83 13 15 13z" />
+    </svg>
+  );
+}
+
+// Report Personalization: green badge with a pale trending-up bar chart.
+function ReportIcon() {
+  return (
+    <svg viewBox="0 0 24 24" className="h-5 w-5 md:h-6 md:w-6" aria-hidden>
+      <rect x="2.5" y="2.5" width="19" height="19" rx="5.5" fill="#5cbf7a" />
+      <path
+        d="M7 16.6v-2.7M12 16.6v-4.7M17 16.6v-6.6"
+        stroke="#edf7cc"
+        strokeWidth="2.1"
+        strokeLinecap="round"
+      />
+      <path
+        d="M6.8 12.3 11.4 8.9l2.4 1.4 4.4-3.2"
+        fill="none"
+        stroke="#edf7cc"
+        strokeWidth="1.7"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M15.1 7.1h3.1v3"
+        fill="none"
+        stroke="#edf7cc"
+        strokeWidth="1.7"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
   );
 }
 
 /* ---------------- Visuals ---------------- */
 
-// About: branded card with the Capstack wordmark and arrow badge.
-function AboutVisual() {
+// Each section's visual is a finished design render, shown as a rounded card.
+function ImageVisual({ src, alt }: { src: string; alt: string }) {
   return (
-    <div className="relative aspect-[4/5] w-full max-w-[340px] overflow-hidden rounded-[28px] shadow-[0_24px_60px_-24px_rgba(0,0,0,0.45)]">
-      <div
-        className="absolute inset-0"
-        style={{ background: "radial-gradient(120% 100% at 30% 15%, #163a23, #0a1d12)" }}
-      />
-      <div className="absolute inset-0 flex items-center justify-center">
-        <span className="serif-italic text-[72px] leading-none text-white">CR</span>
-      </div>
-      <div
-        className="absolute bottom-5 right-5 flex h-16 w-16 items-center justify-center rounded-[18px]"
-        style={{ background: "#34c759" }}
-      >
-        <svg viewBox="0 0 24 24" className="h-7 w-7" fill="none" aria-hidden>
-          <path
-            d="M7 17 17 7M9 7h8v8"
-            stroke="#0a1d12"
-            strokeWidth="2.4"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          />
-        </svg>
-      </div>
-    </div>
-  );
-}
-
-// Seamless Data Collection: conversational-AI chat mockup.
-function ChatVisual() {
-  return (
-    <div className="w-full max-w-[420px] space-y-4">
-      <Bubble role="in">
-        We believe every business owner should have a clear grasp of their worth. Capstack uses
-        conversational AI to guide you step-by-step, removing the complexity from business
-        valuation.
-      </Bubble>
-      <Bubble role="out">Capstack uses conversational.</Bubble>
-      <Bubble role="in">
-        Business owner should have a clear grasp of their worth. Capstack uses conversational.
-      </Bubble>
-      <Bubble role="out">AI to guide you step</Bubble>
-    </div>
-  );
-}
-
-function Bubble({ role, children }: { role: "in" | "out"; children: React.ReactNode }) {
-  if (role === "out") {
-    return (
-      <div className="flex justify-end">
-        <div className="max-w-[70%] rounded-2xl bg-green-deep px-4 py-3 text-[13px] text-lime">
-          {children}
-        </div>
-      </div>
-    );
-  }
-  return (
-    <div className="max-w-[90%] rounded-2xl bg-white px-4 py-3 text-[13px] leading-[1.55] text-green shadow-[0_10px_30px_-18px_rgba(0,0,0,0.4)]">
-      {children}
-    </div>
-  );
-}
-
-// AI-Powered Valuation: dark illustration on a soft white blob.
-function AiVisual() {
-  return (
-    <div className="relative grid place-items-center">
-      <div
-        className="h-[260px] w-[260px] bg-white md:h-[300px] md:w-[300px]"
-        style={{ borderRadius: "46% 54% 43% 57% / 55% 44% 56% 45%" }}
-      />
+    <div className="relative aspect-[361/440] w-full max-w-[340px] overflow-hidden rounded-[28px] shadow-[0_24px_60px_-24px_rgba(0,0,0,0.45)]">
       <img
-        src="/about-robot.png"
-        alt=""
+        src={src}
+        alt={alt}
         draggable={false}
-        className="absolute h-[120px] w-auto md:h-[150px]"
+        className="absolute inset-0 h-full w-full object-cover"
       />
     </div>
   );
 }
 
-// Report Personalization: tilted personalized-report mockup.
+// About: branded Capstack cube.
+function AboutVisual() {
+  return <ImageVisual src="/about-card.png" alt="Capstack branded cube sign" />;
+}
+
+// Seamless Data Collection: conversational-AI chat on a laptop.
+function ChatVisual() {
+  return <ImageVisual src="/about-chat.png" alt="Capstack chat interface on a laptop" />;
+}
+
+// AI-Powered Valuation: business owner using Capstack.
+function AiVisual() {
+  return <ImageVisual src="/about-ai.png" alt="Business owner using Capstack" />;
+}
+
+// Report Personalization: personalized valuation report.
 function ReportVisual() {
-  return (
-    <div className="relative w-full max-w-[340px]">
-      <div className="absolute inset-x-6 top-2 h-40 rotate-[6deg] rounded-2xl bg-green-mid" />
-      <div className="relative -rotate-[7deg] rounded-2xl bg-white p-5 shadow-[0_24px_60px_-24px_rgba(0,0,0,0.4)]">
-        <div className="flex items-center gap-2">
-          <div className="h-6 w-6 rounded-md bg-green" />
-          <div className="h-2.5 w-28 rounded bg-green/70" />
-        </div>
-        <div className="mt-4 space-y-1.5">
-          <div className="h-1.5 w-full rounded bg-green/15" />
-          <div className="h-1.5 w-5/6 rounded bg-green/15" />
-          <div className="h-1.5 w-2/3 rounded bg-green/15" />
-        </div>
-        <div className="mt-5 text-[12px] font-semibold tracking-tight text-green">
-          NGN 553,400,000
-        </div>
-        <div className="mt-3 flex h-20 items-end gap-3">
-          <div className="w-1/2 rounded-t-md bg-lime" style={{ height: "55%" }} />
-          <div className="w-1/2 rounded-t-md bg-green" style={{ height: "92%" }} />
-        </div>
-      </div>
-    </div>
-  );
+  return <ImageVisual src="/about-report.png" alt="Personalized Capstack valuation report" />;
 }
