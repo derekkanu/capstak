@@ -235,7 +235,6 @@ function PricingCard({
   tall?: boolean;
   highlightLast?: boolean;
 }) {
-  const tallOffsets = ["-90px", "130px", "-95px", "140px", "0px"];
   const gradients: Record<string, string> = {
     "1": [
       "radial-gradient(60% 45% at 82% 18%, rgba(120, 200, 130, 0.32), transparent 65%)",
@@ -270,40 +269,65 @@ function PricingCard({
         {description}
       </div>
       <div className="mt-5 flex items-baseline gap-2">
-        <span className="text-[36px] font-medium tracking-tight text-ink md:text-[40px]">
+        <span
+          className={`font-medium tracking-tight text-ink ${
+            // Prioritise the premium (tall) card with a larger price on web.
+            tall ? "text-[36px] md:text-[64px]" : "text-[36px] md:text-[40px]"
+          }`}
+        >
           {price}
         </span>
-        <span className="serif-italic text-[13.5px] text-ink/55">{period}</span>
+        <span
+          className={`serif-italic text-ink/55 ${
+            tall ? "text-[13.5px] md:text-[17px]" : "text-[13.5px]"
+          }`}
+        >
+          {period}
+        </span>
       </div>
-      {tall ? (
-        <div className="mt-6 flex flex-1 flex-col items-center justify-end gap-5 pb-[41px]">
-          {features.map((f, i) => {
-            const isLast = i === features.length - 1;
-            return (
-              <div
-                key={f.text}
-                style={{
-                  transform: `translateX(${tallOffsets[i] ?? "0px"}) translateY(${isLast ? "0px" : "-20px"})`,
-                }}
-              >
-                <FeaturePill
-                  text={f.text}
-                  icon={f.icon}
-                  highlight={highlightLast && i === features.length - 1}
-                />
-              </div>
-            );
-          })}
-        </div>
-      ) : (
-        <div className="mt-5 flex flex-wrap gap-2">
-          {features.map((f, i) => (
-            <div key={f.text} className={i % 2 === 1 ? "ml-auto" : ""}>
-              <FeaturePill text={f.text} icon={f.icon} />
+      <div
+        className={`flex flex-col gap-2.5 md:grid md:grid-cols-2 ${
+          tall
+            ? "mt-6 flex-1 justify-end pb-[44px] md:content-end md:gap-x-4 md:gap-y-12"
+            : "mt-5 md:gap-3"
+        }`}
+      >
+        {features.map((f, i) => {
+          const isLast = i === features.length - 1;
+          const highlighted = highlightLast && isLast;
+          // Web cascade for multi-row cards: each pill is left-anchored in its
+          // grid cell, with row 2 shifted further right than row 1 for a soft
+          // diagonal zig-zag. Single-row cards (e.g. Free plan) centre pills
+          // within each column. Mobile keeps the left/right zig-zag; the
+          // highlighted pill is centred.
+          const cascade = !highlighted && features.length > 2;
+          return (
+            <div
+              key={f.text}
+              className={`flex ${
+                highlighted
+                  ? "justify-center md:col-span-2"
+                  : i % 2 === 1
+                    ? "justify-end"
+                    : "justify-start"
+              } ${
+                cascade
+                  ? "md:justify-start md:[transform:translateX(var(--sx))]"
+                  : !highlighted
+                    ? "md:justify-center"
+                    : ""
+              }`}
+              style={
+                cascade
+                  ? ({ "--sx": i < 2 ? "44px" : "92px" } as React.CSSProperties)
+                  : undefined
+              }
+            >
+              <FeaturePill text={f.text} icon={f.icon} highlight={highlighted} />
             </div>
-          ))}
-        </div>
-      )}
+          );
+        })}
+      </div>
     </div>
   );
 }
