@@ -66,7 +66,7 @@ export default function WaitlistForm({ id, className = "" }: Props) {
       <form
         id={id}
         onSubmit={handleSubmit}
-        className={`flex w-full items-stretch rounded-[14px] bg-cream-soft p-1.5 ${className}`}
+        className={`flex w-full items-stretch rounded-[14px] bg-white p-1.5 shadow-[0_1px_2px_rgba(12,29,18,0.06)] ring-1 ring-ink/10 transition-shadow focus-within:ring-ink/25 ${className}`}
       >
         <input
           ref={inputRef}
@@ -76,11 +76,11 @@ export default function WaitlistForm({ id, className = "" }: Props) {
           onChange={(e) => setEmail(e.target.value)}
           placeholder="Enter your email..."
           aria-label="Email address"
-          className="flex-1 bg-transparent px-4 py-3 text-[14px] text-ink placeholder:text-[#9c9c9c] focus:outline-none"
+          className="min-w-0 flex-1 bg-transparent px-4 py-3 text-[15px] text-ink placeholder:text-[#9c9c9c] focus:outline-none"
         />
         <button
           type="submit"
-          className="rounded-[10px] bg-cream px-5 py-3 text-[14px] font-medium text-ink transition-colors hover:bg-cream-deep"
+          className="shrink-0 rounded-[10px] bg-green px-5 py-3 text-[14px] font-medium text-lime transition-colors hover:bg-green-mid"
         >
           Get Notified
         </button>
@@ -115,7 +115,7 @@ export default function WaitlistForm({ id, className = "" }: Props) {
                 </div>
                 <h3
                   id="waitlist-modal-title"
-                  className="mt-5 text-[22px] font-medium tracking-tight text-ink"
+                  className="display mt-5 text-[34px] text-ink"
                 >
                   Thank you
                 </h3>

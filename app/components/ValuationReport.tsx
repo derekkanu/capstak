@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import SilkArt from "./SilkArt";
 import {
   formatCurrency,
   type ValuationInput,
@@ -26,19 +27,19 @@ export default function ValuationReport({ input, result, onRestart }: Props) {
     }
   };
 
-  const name = input.businessName || "Your Business";
+  const name = input.businessName || "Your business";
+  const money = (n: number) => formatCurrency(n, result.currency);
 
   return (
-    <div className="mx-auto w-full max-w-[860px] px-5 py-8 md:px-8 md:py-10">
-      <div className="flex flex-col gap-2 border-b border-ink/10 pb-6 sm:flex-row sm:items-end sm:justify-between">
+    <div className="mx-auto w-full max-w-[1080px] px-5 py-10 md:px-8 md:py-16">
+      {/* Header */}
+      <div className="playground-in flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
         <div>
-          <p className="text-[12px] uppercase tracking-[0.18em] text-green/60">
-            Valuation Report
+          <p className="text-[15px] text-ink/50">
+            Valuation report · {new Date().toLocaleDateString(undefined, { day: "numeric", month: "long", year: "numeric" })}
           </p>
-          <h2 className="mt-1 text-[26px] font-medium leading-tight tracking-[-0.01em] text-ink md:text-[32px]">
-            {name}
-          </h2>
-          <p className="mt-1 text-[13px] text-ink/55">
+          <h2 className="display mt-3 text-[42px] text-ink md:text-[60px]">{name}</h2>
+          <p className="mt-2 text-[16px] text-ink/55">
             {result.industryLabel}
             {input.location ? ` · ${input.location}` : ""}
           </p>
@@ -47,7 +48,7 @@ export default function ValuationReport({ input, result, onRestart }: Props) {
           <button
             type="button"
             onClick={onRestart}
-            className="rounded-[10px] border border-ink/15 px-4 py-2.5 text-[13px] font-medium text-ink transition-colors hover:bg-ink/5"
+            className="rounded-[8px] bg-ink/[0.06] px-4 py-2.5 text-[14px] font-medium text-ink transition-colors hover:bg-ink/[0.1]"
           >
             Start over
           </button>
@@ -55,7 +56,7 @@ export default function ValuationReport({ input, result, onRestart }: Props) {
             type="button"
             onClick={handleDownload}
             disabled={downloading}
-            className="inline-flex items-center gap-2 rounded-[10px] bg-green px-4 py-2.5 text-[13px] font-medium text-lime transition-transform hover:scale-[1.02] disabled:opacity-60"
+            className="inline-flex items-center gap-2 rounded-[8px] bg-green px-4 py-2.5 text-[14px] font-medium text-lime transition-colors hover:bg-green-mid disabled:opacity-60"
           >
             <DownloadIcon />
             {downloading ? "Preparing…" : "Download PDF"}
@@ -63,58 +64,113 @@ export default function ValuationReport({ input, result, onRestart }: Props) {
         </div>
       </div>
 
-      {/* Headline valuation */}
-      <div
-        className="mt-6 overflow-hidden rounded-[20px] px-6 py-7 md:px-8"
-        style={{
-          background: [
-            "radial-gradient(60% 80% at 90% 10%, rgba(120, 200, 130, 0.35), transparent 65%)",
-            "linear-gradient(180deg, #14331f 0%, #0c2516 100%)",
-          ].join(", "),
-        }}
-      >
-        <p className="text-[12px] uppercase tracking-[0.16em] text-lime/70">
-          Estimated business value
-        </p>
-        <p className="mt-2 text-[40px] font-medium leading-none tracking-tight text-lime md:text-[52px]">
-          {formatCurrency(result.mid, result.currency)}
-        </p>
-        <p className="mt-2 text-[13px] text-white/70">
-          Likely range {formatCurrency(result.low, result.currency)} –{" "}
-          {formatCurrency(result.high, result.currency)}
-        </p>
-        <RangeBar low={result.low} mid={result.mid} high={result.high} />
+      {/* Headline value on dark silk */}
+      <div className="grain relative mt-10 overflow-hidden rounded-[8px] md:mt-12">
+        <SilkArt mood="deep" />
+        <div className="relative z-[2] grid grid-cols-1 gap-10 px-7 py-10 md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] md:items-end md:px-12 md:py-14">
+          <div>
+            <p className="text-[15px] text-cream/60">Estimated business value</p>
+            <p className="display num mt-3 text-[64px] leading-none text-lime md:text-[88px]">
+              {money(result.mid)}
+            </p>
+            <p className="mt-4 text-[16px] text-cream/65">
+              Likely range {money(result.low)} – {money(result.high)}
+            </p>
+          </div>
+          <RangeBar low={result.low} mid={result.mid} high={result.high} money={money} />
+        </div>
       </div>
 
-      {/* Metric cards */}
-      <div className="mt-5 grid grid-cols-2 gap-3 md:grid-cols-4">
-        <Metric label="Annual revenue" value={formatCurrency(result.annualRevenue, result.currency)} />
-        <Metric label="Annual net profit" value={formatCurrency(result.annualNetProfit, result.currency)} />
-        <Metric label="Net margin" value={`${Math.round(result.netMargin * 100)}%`} />
-        <Metric label="Applied multiple" value={`${result.adjustedMultiple.toFixed(1)}×`} />
-      </div>
+      {/* Key figures: hairline grid */}
+      <dl className="mt-4 grid grid-cols-2 overflow-hidden rounded-[8px] border border-ink/10 bg-white/70 backdrop-blur-sm md:grid-cols-4">
+        {[
+          ["Annual revenue", money(result.annualRevenue)],
+          ["Annual net profit", money(result.annualNetProfit)],
+          ["Net margin", `${Math.round(result.netMargin * 100)}%`],
+          ["Applied multiple", `${result.adjustedMultiple.toFixed(1)}×`],
+        ].map(([k, v], i) => (
+          <div
+            key={k}
+            className={`px-6 py-6 ${i % 2 === 1 ? "border-l border-ink/10" : ""} ${
+              i >= 2 ? "border-t border-ink/10 md:border-t-0" : ""
+            } ${i === 2 ? "md:border-l" : ""}`}
+          >
+            <dt className="text-[14px] text-ink/50">{k}</dt>
+            <dd className="display num mt-2 text-[30px] leading-none text-ink md:text-[34px]">{v}</dd>
+          </div>
+        ))}
+      </dl>
 
-      {/* Two-up: revenue trend + value drivers */}
-      <div className="mt-5 grid grid-cols-1 gap-4 md:grid-cols-2">
-        <Panel title="Revenue trend">
-          <RevenueChart
-            threeMonthsAgo={input.revenueThreeMonthsAgo ?? 0}
-            lastMonth={input.revenueLastMonth ?? 0}
-            currency={result.currency}
+      {/* How we got there */}
+      <div className="mt-16 grid grid-cols-1 gap-10 md:mt-20 md:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] md:gap-16">
+        <div>
+          <h3 className="display text-[32px] text-ink md:text-[40px]">How we got there</h3>
+          <p className="mt-4 max-w-[36ch] text-[16px] leading-[1.6] text-ink/55">
+            We start from the typical sale multiple for {result.industryLabel.toLowerCase()}, adjust
+            for what makes your business different, then blend an earnings view with a revenue
+            cross-check.
+          </p>
+        </div>
+        <div className="flex flex-col gap-2.5">
+          <Row
+            title={`${result.industryLabel} benchmark`}
+            detail="Typical earnings multiple for this sector"
+            value={`${result.baseMultiple.toFixed(1)}×`}
           />
-        </Panel>
-        <Panel title="What shaped the multiple">
-          <MultipleBreakdown result={result} />
-        </Panel>
+          {result.adjustments.map((a) => (
+            <Row
+              key={a.label}
+              title={a.label}
+              detail={a.delta > 0 ? "Raises the multiple buyers will pay" : "Lowers the multiple buyers will pay"}
+              value={`${a.delta > 0 ? "+" : "−"}${Math.abs(a.delta).toFixed(1)}×`}
+              tone={a.delta > 0 ? "up" : "down"}
+            />
+          ))}
+          <Row
+            title="Earnings view"
+            detail={`${money(result.annualNetProfit)} profit × ${result.adjustedMultiple.toFixed(1)}, weighted 70%`}
+            value={money(result.earningsValue)}
+          />
+          <Row
+            title="Revenue cross-check"
+            detail={`${money(result.annualRevenue)} revenue × sector revenue multiple, weighted 30%`}
+            value={money(result.revenueValue)}
+          />
+          {result.liabilities > 0 ? (
+            <Row title="Less debt" detail="Outstanding liabilities you mentioned" value={`−${money(result.liabilities)}`} tone="down" />
+          ) : null}
+          <Row title="Estimated value" detail="Midpoint of your range" value={money(result.mid)} strong />
+        </div>
       </div>
 
-      {/* Inputs summary */}
-      <Panel title="Information you provided" className="mt-5">
-        <dl className="grid grid-cols-1 gap-x-8 gap-y-3 sm:grid-cols-2">
+      {/* Revenue trend */}
+      {input.revenueThreeMonthsAgo || input.revenueLastMonth ? (
+        <div className="mt-16 grid grid-cols-1 gap-10 md:mt-20 md:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] md:gap-16">
+          <div>
+            <h3 className="display text-[32px] text-ink md:text-[40px]">Revenue trend</h3>
+            <p className="mt-4 max-w-[36ch] text-[16px] leading-[1.6] text-ink/55">
+              Monthly revenue you shared, used to judge whether the business is growing, steady or
+              declining.
+            </p>
+          </div>
+          <div className="rounded-[8px] border border-ink/10 bg-white/70 p-6 backdrop-blur-sm md:p-8">
+            <RevenueChart
+              threeMonthsAgo={input.revenueThreeMonthsAgo ?? 0}
+              lastMonth={input.revenueLastMonth ?? 0}
+              money={money}
+            />
+          </div>
+        </div>
+      ) : null}
+
+      {/* Inputs */}
+      <div className="mt-16 md:mt-20">
+        <h3 className="display text-[32px] text-ink md:text-[40px]">What you told us</h3>
+        <dl className="mt-8 grid grid-cols-1 border-t border-ink/10 sm:grid-cols-2 sm:gap-x-12">
           <Field label="Years in operation" value={fmt(input.yearsInOperation)} />
           <Field label="Team size" value={fmt(input.teamSize)} />
-          <Field label="Growth trend" value={input.growthTrend} />
-          <Field label="Liabilities" value={input.liabilities != null ? formatCurrency(input.liabilities, result.currency) : null} />
+          <Field label="Revenue trend" value={input.growthTrend ? TREND_LABEL[input.growthTrend] : null} />
+          <Field label="Liabilities" value={input.liabilities != null ? money(input.liabilities) : null} />
           <Field label="Customers" value={input.customerSegments} />
           <Field label="Competitors" value={input.competitors} />
           <Field label="Market size" value={input.marketSize} />
@@ -125,43 +181,53 @@ export default function ValuationReport({ input, result, onRestart }: Props) {
           <Field label="Growth strategy" value={input.growthStrategy} />
           <Field label="Contingency plan" value={input.contingencyPlans} />
         </dl>
-      </Panel>
+      </div>
 
-      <p className="mt-6 text-[11px] leading-relaxed text-ink/45">
-        This is an automated, estimate-only valuation generated from the
-        information provided during this demo. It is not financial advice or a
-        formal appraisal. Accuracy depends on the accuracy of your inputs.
+      <p className="mt-14 max-w-[70ch] text-[13px] leading-[1.6] text-ink/45">
+        This is an automated, estimate-only valuation generated from the information provided during
+        this demo. It is not financial advice or a formal appraisal. Accuracy depends on the accuracy
+        of your inputs.
       </p>
     </div>
   );
 }
 
+const TREND_LABEL = { increasing: "Growing", steady: "Steady", decreasing: "Declining" } as const;
+
 function fmt(n: number | null): string | null {
   return n == null ? null : String(n);
 }
 
-function Metric({ label, value }: { label: string; value: string }) {
-  return (
-    <div className="rounded-[14px] bg-[#fbfaf2] px-4 py-3">
-      <p className="text-[11px] uppercase tracking-[0.12em] text-ink/45">{label}</p>
-      <p className="mt-1 text-[18px] font-medium text-ink">{value}</p>
-    </div>
-  );
-}
-
-function Panel({
+function Row({
   title,
-  children,
-  className = "",
+  detail,
+  value,
+  tone,
+  strong = false,
 }: {
   title: string;
-  children: React.ReactNode;
-  className?: string;
+  detail: string;
+  value: string;
+  tone?: "up" | "down";
+  strong?: boolean;
 }) {
   return (
-    <div className={`rounded-[18px] border border-ink/10 bg-white px-5 py-5 ${className}`}>
-      <h3 className="text-[13px] font-medium text-ink">{title}</h3>
-      <div className="mt-4">{children}</div>
+    <div
+      className={`rounded-[12px] border px-5 py-4 ${
+        strong ? "border-green/20 bg-[#eef6e6]" : "border-ink/[0.08] bg-white/80 backdrop-blur-sm"
+      }`}
+    >
+      <div className="flex items-baseline justify-between gap-4">
+        <p className={`text-[16px] text-ink ${strong ? "font-semibold" : "font-medium"}`}>{title}</p>
+        <p
+          className={`num shrink-0 text-[16px] font-medium ${
+            tone === "up" ? "text-[#1d7a3a]" : tone === "down" ? "text-[#b4532a]" : "text-ink/70"
+          } ${strong ? "!text-ink" : ""}`}
+        >
+          {value}
+        </p>
+      </div>
+      <p className="mt-1 text-[14px] text-ink/50">{detail}</p>
     </div>
   );
 }
@@ -169,27 +235,39 @@ function Panel({
 function Field({ label, value }: { label: string; value: string | null }) {
   if (!value) return null;
   return (
-    <div className="border-l-[3px] border-green/30 pl-3">
-      <dt className="text-[11px] uppercase tracking-[0.1em] text-ink/45">{label}</dt>
-      <dd className="mt-0.5 text-[13px] leading-snug text-ink/80">{value}</dd>
+    <div className="border-b border-ink/10 py-4">
+      <dt className="text-[14px] text-ink/45">{label}</dt>
+      <dd className="mt-1 text-[16px] leading-[1.5] text-ink/85">{value}</dd>
     </div>
   );
 }
 
-function RangeBar({ low, mid, high }: { low: number; mid: number; high: number }) {
+function RangeBar({
+  low,
+  mid,
+  high,
+  money,
+}: {
+  low: number;
+  mid: number;
+  high: number;
+  money: (n: number) => string;
+}) {
   const span = high - low || 1;
   const midPct = ((mid - low) / span) * 100;
   return (
-    <div className="mt-5">
-      <div className="relative h-2 w-full rounded-full bg-white/15">
+    <div>
+      <div className="relative h-2 rounded-full bg-cream/15">
+        <div className="absolute inset-y-0 left-0 right-0 rounded-full bg-gradient-to-r from-lime/40 via-lime to-lime/40" />
         <div
-          className="absolute top-1/2 h-3.5 w-3.5 -translate-x-1/2 -translate-y-1/2 rounded-full bg-lime ring-4 ring-lime/25"
+          className="absolute -top-1.5 h-5 w-[3px] -translate-x-1/2 rounded-full bg-cream"
           style={{ left: `${midPct}%` }}
         />
       </div>
-      <div className="mt-2 flex justify-between text-[11px] text-white/55">
-        <span>{formatCurrency(low)}</span>
-        <span>{formatCurrency(high)}</span>
+      <div className="num mt-3 flex justify-between text-[14px] text-cream/60">
+        <span>Low {money(low)}</span>
+        <span className="text-cream">Mid {money(mid)}</span>
+        <span>High {money(high)}</span>
       </div>
     </div>
   );
@@ -198,72 +276,50 @@ function RangeBar({ low, mid, high }: { low: number; mid: number; high: number }
 function RevenueChart({
   threeMonthsAgo,
   lastMonth,
-  currency,
+  money,
 }: {
   threeMonthsAgo: number;
   lastMonth: number;
-  currency: string;
+  money: (n: number) => string;
 }) {
-  const max = Math.max(threeMonthsAgo, lastMonth, 1);
+  const max = Math.max(threeMonthsAgo, lastMonth, 1) * 1.15;
   const bars = [
-    { label: "3 mo ago", value: threeMonthsAgo },
-    { label: "Last mo", value: lastMonth },
+    { label: "Three months ago", value: threeMonthsAgo, color: "#e3dfd5" },
+    { label: "Last month", value: lastMonth, color: "#2a9d4f" },
   ];
-  if (!threeMonthsAgo && !lastMonth) {
-    return <p className="text-[12px] text-ink/45">No monthly figures provided.</p>;
-  }
+  const change = threeMonthsAgo ? (lastMonth - threeMonthsAgo) / threeMonthsAgo : 0;
   return (
-    <div className="flex h-40 items-end gap-6">
-      {bars.map((b) => (
-        <div key={b.label} className="flex flex-1 flex-col items-center justify-end">
-          <span className="mb-1.5 text-[11px] font-medium text-ink/70">
-            {formatCurrency(b.value, currency)}
-          </span>
-          <div
-            className="w-full max-w-[64px] rounded-t-[8px] bg-green transition-all"
-            style={{ height: `${Math.max(6, (b.value / max) * 110)}px` }}
-          />
-          <span className="mt-2 text-[11px] text-ink/50">{b.label}</span>
-        </div>
-      ))}
-    </div>
-  );
-}
-
-function MultipleBreakdown({ result }: { result: ValuationResult }) {
-  return (
-    <div className="space-y-2.5 text-[12.5px]">
-      <Row label={`${result.industryLabel} base`} value={`${result.baseMultiple.toFixed(1)}×`} />
-      {result.adjustments.map((a) => (
-        <Row
-          key={a.label}
-          label={a.label}
-          value={`${a.delta > 0 ? "+" : ""}${a.delta.toFixed(1)}×`}
-          tone={a.delta > 0 ? "pos" : "neg"}
-        />
-      ))}
-      <div className="mt-2 flex items-center justify-between border-t border-ink/10 pt-2.5 font-medium text-ink">
-        <span>Applied multiple</span>
-        <span>{result.adjustedMultiple.toFixed(1)}×</span>
+    <div>
+      <div className="flex items-baseline justify-between">
+        <p className="text-[14px] text-ink/50">Monthly revenue</p>
+        {threeMonthsAgo && lastMonth ? (
+          <p className={`num text-[14px] font-medium ${change >= 0 ? "text-[#1d7a3a]" : "text-[#b4532a]"}`}>
+            {change >= 0 ? "+" : "−"}
+            {Math.abs(Math.round(change * 100))}% over three months
+          </p>
+        ) : null}
       </div>
-    </div>
-  );
-}
-
-function Row({
-  label,
-  value,
-  tone,
-}: {
-  label: string;
-  value: string;
-  tone?: "pos" | "neg";
-}) {
-  const color = tone === "pos" ? "text-green" : tone === "neg" ? "text-[#b4592f]" : "text-ink/70";
-  return (
-    <div className="flex items-center justify-between">
-      <span className="text-ink/65">{label}</span>
-      <span className={`font-medium ${color}`}>{value}</span>
+      <div className="mt-8 flex h-48 items-end justify-around gap-8 border-b border-ink/30">
+        {bars.map((b) => (
+          <div key={b.label} className="flex h-full w-full max-w-[120px] flex-col justify-end">
+            <div
+              className="bar-grow relative rounded-t-[3px]"
+              style={{ height: `${Math.max(3, (b.value / max) * 100)}%`, background: b.color }}
+            >
+              <span className="num absolute -top-6 left-1/2 -translate-x-1/2 whitespace-nowrap text-[13px] font-medium text-ink">
+                {money(b.value)}
+              </span>
+            </div>
+          </div>
+        ))}
+      </div>
+      <div className="flex justify-around gap-8 pt-3">
+        {bars.map((b) => (
+          <span key={b.label} className="w-full max-w-[120px] text-center text-[14px] text-ink/60">
+            {b.label}
+          </span>
+        ))}
+      </div>
     </div>
   );
 }

@@ -16,6 +16,13 @@
   --peach: #f7e0c9;
   --pink: #f0d2db;
   --mint: #d8eed1;
+  /* Page backdrop (sampled from the original site-bg art). */
+  --paper: #f4f5f4;
+  --stain-cream: rgba(243, 232, 211, 0.95);
+  --stain-cream-soft: #eff1e6;
+  --stain-mint: rgba(214, 234, 219, 0.95);
+  --stain-mint-soft: #e2ede5;
+  --stain-tan: #ebe7da;
 }
 
 @theme inline {
@@ -34,30 +41,100 @@
   --color-peach: var(--peach);
   --color-pink: var(--pink);
   --color-mint: var(--mint);
-  --font-sans: var(--font-geist-sans);
-  --font-serif: var(--font-instrument-serif);
-  --font-mono: var(--font-geist-mono);
+  --font-sans: var(--font-sans-face);
+  --font-serif: var(--font-display-face);
+  --font-display: var(--font-display-face);
+  --font-mono: var(--font-mono-face);
 }
 
 html {
   scroll-behavior: smooth;
-  background: var(--cream-soft);
+  background: var(--paper);
 }
 
+/* Page backdrop: soft paper grey with blurred cream and mint "stains",
+   matching the original site-bg art but without its flat peach top band.
+   The first pair frames the hero on both sides; the rest drift down the
+   page. Each stain is a soft-edged radial blob placed in px so it keeps
+   its shape however long the page gets. */
 body {
-  background: url('/site-bg.png') no-repeat center top;
-  background-size: 100% 100%;
-  background-color: var(--cream-soft);
+  background-color: var(--paper);
+  background-image:
+    radial-gradient(closest-side, var(--stain-cream) 0%, rgba(243, 232, 211, 0) 100%),
+    radial-gradient(closest-side, var(--stain-mint) 0%, rgba(214, 234, 219, 0) 100%),
+    radial-gradient(closest-side, var(--stain-mint-soft) 0%, rgba(229, 238, 231, 0) 100%),
+    radial-gradient(closest-side, var(--stain-cream-soft) 0%, rgba(241, 243, 233, 0) 100%),
+    radial-gradient(closest-side, var(--stain-mint-soft) 0%, rgba(229, 238, 231, 0) 100%),
+    radial-gradient(closest-side, var(--stain-cream-soft) 0%, rgba(241, 243, 233, 0) 100%),
+    radial-gradient(closest-side, var(--stain-tan) 0%, rgba(236, 233, 221, 0) 100%),
+    radial-gradient(closest-side, var(--stain-mint-soft) 0%, rgba(229, 238, 231, 0) 100%);
+  background-size:
+    min(1100px, 95vw) 900px,
+    min(1000px, 90vw) 900px,
+    700px 700px,
+    760px 760px,
+    720px 720px,
+    760px 760px,
+    700px 700px,
+    720px 720px;
+  background-position:
+    left calc(-1 * min(420px, 45vw)) top 40px,
+    right calc(-1 * min(380px, 45vw)) top 380px,
+    left -300px top 1900px,
+    right -320px top 2700px,
+    right -300px top 3900px,
+    left -320px top 4800px,
+    left -300px top 5900px,
+    right -300px top 6800px;
+  background-repeat: no-repeat;
   color: var(--ink);
-  font-family: var(--font-geist-sans), system-ui, -apple-system, sans-serif;
+  font-family: var(--font-sans-face), system-ui, -apple-system, sans-serif;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
 }
 
 .serif-italic {
-  font-family: var(--font-instrument-serif), Georgia, serif;
+  font-family: var(--font-display-face), Georgia, serif;
   font-style: italic;
   font-weight: 400;
+}
+
+/* Exa-style type system.
+   .display — large light serif headline with tight tracking.
+   Hierarchy comes from the serif headline and plain copy; no mono
+   uppercase "eyebrow" labels, pill badges or step numbers. */
+.display {
+  font-family: var(--font-display-face), Georgia, serif;
+  font-weight: 400;
+  letter-spacing: -0.02em;
+  line-height: 1.06;
+}
+
+.display em,
+.display .serif-italic {
+  font-style: italic;
+  font-weight: 400;
+}
+
+/* Film grain used on the atmospheric art panels and the footer. */
+.grain {
+  position: relative;
+  isolation: isolate;
+}
+.grain::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  opacity: 0.22;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+
+.num {
+  font-variant-numeric: tabular-nums;
 }
 
 /* When the italic phrase is also a highlight (heading accent), make it
@@ -232,4 +309,98 @@ body {
   border-radius: 0.18em;
   box-decoration-break: clone;
   -webkit-box-decoration-break: clone;
+}
+
+/* Panels inside the playground and method charts fade up when they change. */
+@keyframes panelIn {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.playground-in {
+  animation: panelIn 420ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes barGrow {
+  from {
+    transform: scaleY(0);
+  }
+  to {
+    transform: scaleY(1);
+  }
+}
+@keyframes barGrowX {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+.bar-grow {
+  transform-origin: bottom;
+  animation: barGrow 700ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+.bar-grow-x {
+  animation: barGrowX 700ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* Playground range sliders. */
+.playground-range {
+  -webkit-appearance: none;
+  appearance: none;
+  height: 4px;
+  border-radius: 999px;
+  background: linear-gradient(
+    to right,
+    var(--green) 0%,
+    var(--green) var(--pct),
+    rgba(12, 29, 18, 0.12) var(--pct)
+  );
+  cursor: pointer;
+}
+.playground-range::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 18px;
+  height: 18px;
+  border-radius: 999px;
+  background: #fff;
+  border: 1px solid rgba(12, 29, 18, 0.18);
+  box-shadow: 0 1px 3px rgba(12, 29, 18, 0.2);
+}
+.playground-range::-moz-range-thumb {
+  width: 18px;
+  height: 18px;
+  border-radius: 999px;
+  background: #fff;
+  border: 1px solid rgba(12, 29, 18, 0.18);
+  box-shadow: 0 1px 3px rgba(12, 29, 18, 0.2);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .playground-in,
+  .bar-grow,
+  .bar-grow-x {
+    animation: none;
+  }
+}
+
+/* Demo overlay: same paper + soft cream/mint stains as the homepage. */
+.demo-backdrop {
+  background-color: var(--paper);
+  background-image:
+    radial-gradient(closest-side, var(--stain-cream) 0%, rgba(243, 232, 211, 0) 100%),
+    radial-gradient(closest-side, var(--stain-mint) 0%, rgba(214, 234, 219, 0) 100%);
+  background-size:
+    min(1000px, 95vw) 800px,
+    min(900px, 90vw) 800px;
+  background-position:
+    right calc(-1 * min(360px, 40vw)) top -120px,
+    right calc(-1 * min(300px, 40vw)) bottom -260px;
+  background-repeat: no-repeat;
 }

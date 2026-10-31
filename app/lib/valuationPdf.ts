@@ -50,7 +50,7 @@ export function generatePdf(input: ValuationInput, result: ValuationResult) {
   doc.roundedRect(margin, y, contentW, 92, 8, 8, "F");
   doc.setTextColor(...muted);
   doc.setFontSize(9);
-  doc.text("ESTIMATED BUSINESS VALUE", margin + 18, y + 26);
+  doc.text("Estimated business value", margin + 18, y + 26);
   doc.setTextColor(...green);
   doc.setFont("helvetica", "bold");
   doc.setFontSize(28);
@@ -79,7 +79,7 @@ export function generatePdf(input: ValuationInput, result: ValuationResult) {
     doc.roundedRect(x, y, cardW, 58, 6, 6, "F");
     doc.setTextColor(...muted);
     doc.setFontSize(7.5);
-    doc.text(label.toUpperCase(), x + 10, y + 20);
+    doc.text(label, x + 10, y + 20);
     doc.setTextColor(...ink);
     doc.setFont("helvetica", "bold");
     doc.setFontSize(12);
@@ -133,7 +133,7 @@ export function generatePdf(input: ValuationInput, result: ValuationResult) {
     }
     doc.setTextColor(...muted);
     doc.setFontSize(8);
-    doc.text(String(label).toUpperCase(), margin, y);
+    doc.text(String(label), margin, y);
     y += 13;
     doc.setTextColor(...ink);
     doc.setFontSize(10);

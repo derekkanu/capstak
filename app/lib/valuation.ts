@@ -103,7 +103,7 @@ export const INTAKE_STAGES: { title: string; questions: string[] }[] = [
 ];
 
 /** EBITDA / SDE earnings multiples by sector keyword (rough industry norms). */
-const INDUSTRY_MULTIPLES: { keys: string[]; multiple: number; revMultiple: number; label: string }[] = [
+export const INDUSTRY_MULTIPLES: { keys: string[]; multiple: number; revMultiple: number; label: string }[] = [
   { keys: ["saas", "software", "b2b software"], multiple: 4.6, revMultiple: 2.4, label: "Software / SaaS" },
   { keys: ["tech", "technology", "ai", "app"], multiple: 4.0, revMultiple: 1.8, label: "Technology" },
   { keys: ["ecommerce", "e-commerce", "online store", "dtc"], multiple: 2.9, revMultiple: 0.9, label: "E-commerce" },
