@@ -39,6 +39,22 @@ export default function HeroDeck() {
     };
   }, []);
 
+  // the tilt: up to 9° toward wherever the cursor is over the file (mouse only, and not for reduced motion)
+  const tiltRef = useRef<HTMLDivElement>(null);
+  const tilt = (e: React.PointerEvent<HTMLDivElement>) => {
+    const el = tiltRef.current;
+    if (!el || e.pointerType !== "mouse" || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    const r = e.currentTarget.getBoundingClientRect();
+    const x = (e.clientX - r.left) / r.width - 0.5; // -0.5 … 0.5
+    const y = (e.clientY - r.top) / r.height - 0.5;
+    el.style.setProperty("--ry", `${(x * 18).toFixed(2)}deg`);
+    el.style.setProperty("--rx", `${(-y * 14).toFixed(2)}deg`);
+  };
+  const untilt = () => {
+    tiltRef.current?.style.setProperty("--ry", "0deg");
+    tiltRef.current?.style.setProperty("--rx", "0deg");
+  };
+
   useEffect(() => {
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     const t = window.setTimeout(() => setOpen(true), reduce ? 0 : INTRO_DONE_MS);
@@ -56,8 +72,12 @@ export default function HeroDeck() {
             className="relative w-[min(81vw,486px,calc((100svh-420px)*0.98))] min-w-[280px] will-change-transform"
             style={{ transform: "scale(calc(1 - var(--p) * 0.42))", opacity: "calc(1 - var(--p) * 1.5)", transformOrigin: "50% 40%" }}
           >
-            <div className="relative z-10">
-              <FileHero intro />
+            <div className="relative z-10" onPointerMove={tilt} onPointerLeave={untilt}>
+              {/* hover tilt: sets --rx/--ry; FileHero tilts only the folder (and the bundle inside it) with them,
+                  the files waiting at the sides stay flat */}
+              <div ref={tiltRef}>
+                <FileHero intro />
+              </div>
             </div>
           </div>
         </div>

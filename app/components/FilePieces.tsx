@@ -98,3 +98,9 @@ export function Seal({ id, className = "" }: { id: string; className?: string })
 export function Stop({ char = "." }: { char?: string }) {
   return <span className="stop">{char}</span>;
 }
+
+/** The hero's hover tilt, read from --rx/--ry (set by HeroDeck). */
+export const TILT = {
+  transform: "perspective(1100px) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg))",
+  transition: "transform 700ms cubic-bezier(0.22,1,0.36,1)",
+} as const;

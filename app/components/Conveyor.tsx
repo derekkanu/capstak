@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Seal } from "./FilePieces";
+import { Seal, TILT } from "./FilePieces";
 
 /* Business paperwork passing through the hero's file in tidy bundles of three.
 
@@ -276,7 +276,7 @@ const OUT = 0.32; // outside the folder: about 60% smaller than before (and well
    0 in the file · 1 just out, right · 2 further right · 3 leaving right (fades) ·
    4 out of sight (jumps to the far left) · 5 far left (fades in) · 6 next to go in, left */
 function place(k: number, sub: Sub) {
-  if (k === 0) return sub === "sink" ? { x: 54, y: 108, s: 1, r: 0, o: 1 } : { x: 54, y: 40, s: 1, r: 0, o: 1 };
+  if (k === 0) return sub === "sink" ? { x: 54, y: 108, s: 1, r: 0, o: 0 } : { x: 54, y: 40, s: 1, r: 0, o: 1 };
   const table: Record<number, { x: number; y: number; s: number; r: number; o: number }> = {
     1: { x: 124, y: 58, s: OUT, r: 4, o: 1 },
     2: { x: 158, y: 62, s: OUT * 0.92, r: -3, o: 1 },
@@ -332,16 +332,22 @@ export default function Conveyor({ startAfter = 4400 }: { startAfter?: number })
   const ease = "cubic-bezier(0.55,0,0.25,1)";
 
   return (
-    // its own layer at z 0, so the lid (later in FileHero) always covers it
-    <div aria-hidden className="absolute inset-0 z-0">
+    // its own layer at z 0, so the lid (later in FileHero) always covers it. Its bottom edge is cut 5% above the
+    // folder's base: when the folder tilts, the lid's lower corners lift a few px, and a sinking bundle must never
+    // show in that sliver
+    <div aria-hidden className="absolute inset-0 z-0 [clip-path:inset(-400px_-2400px_5%_-2400px)]">
       {BUNDLES.map((pieces, i) => {
         // the bundle at step % N is in the file; k counts how far along the line each bundle is
         const k = (((step - i) % N) + N) % N;
         const p = place(k, sub);
         let transition = `left ${ENTER_MS}ms ${ease}, top ${ENTER_MS}ms ${ease}, transform ${ENTER_MS}ms ${ease}, opacity 450ms ease`;
         if (k === 4) transition = "none"; // out of sight: jump across
-        if (k === 0 && sub === "sink") transition = `top ${SINK_MS}ms cubic-bezier(0.5,0,0.75,0.4)`;
-        if (k === 0 && sub === "rise") transition = `top ${RISE_MS}ms cubic-bezier(0.25,0.6,0.3,1)`;
+        // deep in the folder it fades out, so with the folder tilted nothing peeks out under the lid's edge;
+        // it fades back in on the way up, once it is behind the lid again
+        if (k === 0 && sub === "sink")
+          transition = `top ${SINK_MS}ms cubic-bezier(0.5,0,0.75,0.4), opacity ${Math.round(SINK_MS * 0.35)}ms ease ${Math.round(SINK_MS * 0.45)}ms`;
+        if (k === 0 && sub === "rise")
+          transition = `top ${RISE_MS}ms cubic-bezier(0.25,0.6,0.3,1), opacity ${Math.round(RISE_MS * 0.35)}ms ease ${Math.round(RISE_MS * 0.15)}ms`;
         return (
           <div
             key={i}
@@ -355,7 +361,10 @@ export default function Conveyor({ startAfter = 4400 }: { startAfter?: number })
               transition,
             }}
           >
-            <Bundle pieces={pieces} assembled={assembled} order={i} />
+            {/* only the bundle in the folder tilts with it; the ones waiting at the sides stay flat */}
+            <div style={{ transform: k === 0 ? TILT.transform : "none", transition: TILT.transition }}>
+              <Bundle pieces={pieces} assembled={assembled} order={i} />
+            </div>
           </div>
         );
       })}

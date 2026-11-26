@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Folder, Seal } from "./FilePieces";
+import { Folder, Seal, TILT } from "./FilePieces";
 import Conveyor from "./Conveyor";
 
 /* The hero's living file: back folders, the owner's photo clipped in as the first page, and the dark
@@ -19,6 +19,15 @@ const PHOTOS = [
 
 // the inner folder's colour
 const INNER = "#93b99b"; // sage: quiet, now that the documents carry the colour
+
+// the hover tilt (HeroDeck sets --rx/--ry): every folder layer turns about the same centre, so they move as one
+function Tilt({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="absolute inset-0" style={TILT}>
+      {children}
+    </div>
+  );
+}
 
 export default function FileHero({ intro = false }: { intro?: boolean }) {
   // intro: the folder builds itself around the first page after the logo sheet lands on it
@@ -61,16 +70,19 @@ export default function FileHero({ intro = false }: { intro?: boolean }) {
     >
       {/* back folders */}
       <div {...fx(4250)}>
+      <Tilt>
         <div className="absolute left-[2%] top-[6%] aspect-[500/320] w-[92%]">
           <Folder w={500} h={320} tx={0.5} tw={0.3} th={36} fill="#fbfaf6" stroke="#1d2a22" />
         </div>
         <div className="absolute left-[4%] top-0 aspect-[500/320] w-[92%] [&_path]:transition-[fill] [&_path]:duration-700">
           <Folder w={500} h={320} tx={0.22} tw={0.3} th={36} fill={INNER} />
         </div>
+      </Tilt>
       </div>
 
       {/* the owner's photo, clipped in: it comes in with the folder, so the inner folder never sits empty */}
       <div {...fx(4350)}>
+      <Tilt>
       <div
         data-deck-front=""
         className="absolute left-[12%] top-[9%] h-[60%] w-[60%] -rotate-3 rounded-[4px] bg-white p-2 shadow-[0_10px_24px_-14px_rgba(0,0,0,0.45)]"
@@ -87,6 +99,7 @@ export default function FileHero({ intro = false }: { intro?: boolean }) {
           ))}
         </span>
       </div>
+      </Tilt>
       </div>
 
       {/* the paperwork flowing in: over the first page, always under the lid */}
@@ -116,6 +129,7 @@ export default function FileHero({ intro = false }: { intro?: boolean }) {
 
       {/* the lid (front of the folder) */}
       <div {...fx(4450)}>
+      <Tilt>
         <div
           className="absolute inset-x-0 bottom-0 h-[47%] origin-bottom transition-transform duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]"
           style={{ transform: lidOpen ? "perspective(900px) rotateX(-16deg)" : "perspective(900px) rotateX(0deg)" }}
@@ -129,6 +143,7 @@ export default function FileHero({ intro = false }: { intro?: boolean }) {
             <span className="num font-mono text-[clamp(24px,4vw,34px)] font-medium tracking-[-0.03em] text-white">₦28M – ₦36M</span>
           </div>
         </div>
+      </Tilt>
       </div>
     </div>
   );
