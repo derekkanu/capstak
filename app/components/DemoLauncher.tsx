@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, type ReactNode } from "react";
-import DemoModal from "./DemoModal";
+import ComingSoonModal from "./ComingSoonModal";
 
 type Variant = "primary" | "lime" | "ghost" | "plain";
 
@@ -25,8 +25,8 @@ const SIZES = {
 };
 
 /**
- * Any button that opens the fullscreen AI valuation demo. Owns the modal so it
- * can be dropped anywhere on the page.
+ * Any "Try it free" / guided-interview button. The guided valuation is being built next, so for now it opens
+ * the coming-soon popup with the waitlist (DemoModal, the old AI interview demo, is kept for when it's back).
  */
 export default function DemoLauncher({
   variant = "primary",
@@ -43,7 +43,7 @@ export default function DemoLauncher({
       <button type="button" onClick={() => setOpen(true)} className={styles}>
         {children}
       </button>
-      <DemoModal open={open} onClose={() => setOpen(false)} />
+      <ComingSoonModal open={open} onClose={() => setOpen(false)} />
     </>
   );
 }

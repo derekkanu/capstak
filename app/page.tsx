@@ -129,14 +129,14 @@ function Estimate() {
           align="center"
           label="Free · quick estimate"
           title={<>Try a rough number <em>right now</em></>}
-          sub="Move the sliders to see how sector, growth, time trading and profit change a business's value. The full guided version asks about your business and shows every reason."
+          sub="Seven plain answers, the same way small businesses are priced when they change hands: what's left for you each year, times what buyers pay in your trade."
         />
         <FadeIn className="mt-12 md:mt-16">
           <ValuationPlayground />
         </FadeIn>
         <p className="mx-auto mt-6 max-w-[60ch] text-center text-[13px] leading-[1.6] text-ink/45">
-          Sector benchmarks are starting points and will be sharpened with real sale prices from our broker partners.
-          A quick estimate is a guide, not a formal valuation.
+          Multiples start from small-business sale data, adjusted down for Nigeria&rsquo;s higher risk, and will be sharpened
+          with real sale prices from our broker partners. Debts aren&rsquo;t included. A quick estimate is a guide, not a formal valuation.
         </p>
       </div>
     </section>

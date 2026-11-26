@@ -1,35 +1,42 @@
 "use client";
 
 import { useMemo, useState, type ReactNode } from "react";
-import DemoLauncher from "./DemoLauncher";
+import ComingSoonModal from "./ComingSoonModal";
 import {
-  computeValuation,
-  type GrowthTrend,
-  type ValuationInput,
-} from "../lib/valuation";
+  quickEstimate,
+  SECTORS,
+  type OwnerReliance,
+  type Records,
+  type SectorKey,
+  type Tenure,
+  type Trend,
+} from "../lib/quickEstimate";
 
-/* A live, in-page valuation preview modelled on Exa's API playground. Every
-   number comes from the same deterministic engine the full demo uses. */
+/* The free quick estimate: a few plain answers, one honest method (what's left for the owner × a multiple for
+   the trade, checked against sales). See lib/quickEstimate.ts for the method and where the benchmarks come from. */
 
-const INDUSTRIES = [
-  { label: "Food & hospitality", value: "cafe" },
-  { label: "Retail", value: "retail" },
-  { label: "Services", value: "services" },
-  { label: "Software", value: "software" },
-  { label: "Healthcare", value: "clinic" },
-  { label: "Construction", value: "construction" },
+const TRENDS: { label: string; value: Trend }[] = [
+  { label: "Shrinking", value: "shrinking" },
+  { label: "Keeping up", value: "keeping-up" },
+  { label: "Growing faster", value: "growing" },
 ];
 
-const TRENDS: { label: string; value: GrowthTrend }[] = [
-  { label: "Declining", value: "decreasing" },
-  { label: "Steady", value: "steady" },
-  { label: "Growing", value: "increasing" },
+const TENURE: { label: string; value: Tenure }[] = [
+  { label: "Under 2 yrs", value: "new" },
+  { label: "2–5 yrs", value: "mid" },
+  { label: "5+ yrs", value: "established" },
 ];
 
-const TENURE = [
-  { label: "Under 2 yrs", value: 1 },
-  { label: "2–5 yrs", value: 3 },
-  { label: "5+ yrs", value: 6 },
+const WITHOUT_YOU: { label: string; value: OwnerReliance }[] = [
+  { label: "No", value: "no" },
+  { label: "Partly", value: "partly" },
+  { label: "Yes", value: "yes" },
+];
+
+const RECORDS: { label: string; value: Records }[] = [
+  { label: "Mostly cash", value: "cash" },
+  { label: "Some", value: "some" },
+  { label: "Bank & POS", value: "bank" },
 ];
 
 type Tab = "range" | "breakdown" | "report";
@@ -41,63 +48,46 @@ function money(n: number) {
   return `₦${Math.round(n)}`;
 }
 
-function baseInput(): ValuationInput {
-  return {
-    businessName: null,
-    industry: null,
-    location: null,
-    yearsInOperation: null,
-    revenueThreeMonthsAgo: null,
-    revenueLastMonth: null,
-    annualRevenue: null,
-    annualNetProfit: null,
-    costStructure: null,
-    liabilities: null,
-    growthTrend: null,
-    growthRatePct: null,
-    competitors: null,
-    marketSize: null,
-    customerSegments: null,
-    teamSize: null,
-    keyAssets: null,
-    keyProcesses: null,
-    risks: null,
-    growthStrategy: null,
-    contingencyPlans: null,
-  };
-}
+// monthly sales slider runs on a curve, so ₦200k and ₦50M are both easy to reach
+const SALES_MIN = 200_000;
+const SALES_MAX = 50_000_000;
+const salesAt = (pos: number) => {
+  const v = SALES_MIN * Math.pow(SALES_MAX / SALES_MIN, pos / 1000);
+  const step = v < 1_000_000 ? 10_000 : v < 10_000_000 ? 50_000 : 250_000;
+  return Math.round(v / step) * step;
+};
+const posFor = (v: number) => Math.round((Math.log(v / SALES_MIN) / Math.log(SALES_MAX / SALES_MIN)) * 1000);
 
 export default function ValuationPlayground() {
   const [prompt, setPrompt] = useState("Family restaurant in Lagos, six years trading");
-  const [mode, setMode] = useState<"estimate" | "interview">("estimate");
-  const [industry, setIndustry] = useState(INDUSTRIES[0]);
-  const [trend, setTrend] = useState<GrowthTrend>("increasing");
-  const [years, setYears] = useState(6);
-  const [revenue, setRevenue] = useState(48_000_000);
-  const [margin, setMargin] = useState(18);
+  // "Guided interview" is the full valuation, coming next: picking it opens the coming-soon popup
+  const [soon, setSoon] = useState(false);
+  const [sector, setSector] = useState<SectorKey>("food");
+  const [salesPos, setSalesPos] = useState(posFor(4_000_000));
+  const [leftPct, setLeftPct] = useState(18);
+  const [tenure, setTenure] = useState<Tenure>("established");
+  const [trend, setTrend] = useState<Trend>("growing");
+  const [withoutYou, setWithoutYou] = useState<OwnerReliance>("partly");
+  const [records, setRecords] = useState<Records>("some");
   const [tab, setTab] = useState<Tab>("range");
   const [pulse, setPulse] = useState(0);
 
-  const result = useMemo(
-    () =>
-      computeValuation({
-        ...baseInput(),
-        industry: industry.value,
-        yearsInOperation: years,
-        growthTrend: trend,
-        annualRevenue: revenue,
-        annualNetProfit: (revenue * margin) / 100,
-      }),
-    [industry, years, trend, revenue, margin],
-  );
+  // the first five trades, plus the chosen one if it's further down the list, so a pick never disappears
+  const [allTrades, setAllTrades] = useState(false);
+  const picked = SECTORS.findIndex((t) => t.key === sector);
+  const shownTrades = picked < 5 ? SECTORS.slice(0, 5) : [...SECTORS.slice(0, 4), SECTORS[picked]];
 
-  const profit = (revenue * margin) / 100;
-  const sectorRevMultiple = result.annualRevenue
-    ? result.revenueValue / result.annualRevenue
-    : 0;
+  const monthlySales = salesAt(salesPos);
+  const monthlyLeft = Math.round((monthlySales * leftPct) / 100 / 1000) * 1000;
+
+  const r = useMemo(
+    () => quickEstimate({ sector, monthlySales, monthlyLeft, tenure, trend, withoutYou, records }),
+    [sector, monthlySales, monthlyLeft, tenure, trend, withoutYou, records],
+  );
 
   return (
     <div className="relative mx-auto w-full max-w-[1120px] text-left">
+      <ComingSoonModal open={soon} onClose={() => setSoon(false)} />
       {/* Prompt bar */}
       <div className="relative z-10 rounded-[20px] border border-ink/10 bg-white p-3 shadow-[0_24px_60px_-30px_rgba(12,29,18,0.35)] md:p-4">
         <input
@@ -109,8 +99,8 @@ export default function ValuationPlayground() {
         />
         <div className="flex items-center justify-between gap-3">
           <Segmented
-            value={mode}
-            onChange={setMode}
+            value={"estimate" as "estimate" | "interview"}
+            onChange={(v) => v === "interview" && setSoon(true)}
             options={[
               { value: "estimate", label: "Quick estimate", icon: <CalcIcon /> },
               { value: "interview", label: "Guided interview", icon: <ChatIcon /> },
@@ -128,24 +118,14 @@ export default function ValuationPlayground() {
                 <path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
               </svg>
             </button>
-            {mode === "interview" ? (
-              <DemoLauncher
-                variant="plain"
-                className="flex h-11 w-11 items-center justify-center rounded-[12px] bg-green text-lime shadow-[inset_0_1px_0_rgba(255,255,255,0.15)] transition-colors hover:bg-green-mid"
-              >
-                <ArrowUp />
-                <span className="sr-only">Start guided interview</span>
-              </DemoLauncher>
-            ) : (
-              <button
-                type="button"
-                aria-label="Recalculate"
-                onClick={() => setPulse((p) => p + 1)}
-                className="flex h-11 w-11 items-center justify-center rounded-[12px] bg-green text-lime shadow-[inset_0_1px_0_rgba(255,255,255,0.15)] transition-colors hover:bg-green-mid"
-              >
-                <ArrowUp />
-              </button>
-            )}
+            <button
+              type="button"
+              aria-label="Recalculate"
+              onClick={() => setPulse((p) => p + 1)}
+              className="flex h-11 w-11 items-center justify-center rounded-[12px] bg-green text-lime shadow-[inset_0_1px_0_rgba(255,255,255,0.15)] transition-colors hover:bg-green-mid"
+            >
+              <ArrowUp />
+            </button>
           </div>
         </div>
       </div>
@@ -154,53 +134,53 @@ export default function ValuationPlayground() {
       <div className="-mt-5 grid grid-cols-1 overflow-hidden rounded-b-[20px] border border-t-0 border-ink/[0.08] bg-white/55 pt-5 backdrop-blur-xl md:grid-cols-[minmax(0,5fr)_minmax(0,7fr)]">
         {/* Controls */}
         <div className="flex flex-col gap-6 p-5 md:border-r md:border-ink/[0.08] md:p-6">
-          <Field label="Industry">
-            <div className="grid grid-cols-2 gap-1.5 sm:grid-cols-3">
-              {INDUSTRIES.map((opt) => (
-                <Chip
-                  key={opt.value}
-                  active={opt.value === industry.value}
-                  onClick={() => setIndustry(opt)}
-                >
+          <Field label="What do you do?">
+            {/* five trades and "More", three rows; the rest open in place */}
+            <div className="grid grid-cols-2 gap-1.5">
+              {(allTrades ? SECTORS : shownTrades).map((opt) => (
+                <Chip key={opt.key} active={opt.key === sector} onClick={() => setSector(opt.key)}>
                   {opt.label}
                 </Chip>
               ))}
+              <Chip active={false} onClick={() => setAllTrades((v) => !v)}>
+                {allTrades ? "Fewer" : "More…"}
+              </Chip>
             </div>
           </Field>
 
-          <Field label="Revenue trend">
+          <Slider
+            label="Sales in a normal month"
+            value={salesPos}
+            display={money(monthlySales)}
+            min={0}
+            max={1000}
+            step={1}
+            onChange={setSalesPos}
+          />
+          <Slider
+            label="Left for you each month"
+            hint="After all costs, before paying yourself"
+            value={leftPct}
+            display={`${money(monthlyLeft)} · ${leftPct}%`}
+            min={0}
+            max={60}
+            step={1}
+            onChange={setLeftPct}
+          />
+
+          <Field label="How long have you been trading?">
+            <Segmented value={tenure} onChange={setTenure} options={TENURE} full />
+          </Field>
+          <Field label="Sales compared with a year ago, against rising prices">
             <Segmented value={trend} onChange={setTrend} options={TRENDS} full />
           </Field>
-
-          <Field label="Time trading">
-            <Segmented value={years} onChange={setYears} options={TENURE} full />
+          <Field label="Could it run for a month without you?">
+            <Segmented value={withoutYou} onChange={setWithoutYou} options={WITHOUT_YOU} full />
+          </Field>
+          <Field label="How are your sales recorded?">
+            <Segmented value={records} onChange={setRecords} options={RECORDS} full />
           </Field>
 
-          <Slider
-            label="Annual revenue"
-            value={revenue}
-            display={money(revenue)}
-            min={3_000_000}
-            max={600_000_000}
-            step={1_000_000}
-            onChange={setRevenue}
-          />
-          <Slider
-            label="Profit margin"
-            value={margin}
-            display={`${margin}%`}
-            min={2}
-            max={40}
-            step={1}
-            onChange={setMargin}
-          />
-
-          <div className="mt-auto flex flex-wrap items-center gap-2 pt-1">
-            <DemoLauncher variant="plain" className="inline-flex items-center gap-2 rounded-[10px] border border-ink/10 bg-white px-3.5 py-2.5 text-[14px] font-medium text-ink transition-colors hover:border-ink/20">
-              Run the full interview
-              <ExternalIcon />
-            </DemoLauncher>
-          </div>
         </div>
 
         {/* Output */}
@@ -212,77 +192,83 @@ export default function ValuationPlayground() {
               options={[
                 { value: "range", label: "Range" },
                 { value: "breakdown", label: "Breakdown" },
-                { value: "report", label: "Report" },
+                { value: "report", label: "Full report" },
               ]}
             />
-            <span className="num inline-flex items-center gap-1.5 rounded-[8px] bg-[#34c759]/15 px-2.5 py-1.5 text-[14px] font-medium text-[#1d7a3a]">
-              <svg viewBox="0 0 16 16" className="h-3.5 w-3.5" fill="none" aria-hidden>
-                <path d="M8 13V3M4 7l4-4 4 4" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
-              </svg>
-              {result.adjustedMultiple.toFixed(1)}× multiple
-            </span>
+            {r.ok ? (
+              <span className="num inline-flex items-center gap-1.5 rounded-[8px] bg-[#34c759]/15 px-2.5 py-1.5 text-[14px] font-medium text-[#1d7a3a]">
+                {r.multiple.toFixed(1)}× a year&rsquo;s earnings
+              </span>
+            ) : null}
           </div>
 
           <div key={`${tab}-${pulse}`} className="playground-in mt-5 flex flex-1 flex-col gap-2.5">
-            {tab === "range" && (
+            {!r.ok ? (
+              <div className="rounded-[14px] border border-ink/[0.08] bg-white p-5">
+                <p className="text-[14px] text-ink/50">Estimated value · {r.sector.label}</p>
+                <p className="display num mt-1 text-[40px] leading-none text-ink/40">No number yet</p>
+                <p className="mt-4 max-w-[46ch] text-[15px] leading-[1.55] text-ink/65">{r.reason}</p>
+              </div>
+            ) : null}
+
+            {r.ok && tab === "range" && (
               <>
                 <div className="rounded-[14px] border border-ink/[0.08] bg-white p-5">
-                  <p className="text-[14px] text-ink/50">Estimated value · {result.industryLabel}</p>
-                  <p className="display num mt-1 text-[48px] leading-none text-ink md:text-[56px]">
-                    {money(result.mid)}
+                  <p className="text-[14px] text-ink/50">Rough value before debts · {r.sector.label}</p>
+                  <p className="display num mt-1 text-[48px] leading-none text-ink md:text-[56px]">{money(r.mid)}</p>
+                  <RangeBar low={r.low} mid={r.mid} high={r.high} />
+                  <p className="mt-3 text-[13px] text-ink/50">
+                    Confidence: <span className="font-medium text-ink/75">{r.confidence}</span> · ±{Math.round(r.spread * 100)}%.
+                    {r.confidence !== "Good" ? " Bank and POS records narrow it." : ""}
                   </p>
-                  <RangeBar low={result.low} mid={result.mid} high={result.high} />
                 </div>
                 <ResultRow
                   title="Earnings view"
-                  value={money(result.earningsValue)}
-                  detail={`${money(profit)} profit × ${result.adjustedMultiple.toFixed(1)} adjusted multiple, weighted 70%`}
+                  value={money(r.earningsValue)}
+                  detail={`${money(r.yearlyLeft)} left a year × ${r.multiple.toFixed(1)}`}
+                  faded={r.capped}
                 />
                 <ResultRow
-                  title="Revenue cross-check"
-                  value={money(result.revenueValue)}
-                  detail={`${money(revenue)} revenue × ${sectorRevMultiple.toFixed(1)} sector multiple, weighted 30%`}
-                  faded
+                  title={r.capped ? "Capped by sales" : "Sales check"}
+                  value={money(r.salesCeiling)}
+                  detail={`Buyers in ${r.sector.label.toLowerCase()} rarely pay over ${r.sector.salesCap}× a year's sales (${money(r.yearlySales)})`}
+                  strong={r.capped}
+                  faded={!r.capped}
                 />
               </>
             )}
 
-            {tab === "breakdown" && (
+            {r.ok && tab === "breakdown" && (
               <>
                 <ResultRow
-                  title={`${result.industryLabel} benchmark`}
-                  value={`${result.baseMultiple.toFixed(1)}×`}
-                  detail="Typical earnings multiple for businesses in this sector"
+                  title={`${r.sector.label}, typical`}
+                  value={`${r.sector.multiple.toFixed(1)}×`}
+                  detail="What small businesses in this trade sell for, in years of earnings"
                 />
-                {result.adjustments.length ? (
-                  result.adjustments.map((a) => (
+                {r.steps.length ? (
+                  r.steps.map((a) => (
                     <ResultRow
                       key={a.label}
                       title={a.label}
                       value={`${a.delta > 0 ? "+" : "−"}${Math.abs(a.delta).toFixed(1)}×`}
                       tone={a.delta > 0 ? "up" : "down"}
-                      detail={a.delta > 0 ? "Raises the multiple buyers will pay" : "Lowers the multiple buyers will pay"}
+                      detail={a.why}
                     />
                   ))
                 ) : (
-                  <ResultRow title="No adjustments" value="0.0×" detail="Your answers sit right at the sector norm" />
+                  <ResultRow title="No adjustments" value="0.0×" detail="Your answers sit right at the norm for the trade" />
                 )}
-                <ResultRow
-                  title="Your multiple"
-                  value={`${result.adjustedMultiple.toFixed(1)}×`}
-                  detail="Applied to your annual profit"
-                  strong
-                />
+                <ResultRow title="Your multiple" value={`${r.multiple.toFixed(1)}×`} detail="Applied to what's left for you in a year" strong />
               </>
             )}
 
-            {tab === "report" && (
+            {r.ok && tab === "report" && (
               <>
-                <ResultRow title="Business overview" value="p. 1" detail={`${prompt || "Your business"} · ${result.industryLabel}`} />
-                <ResultRow title="Financials" value="p. 2" detail={`${money(revenue)} revenue · ${margin}% margin · ${money(profit)} profit`} />
-                <ResultRow title="Valuation range" value="p. 3" detail={`${money(result.low)} – ${money(result.high)}, midpoint ${money(result.mid)}`} />
-                <ResultRow title="What moves your value" value="p. 4" detail="Growth, track record, margin and debt, explained in plain English" />
-                <ResultRow title="Risks & strategy" value="p. 5" detail="Where the value could go next, and how to protect it" faded />
+                <ResultRow title="What the full valuation adds" value="" detail="Your real numbers from bank statements, so the range narrows" />
+                <ResultRow title="Debts and assets" value="" detail="Loans netted out; equipment, stock and property counted" />
+                <ResultRow title="Three methods, not one" value="" detail="Market, earnings over time and assets, blended by how sure we are" />
+                <ResultRow title="Your business model" value="" detail="Customers, suppliers and risks that move the multiple" />
+                <ResultRow title="A report to share" value="" detail="For a buyer, a broker or a bank, every reason written down" faded />
               </>
             )}
           </div>
@@ -374,6 +360,7 @@ function Segmented<T extends string | number>({
 
 function Slider({
   label,
+  hint,
   value,
   display,
   min,
@@ -382,6 +369,7 @@ function Slider({
   onChange,
 }: {
   label: string;
+  hint?: string;
   value: number;
   display: string;
   min: number;
@@ -396,6 +384,7 @@ function Slider({
         <span className="text-[13px] font-medium text-ink/45">{label}</span>
         <span className="num text-[14px] font-medium text-ink">{display}</span>
       </span>
+      {hint ? <span className="-mt-1 mb-2 block text-[12px] text-ink/40">{hint}</span> : null}
       <input
         type="range"
         min={min}
@@ -490,14 +479,6 @@ function ChatIcon() {
     <svg viewBox="0 0 20 20" className="h-[18px] w-[18px] text-[#1d7a3a]" fill="none" aria-hidden>
       <path d="M4 4.5h12a1.5 1.5 0 011.5 1.5v7a1.5 1.5 0 01-1.5 1.5H9l-3.5 3v-3H4A1.5 1.5 0 012.5 13V6A1.5 1.5 0 014 4.5z" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round" />
       <path d="M6.5 8.5h7M6.5 11h4.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-    </svg>
-  );
-}
-
-function ExternalIcon() {
-  return (
-    <svg viewBox="0 0 16 16" className="h-3.5 w-3.5 text-ink/60" fill="none" aria-hidden>
-      <path d="M6.5 3.5H4A1.5 1.5 0 002.5 5v7A1.5 1.5 0 004 13.5h7a1.5 1.5 0 001.5-1.5V9.5M9.5 2.5h4v4M13.5 2.5L7.5 8.5" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
   );
 }

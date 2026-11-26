@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import DemoLauncher from "./DemoLauncher";
 import FileHero from "./FileHero";
 import { Arrow } from "./FilePieces";
 
@@ -104,10 +103,10 @@ export default function HeroDeck() {
               No spreadsheets, no finance words, right from your phone.
             </p>
             <div className="flex flex-wrap items-center gap-3">
-              <DemoLauncher size="lg">
+              <a href="#estimate" className="btn btn-p btn-lg">
                 <Arrow className="h-2.5 w-2.5 text-lime" />
                 Get my free estimate
-              </DemoLauncher>
+              </a>
               <a href="#how" className="btn btn-s btn-lg">
                 See how it works
               </a>
