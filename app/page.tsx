@@ -9,7 +9,7 @@ import Shelf from "./components/Shelf";
 import { Arrow, Folder, Seal, Stop } from "./components/FilePieces";
 
 /* Capstack landing page, "On file" direction (docs/brand/on-file, docs/capstack-spec.html).
-   Example business across the page: Okafor Woodworks, a furniture workshop, ₦28M–₦36M (illustrative). */
+   Example business across the page: Okafor Woodworks, a furniture workshop, ₦24M–₦35M (illustrative). */
 
 export default function Home() {
   return (
@@ -240,7 +240,7 @@ function BothSides() {
           </div>
           <div className="absolute left-1/2 top-1/2 w-[74%] -translate-x-1/2 -translate-y-1/2 rounded-[6px] bg-lime p-5 text-green shadow-[0_18px_36px_-16px_rgba(0,0,0,0.55)]">
             <span className="tab-label">Capstack · with every reason</span>
-            <p className="num mt-2 font-mono text-[34px] font-medium tracking-[-0.04em]">₦28M – ₦36M</p>
+            <p className="num mt-2 font-mono text-[34px] font-medium tracking-[-0.04em]">₦24M – ₦35M</p>
             <p className="mt-1 text-[14px]">Okafor Woodworks · File №0142</p>
             <Seal id="deal" className="absolute -right-6 -top-8 h-[76px] w-[76px] rotate-[-12deg] text-green" />
           </div>
@@ -272,7 +272,7 @@ const PLANS: Plan[] = [
     who: "For anyone curious about their number.",
     price: "₦0",
     period: "always free",
-    features: ["The quick estimate calculator", "A rough range by sector", "No sign-up needed"],
+    features: ["The quick estimate calculator", "A rough range for your trade, with every step shown", "No sign-up needed"],
     cta: "demo",
     fill: "#fbfaf6",
     tabFill: "#93b99b",
@@ -340,9 +340,10 @@ function Pricing() {
                 </p>
                 <div className="mt-8">
                   {p.cta === "demo" ? (
-                    <DemoLauncher variant="ghost" size="lg" className="w-full">
-                      Try it free
-                    </DemoLauncher>
+                    // the quick estimate is live: this goes straight to it
+                    <a href="#estimate" className="btn btn-s btn-lg w-full">
+                      Try the quick estimate
+                    </a>
                   ) : (
                     <a href="#waitlist" className={`btn btn-lg w-full ${p.dark ? "btn-lime" : "btn-p"}`}>
                       Join the waitlist

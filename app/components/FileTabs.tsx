@@ -48,14 +48,14 @@ const TABS: Tab[] = [
     title: <>No finance words. <em>Just your money.</em></>,
     body: "Rough answers are fine. If a question doesn't make sense, ask, and it's explained in plain words.",
     asks: ["Roughly what came in last month?", "What went out? Rent, stock, salaries, everything.", "Do you owe anyone for the business: a loan, a supplier, equipment?"],
-    gets: "Your real profit, worked out for you, and what it means for your value.",
+    gets: "What's really left for you each month, worked out, and what it means for your value.",
   },
   {
     key: "receipts",
     label: "Receipts",
     colour: "#e8e7df",
     ink: "#042e1b",
-    title: <>Bring the receipts. <em>Raise your confidence.</em></>,
+    title: <>Bring the receipts. <em>Raise your confidence</em></>,
     body: "POS slips, bank statements, a photo of your sales book. Optional, and each one makes your number harder to argue with.",
     asks: ["Three months of bank statements", "POS or transfer summaries", "A list of equipment and stock"],
     gets: "A higher confidence score, and a range that gets tighter.",
@@ -112,14 +112,15 @@ export default function FileTabs() {
             {t.key === "valuation" ? (
               <div className="relative rounded-[4px] bg-white p-6 shadow-[0_12px_26px_-18px_rgba(0,0,0,0.45)]">
                 <p className="tab-label text-ink/45">Okafor Woodworks · estimated value</p>
-                <p className="num mt-3 font-mono text-[30px] font-medium tracking-[-0.03em] text-green md:text-[34px]">₦28M – ₦36M</p>
-                <p className="mt-1 text-[13px] text-ink/50">Confidence: medium</p>
+                <p className="num mt-3 font-mono text-[30px] font-medium tracking-[-0.03em] text-green md:text-[34px]">₦24M – ₦35M</p>
+                <p className="mt-1 text-[13px] text-ink/50">Confidence: good · bank statements on file</p>
                 <ul className="mt-5 flex flex-col gap-2.5 border-t border-ink/10 pt-4 text-[14px]">
                   {[
-                    ["Six years on the same street", "+₦4.4M"],
-                    ["Customers come back", "+₦3.1M"],
-                    ["One big timber supplier", "−₦1.2M"],
-                    ["Equipment loan", "−₦1.2M"],
+                    // Okafor through the same method as the calculator: ₦890k left a month × 2.4 for makers = ₦25.6M
+                    ["Furniture makers sell for 2.4× a year's earnings", "₦25.6M"],
+                    ["Six years on the same street", "+₦3.2M"],
+                    ["Growing faster than prices", "+₦4.3M"],
+                    ["Capped at 0.7× a year's sales", "−₦3.7M"],
                   ].map(([k, v]) => (
                     <li key={k} className="flex justify-between gap-3">
                       <span className="text-ink/75">{k}</span>

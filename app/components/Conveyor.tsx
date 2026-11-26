@@ -78,7 +78,7 @@ function Doc({ kind, tone }: { kind: Kind; tone?: string }) {
           <span className="absolute inset-x-0 top-0 flex items-center bg-green font-mono uppercase text-lime" style={{ height: mm(32), paddingLeft: mm(16), fontSize: mm(7), letterSpacing: "0.1em" }}>Valuation report · File №0142</span>
           <span className="font-semibold leading-tight text-ink" style={{ fontSize: mm(17) }}>Okafor Woodworks</span>
           <Lines n={3} />
-          <span className="num font-mono font-medium text-green" style={{ fontSize: mm(15), marginTop: mm(6) }}>₦28M – ₦36M</span>
+          <span className="num font-mono font-medium text-green" style={{ fontSize: mm(15), marginTop: mm(6) }}>₦24M – ₦35M</span>
           <Lines n={4} />
           <span className="absolute" style={{ right: mm(14), bottom: mm(14), width: mm(52), height: mm(52) }}>
             <Seal id="conv-report" className="h-full w-full text-seal" />

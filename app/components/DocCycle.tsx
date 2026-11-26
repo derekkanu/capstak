@@ -24,7 +24,7 @@ function Doc({ kind }: { kind: Kind }) {
           <b className="text-[17px] font-semibold leading-tight tracking-[-0.02em]">Okafor Woodworks</b>
           <span className="h-[5px] rounded bg-[#ecebe5]" />
           <span className="h-[5px] w-[70%] rounded bg-[#ecebe5]" />
-          <span className="num mt-1 font-mono text-[17px] font-medium text-green">₦28M – ₦36M</span>
+          <span className="num mt-1 font-mono text-[17px] font-medium text-green">₦24M – ₦35M</span>
           <Seal id="cycle" className="doc-stamp absolute bottom-3 right-3 h-16 w-16 text-seal" />
         </div>
       );

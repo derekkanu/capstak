@@ -1,26 +1,26 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { INDUSTRY_MULTIPLES, computeValuation } from "../lib/valuation";
+import { SECTORS, quickEstimate } from "../lib/quickEstimate";
 
-/* Exa-style split: dark story panel with tabs on the left, a clean chart on the
-   right. Every figure is read from the valuation engine, not typed in. */
+/* Dark story panel with tabs on the left, a chart on the right. Every figure is read from the same engine as
+   the free calculator (lib/quickEstimate.ts), not typed in, so this section and the calculator always agree. */
 
 const TABS = [
   {
     key: "sectors",
-    title: "Industry benchmarks",
-    body: "Each valuation starts from what businesses in your sector typically sell for, on earnings and on revenue.",
+    title: "What buyers pay in your trade",
+    body: "Every estimate starts from what small businesses in your trade sell for: a number of years of what's left for the owner, and a ceiling on a year's sales.",
   },
   {
     key: "adjust",
     title: "What moves your multiple",
-    body: "Growth, track record, margins and debt each nudge the multiple up or down from the sector norm.",
+    body: "Size, years trading, growth against rising prices, whether it runs without you and how good your records are each move it up or down.",
   },
   {
     key: "value",
     title: "From multiple to value",
-    body: "An earnings view and a revenue cross-check are blended, then any debt is netted out to give your range.",
+    body: "What's left for you in a year, times your multiple, checked against the ceiling on sales. The full valuation then takes off debts and counts equipment and stock.",
   },
 ] as const;
 
@@ -49,8 +49,8 @@ export default function ValuationMethod() {
               How your number is made<span className="stop">.</span>
             </h2>
             <p className="mt-5 max-w-[34ch] text-[16px] leading-[1.6] text-cream/60 md:text-[17px]">
-              The AI gathers your story. A transparent, rule-based engine does the maths, so the same
-              answers always give the same result.
+              The way small businesses are priced when they change hands. Fixed rules do the maths, so the same
+              answers always give the same result, and every step is shown.
             </p>
 
             <ul className="mt-12 flex flex-col gap-1" role="tablist" aria-label="Valuation method">
@@ -127,23 +127,24 @@ function Legend({ items }: { items: { color: string; label: string }[] }) {
 }
 
 function SectorChart() {
-  const pick = ["Software / SaaS", "Healthcare", "Manufacturing", "Professional Services", "Retail", "Food & Hospitality"];
-  const rows = pick
-    .map((l) => INDUSTRY_MULTIPLES.find((s) => s.label === l)!)
-    .filter(Boolean);
-  const max = 5;
-  const ticks = [0, 1, 2, 3, 4, 5];
+  const pick = ["tech", "health", "education", "making", "trade", "food"];
+  const rows = pick.map((k) => SECTORS.find((s) => s.key === k)!);
+  const max = 3;
+  const ticks = [0, 1, 2, 3];
   const short: Record<string, string> = {
-    "Software / SaaS": "Software",
-    "Professional Services": "Prof. services",
-    "Food & Hospitality": "Hospitality",
+    tech: "Tech",
+    health: "Health",
+    education: "Schools",
+    making: "Making things",
+    trade: "Shop & trading",
+    food: "Food & drinks",
   };
   return (
     <div className="flex flex-1 flex-col">
       <Legend
         items={[
-          { color: ACCENT, label: "Earnings multiple" },
-          { color: MUTED, label: "Revenue multiple" },
+          { color: ACCENT, label: "Years of earnings" },
+          { color: MUTED, label: "Ceiling, × a year's sales" },
         ]}
       />
       <div className="relative mt-6 flex flex-1 pl-9">
@@ -161,20 +162,23 @@ function SectorChart() {
         </div>
         <div className="relative flex min-h-[320px] flex-1 items-end justify-around gap-2 border-b border-ink/30 md:gap-4">
           {rows.map((r, i) => (
-            <div key={r.label} className={`h-full flex-1 items-end justify-center gap-1 md:gap-1.5 ${i >= 4 ? "hidden sm:flex" : "flex"}`}>
+            <div key={r.key} className={`h-full flex-1 items-end justify-center gap-1 md:gap-1.5 ${i >= 4 ? "hidden sm:flex" : "flex"}`}>
               <Bar value={r.multiple} max={max} color={ACCENT} label={`${r.multiple.toFixed(1)}×`} />
-              <Bar value={r.revMultiple} max={max} color={MUTED} label={`${r.revMultiple.toFixed(1)}×`} />
+              <Bar value={r.salesCap} max={max} color={MUTED} label={`${r.salesCap.toFixed(1)}×`} />
             </div>
           ))}
         </div>
       </div>
       <div className="flex justify-around gap-2 pl-9 pt-3 md:gap-4">
         {rows.map((r, i) => (
-          <span key={r.label} className={`flex-1 text-center text-[12px] leading-tight text-ink/70 md:text-[14px] ${i >= 4 ? "hidden sm:block" : ""}`}>
-            {short[r.label] ?? r.label}
+          <span key={r.key} className={`flex-1 text-center text-[12px] leading-tight text-ink/70 md:text-[14px] ${i >= 4 ? "hidden sm:block" : ""}`}>
+            {short[r.key]}
           </span>
         ))}
       </div>
+      <p className="mt-5 text-[13px] text-ink/50">
+        From small-business sale data, adjusted down for Nigeria&rsquo;s higher risk. To be sharpened with brokers&rsquo; real sale prices.
+      </p>
     </div>
   );
 }
@@ -195,16 +199,20 @@ function Bar({ value, max, color, label }: { value: number; max: number; color: 
 }
 
 function AdjustmentChart() {
+  // the same steps as lib/quickEstimate.ts
   const rows = [
-    { label: "Revenue growing", delta: 0.5 },
-    { label: "Established, 5+ years", delta: 0.3 },
-    { label: "Strong profit margin", delta: 0.3 },
-    { label: "Thin profit margin", delta: -0.3 },
-    { label: "Elevated debt load", delta: -0.3 },
-    { label: "Early stage, under 2 years", delta: -0.4 },
-    { label: "Revenue declining", delta: -0.5 },
+    { label: "Larger business, ₦10M+ a month left", delta: 0.6 },
+    { label: "Growing faster than prices", delta: 0.4 },
+    { label: "Mid-sized, ₦3M+ a month left", delta: 0.3 },
+    { label: "5+ years trading", delta: 0.3 },
+    { label: "Runs without you", delta: 0.3 },
+    { label: "Small, under ₦500k a month", delta: -0.2 },
+    { label: "Mostly cash, few records", delta: -0.2 },
+    { label: "Under 2 years trading", delta: -0.4 },
+    { label: "Sales shrinking", delta: -0.4 },
+    { label: "Depends on you", delta: -0.4 },
   ];
-  const max = 0.6;
+  const max = 0.7;
   return (
     <div className="flex flex-1 flex-col">
       <Legend
@@ -213,15 +221,15 @@ function AdjustmentChart() {
           { color: "#d9a184", label: "Lowers multiple" },
         ]}
       />
-      <div className="mt-8 flex flex-1 flex-col justify-center gap-3.5">
+      <div className="mt-6 flex flex-1 flex-col justify-center gap-2.5">
         {rows.map((r) => {
           const w = (Math.abs(r.delta) / max) * 50;
           const up = r.delta > 0;
           return (
             <div key={r.label} className="grid grid-cols-[minmax(0,1fr)] gap-1.5 md:grid-cols-[200px_minmax(0,1fr)] md:items-center md:gap-4">
               <span className="text-[14px] text-ink/75 md:text-right md:text-[15px]">{r.label}</span>
-              <div className="relative h-8">
-                <div className="absolute inset-y-[-6px] left-1/2 border-l border-ink/30" />
+              <div className="relative h-7">
+                <div className="absolute inset-y-[-5px] left-1/2 border-l border-ink/30" />
                 <div
                   className="bar-grow-x absolute inset-y-0 flex items-center rounded-[3px]"
                   style={{
@@ -250,72 +258,44 @@ function AdjustmentChart() {
 }
 
 function ValueChart() {
-  // A worked example straight through the engine.
-  const r = computeValuation({
-    businessName: null,
-    industry: "cafe",
-    location: null,
-    yearsInOperation: 6,
-    revenueThreeMonthsAgo: null,
-    revenueLastMonth: null,
-    annualRevenue: 48_000_000,
-    annualNetProfit: 8_640_000,
-    costStructure: null,
-    liabilities: 2_000_000,
-    growthTrend: "increasing",
-    growthRatePct: null,
-    competitors: null,
-    marketSize: null,
-    customerSegments: null,
-    teamSize: null,
-    keyAssets: null,
-    keyProcesses: null,
-    risks: null,
-    growthStrategy: null,
-    contingencyPlans: null,
+  // the calculator's own example, straight through the engine
+  const r = quickEstimate({
+    sector: "food",
+    monthlySales: 4_000_000,
+    monthlyLeft: 720_000,
+    tenure: "established",
+    trend: "growing",
+    withoutYou: "partly",
+    records: "some",
   });
-  const earnings = r.earningsValue * 0.7;
-  const revenue = r.revenueValue * 0.3;
-  const debt = r.liabilities;
-  const top = earnings + revenue;
-  const afterDebt = top - debt;
-  const adj = r.mid - afterDebt; // the engine's own nudges (growth, years, risk)
-  type Row = { label: string; from: number; to: number; color: string; value: number; total?: boolean };
+  if (!r.ok) return null;
+  const k = (n: number) => `₦${(n / 1_000_000).toFixed(1).replace(/\.0$/, "")}M`;
+  const why = [`${r.sector.multiple}× typical`, ...r.steps.map((s) => `${s.delta > 0 ? "+" : "−"}${Math.abs(s.delta)} ${s.label.toLowerCase()}`)].join(", ");
+  type Row = { label: string; note: string; value: number; color: string; total?: boolean; faded?: boolean };
   const rows: Row[] = [
-    { label: "Earnings view (70%)", from: 0, to: earnings, color: ACCENT, value: earnings },
-    { label: "Revenue view (30%)", from: earnings, to: top, color: "#7fc794", value: revenue },
-    { label: "Less debt", from: afterDebt, to: top, color: "#d9a184", value: -debt },
+    { label: "Left for you a year", note: `${r.yearlyLeft / 12 < 1_000_000 ? `₦${Math.round(r.yearlyLeft / 12 / 1000)}k` : k(r.yearlyLeft / 12)} a month × 12`, value: r.yearlyLeft, color: "#7fc794" },
+    { label: `× ${r.multiple.toFixed(1)} multiple`, note: why, value: r.earningsValue, color: ACCENT, faded: r.capped },
+    { label: "Ceiling on sales", note: `${r.sector.salesCap}× a year's sales of ${k(r.yearlySales)}`, value: r.salesCeiling, color: "#d9a184", faded: !r.capped },
+    { label: "Rough value", note: "The lower of the two, before debts", value: r.mid, color: "#042e1b", total: true },
   ];
-  if (Math.abs(adj) > 50_000)
-    rows.push({ label: adj > 0 ? "Growth and track record" : "Risk", from: Math.min(afterDebt, r.mid), to: Math.max(afterDebt, r.mid), color: adj > 0 ? "#b9d77a" : "#e3b9a3", value: adj });
-  rows.push({ label: "Estimated value", from: 0, to: r.mid, color: "#042e1b", value: r.mid, total: true });
-  const max = Math.max(top, r.mid) * 1.04;
-  const pct = (n: number) => `${(n / max) * 100}%`;
-  const k = (n: number) => `₦${(Math.abs(n) / 1_000_000).toFixed(1).replace(/\.0$/, "")}M`;
+  const max = Math.max(...rows.map((x) => x.value)) * 1.04;
   return (
     <div className="flex flex-1 flex-col">
-      <p className="text-[14px] text-ink/60">Example: Lagos restaurant, ₦48M a year in sales, 18% kept as profit, growing, six years trading</p>
-      {/* a ledger, read top to bottom: each line adds or takes away, the total sits under a rule */}
-      <div className="mt-8 flex flex-1 flex-col justify-center font-mono">
-        {rows.map((s, i) => (
-          <div key={s.label} className={`grid grid-cols-[minmax(0,10.5rem)_minmax(0,1fr)_5rem] items-center gap-4 py-3 ${s.total ? "mt-2 border-t border-ink/40 pt-5" : "border-b border-dashed border-ink/15"}`}>
-            <span className={`text-[12px] leading-tight md:text-[13px] ${s.total ? "font-semibold text-ink" : "text-ink/70"}`}>{s.label}</span>
+      <p className="text-[14px] text-ink/60">Example: Lagos restaurant, ₦4M sales and ₦720k left a month, growing, six years trading</p>
+      {/* a ledger, read top to bottom; the total sits under a rule */}
+      <div className="mt-8 flex flex-1 flex-col justify-center">
+        {rows.map((s) => (
+          <div key={s.label} className={`grid grid-cols-[minmax(0,11rem)_minmax(0,1fr)_4.5rem] items-center gap-x-4 gap-y-1 py-3 ${s.total ? "mt-2 border-t border-ink/40 pt-5" : "border-b border-dashed border-ink/15"} ${s.faded ? "opacity-45" : ""}`}>
+            <span className={`font-mono text-[12px] leading-tight md:text-[13px] ${s.total ? "font-semibold text-ink" : "text-ink/75"}`}>{s.label}</span>
             <span className="relative block h-5">
-              {/* where the previous line ended: a hairline the next bar starts from */}
-              {i > 0 && !s.total ? <span aria-hidden className="absolute -top-3 bottom-0 w-px bg-ink/25" style={{ left: pct(s.value < 0 ? s.to : s.from) }} /> : null}
-              <span
-                className="bar-grow-x absolute inset-y-0 rounded-[2px]"
-                style={{ left: pct(s.from), width: pct(s.to - s.from), background: s.color }}
-              />
+              <span className="bar-grow-x absolute inset-y-0 left-0 rounded-[2px]" style={{ width: `${(s.value / max) * 100}%`, background: s.color }} />
             </span>
-            <span className={`num text-right text-[13px] ${s.total ? "font-semibold text-green" : "text-ink"}`}>
-              {s.value < 0 ? "−" : s.total ? "" : "+"}
-              {k(s.value)}
-            </span>
+            <span className={`num text-right font-mono text-[13px] ${s.total ? "font-semibold text-green" : "text-ink"}`}>{k(s.value)}</span>
+            <span className="col-span-3 text-[12px] text-ink/50 md:col-span-1 md:col-start-2">{s.note}</span>
           </div>
         ))}
         <p className="mt-4 text-right text-[13px] text-ink/60">
-          Range <span className="num font-medium text-ink">{k(r.low)} – {k(r.high)}</span>
+          Range <span className="num font-medium text-ink">{k(r.low)} – {k(r.high)}</span> · the full valuation then takes off debts
         </p>
       </div>
     </div>

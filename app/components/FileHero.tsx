@@ -65,7 +65,7 @@ export default function FileHero({ intro = false }: { intro?: boolean }) {
   return (
     <div
       className="relative mx-auto aspect-[10/9.4] w-full max-w-[560px] [clip-path:inset(-400px_-2400px_0_-2400px)]"
-      aria-label="An example valuation file for Okafor Woodworks, valued at ₦28M to ₦36M"
+      aria-label="An example valuation file for Okafor Woodworks, valued at ₦24M to ₦35M"
       role="img"
     >
       {/* back folders */}
@@ -113,7 +113,7 @@ export default function FileHero({ intro = false }: { intro?: boolean }) {
             <b className="text-[17px] font-semibold leading-tight tracking-[-0.02em]">Okafor Woodworks</b>
             <span className="h-[5px] rounded bg-[#ecebe5]" />
             <span className="h-[5px] w-[70%] rounded bg-[#ecebe5]" />
-            <span className="num mt-1 font-mono text-[17px] font-medium text-green">₦28M – ₦36M</span>
+            <span className="num mt-1 font-mono text-[17px] font-medium text-green">₦24M – ₦35M</span>
             <Seal id="hero" className="file-seal absolute bottom-3 right-3 h-16 w-16 text-seal" />
           </div>
 
@@ -140,7 +140,7 @@ export default function FileHero({ intro = false }: { intro?: boolean }) {
               <span className="tab-label">( Okafor Woodworks )</span>
               <span className="tab-label">File №0142</span>
             </div>
-            <span className="num font-mono text-[clamp(24px,4vw,34px)] font-medium tracking-[-0.03em] text-white">₦28M – ₦36M</span>
+            <span className="num font-mono text-[clamp(24px,4vw,34px)] font-medium tracking-[-0.03em] text-white">₦24M – ₦35M</span>
           </div>
         </div>
       </Tilt>
