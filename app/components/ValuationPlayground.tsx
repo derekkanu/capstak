@@ -35,9 +35,10 @@ const TENURE = [
 type Tab = "range" | "breakdown" | "report";
 
 function money(n: number) {
-  if (n >= 1_000_000) return `$${(n / 1_000_000).toFixed(n >= 10_000_000 ? 0 : 2).replace(/\.?0+$/, "")}M`;
-  if (n >= 1000) return `$${Math.round(n / 1000)}k`;
-  return `$${Math.round(n)}`;
+  if (n >= 1_000_000_000) return `₦${(n / 1_000_000_000).toFixed(2).replace(/\.?0+$/, "")}B`;
+  if (n >= 1_000_000) return `₦${(n / 1_000_000).toFixed(n >= 10_000_000 ? 0 : 1).replace(/\.0$/, "")}M`;
+  if (n >= 1000) return `₦${Math.round(n / 1000)}k`;
+  return `₦${Math.round(n)}`;
 }
 
 function baseInput(): ValuationInput {
@@ -67,12 +68,12 @@ function baseInput(): ValuationInput {
 }
 
 export default function ValuationPlayground() {
-  const [prompt, setPrompt] = useState("Family café in Austin, six years trading");
+  const [prompt, setPrompt] = useState("Family restaurant in Lagos, six years trading");
   const [mode, setMode] = useState<"estimate" | "interview">("estimate");
   const [industry, setIndustry] = useState(INDUSTRIES[0]);
   const [trend, setTrend] = useState<GrowthTrend>("increasing");
   const [years, setYears] = useState(6);
-  const [revenue, setRevenue] = useState(480_000);
+  const [revenue, setRevenue] = useState(48_000_000);
   const [margin, setMargin] = useState(18);
   const [tab, setTab] = useState<Tab>("range");
   const [pulse, setPulse] = useState(0);
@@ -179,9 +180,9 @@ export default function ValuationPlayground() {
             label="Annual revenue"
             value={revenue}
             display={money(revenue)}
-            min={100_000}
-            max={3_000_000}
-            step={10_000}
+            min={3_000_000}
+            max={600_000_000}
+            step={1_000_000}
             onChange={setRevenue}
           />
           <Slider

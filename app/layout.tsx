@@ -1,42 +1,32 @@
 import type { Metadata, Viewport } from "next";
-import { Inter_Tight, Faustina, Geist_Mono } from "next/font/google";
+import { Instrument_Sans, IBM_Plex_Mono } from "next/font/google";
 import "./globals.css";
 import LoadingScreen from "./components/LoadingScreen";
 
-// Free stand-ins for Exa's Dinamo faces. To switch to the licensed fonts
-// later, replace these with next/font/local and keep the same CSS variables.
-// Body / UI: Inter Tight (≈ ABC Diatype).
-const sans = Inter_Tight({
+// "On file" type system: one sans in upright + italic for everything people read,
+// and a typewriter mono for tabs, labels and figures (the file-folder voice).
+const sans = Instrument_Sans({
   variable: "--font-sans-face",
-  subsets: ["latin"],
-});
-
-// Headlines: Faustina at regular weight (≈ ABC Arizona Flare): sturdy,
-// low-contrast, softly flared serifs.
-const display = Faustina({
-  variable: "--font-display-face",
-  weight: ["400", "500"],
+  weight: ["400", "500", "600", "700"],
   style: ["normal", "italic"],
-  subsets: ["latin"],
+  subsets: ["latin", "latin-ext"],
 });
 
-// Numbers in data cards and charts.
-const mono = Geist_Mono({
+const mono = IBM_Plex_Mono({
   variable: "--font-mono-face",
+  weight: ["400", "500", "600"],
   subsets: ["latin"],
 });
 
 export const metadata: Metadata = {
-  title: "Capstak — Effortless Business Valuations",
+  title: "Capstack · What’s your business really worth?",
   description:
-    "Unlock your business's true value with ease and confidence. A free, streamlined valuation today.",
+    "Know what your business is worth. Answer a few plain questions and get a valuation range in Naira, with every reason written down.",
 };
 
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
-  maximumScale: 1,
-  userScalable: false,
   viewportFit: "cover",
 };
 
@@ -46,10 +36,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html
-      lang="en"
-      className={`${sans.variable} ${display.variable} ${mono.variable} h-full antialiased`}
-    >
+    <html lang="en" className={`${sans.variable} ${mono.variable} h-full antialiased`}>
       <body className="min-h-full flex flex-col text-ink">
         <LoadingScreen />
         <div className="flex flex-1 flex-col">{children}</div>

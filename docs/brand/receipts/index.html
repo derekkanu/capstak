@@ -1,0 +1,424 @@
+<title>Capstack Receipts</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wdth,wght@12..96,75..100,400..800&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap">
+<style>
+/* Layout: review board, one band per direction. Each band: the idea, then four pieces in a grid:
+   poster (4:5), website hero with the living receipt (browser frame), onboarding (phone), dashboard card.
+   One deliberate light look; every colour explicit. Capstack palette + its soft gradient fields. */
+:root {
+  --board: #ECEDE9; --ink: #0E1A13; --muted: #5E6A62;
+  --deep: #042E1B; --lime: #D4ED6F; --green: #25D366; --ember: #FFF1E2; --slate: #F4F5F4; --white: #FFFFFF;
+  --paper-b: #FBF5EA; --rule: #C9D9E8; --ink-b: #1F5136;
+  --display: "Bricolage Grotesque", "Arial Black", system-ui, sans-serif;
+  --body: "Inter", system-ui, -apple-system, sans-serif;
+  --mono: "JetBrains Mono", ui-monospace, Menlo, monospace;
+  color-scheme: light;
+}
+* { box-sizing: border-box; }
+body { background: var(--board); color: var(--ink); font: 400 15px/1.55 var(--body); }
+.wrap { max-width: 1240px; margin: 0 auto; padding-block: 40px 96px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); display: grid; gap: 72px; }
+h1, h2 { font-family: var(--display); margin: 0; text-wrap: balance; }
+p { margin: 0; }
+.mono { font-family: var(--mono); font-variant-numeric: tabular-nums; }
+.intro { display: grid; gap: 16px; max-width: 800px; }
+.intro h1 { font-size: clamp(2.2rem, 5vw, 3.4rem); font-weight: 800; letter-spacing: -0.02em; line-height: 1; }
+.intro p { color: var(--muted); font-size: 1.05rem; }
+.rules { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 10px; }
+.rules div { background: var(--white); padding: 14px; border-radius: 10px; display: grid; gap: 4px; min-width: 0; }
+.rules b { font: 700 1rem/1.2 var(--display); }
+.rules span { font-size: .88rem; color: var(--muted); }
+
+.dir { display: grid; gap: 22px; }
+.dir-head { display: grid; gap: 8px; }
+.dir-head .k { font: 700 12px/1 var(--mono); letter-spacing: .12em; text-transform: uppercase; color: var(--muted); }
+.dir-head h2 { font-size: clamp(1.9rem, 3.8vw, 2.7rem); font-weight: 800; letter-spacing: -0.02em; line-height: 1; }
+.dir-head p { color: var(--muted); max-width: 72ch; }
+.grid4 { display: grid; grid-template-columns: minmax(0, 360px) minmax(0, 1fr); gap: 20px; align-items: start; }
+.grid4 .row2 { grid-column: 1 / -1; display: grid; grid-template-columns: minmax(0, 300px) minmax(0, 1fr); gap: 20px; align-items: start; }
+@media (max-width: 880px) { .grid4, .grid4 .row2 { grid-template-columns: 1fr; } .poster, .phone { max-width: 400px; } }
+.label { font: 600 11px/1 var(--mono); letter-spacing: .1em; text-transform: uppercase; color: var(--muted); margin-bottom: 8px; display: block; }
+.shadow { box-shadow: 0 1px 0 rgb(0 0 0 / .05), 0 22px 44px -26px rgb(0 0 0 / .4); }
+
+/* ───── shared receipt object ───── */
+.receipt { background: var(--white); color: var(--ink); font: 500 10.5px/1.75 var(--mono); padding: 14px 14px 18px; position: relative;
+  -webkit-mask: conic-gradient(from -45deg at bottom, #0000, #000 1deg 89deg, #0000 90deg) 50% / 11px 100%;
+          mask: conic-gradient(from -45deg at bottom, #0000, #000 1deg 89deg, #0000 90deg) 50% / 11px 100%; }
+.receipt .hd { text-align: center; font-weight: 700; letter-spacing: .14em; padding-bottom: 7px; margin-bottom: 7px; border-bottom: 1px dashed #B9BEB7; }
+.receipt .row { display: flex; justify-content: space-between; gap: 10px; }
+.receipt .tot { border-top: 1px dashed #B9BEB7; margin-top: 7px; padding-top: 7px; font-weight: 700; font-size: 12px; }
+.receipt .sub { text-align: center; color: var(--muted); font-size: 9.5px; margin-top: 6px; letter-spacing: .06em; }
+
+/* the living receipt: prints line by line, total, then the seal lands; loops */
+.live .row, .live .tot, .live .sub { opacity: 0; transform: translateY(-4px); animation: print 9s infinite; }
+.live .row:nth-of-type(1) { animation-delay: .3s; } .live .row:nth-of-type(2) { animation-delay: .7s; } .live .row:nth-of-type(3) { animation-delay: 1.1s; }
+.live .row:nth-of-type(4) { animation-delay: 1.5s; } .live .row:nth-of-type(5) { animation-delay: 1.9s; } .live .row:nth-of-type(6) { animation-delay: 2.3s; }
+.live .tot { animation-delay: 2.9s; } .live .sub { animation-delay: 3.1s; }
+@keyframes print { 0% { opacity: 0; transform: translateY(-4px); } 3%, 88% { opacity: 1; transform: none; } 94%, 100% { opacity: 0; } }
+.live-seal { opacity: 0; animation: seal 9s infinite; animation-delay: 3.4s; }
+@keyframes seal { 0% { opacity: 0; transform: scale(1.8) rotate(-14deg); } 4% { opacity: 1; transform: scale(.94) rotate(-14deg); } 6%, 82% { opacity: 1; transform: scale(1) rotate(-14deg); } 88%, 100% { opacity: 0; transform: scale(1) rotate(-14deg); } }
+@media (prefers-reduced-motion: reduce) { .live .row, .live .tot, .live .sub, .live-seal { animation: none; opacity: 1; transform: rotate(-14deg); } .live .row, .live .tot, .live .sub { transform: none; } }
+
+/* browser + phone frames */
+.browser { background: var(--white); border-radius: 10px; overflow: hidden; min-width: 0; }
+.chrome { height: 30px; background: #F1F2EF; display: flex; align-items: center; gap: 6px; padding: 0 12px; border-bottom: 1px solid #E2E4DF; }
+.chrome i { width: 9px; height: 9px; border-radius: 50%; background: #D3D6D0; }
+.chrome span { margin-left: 12px; font: 500 11px/1 var(--mono); color: var(--muted); }
+.page { position: relative; overflow: hidden; }
+.nav { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 16px 24px; position: relative; z-index: 2; }
+.nav img { height: 20px; width: auto; }
+.nav ul { display: flex; gap: 18px; list-style: none; margin: 0; padding: 0; font-size: 12.5px; }
+@media (max-width: 640px) { .nav ul { display: none; } }
+.btn { display: inline-block; font: 600 13px/1 var(--body); padding: 11px 16px; border-radius: 999px; }
+.hero { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; padding: 10px 24px 0; align-items: end; position: relative; z-index: 1; }
+@media (max-width: 640px) { .hero { grid-template-columns: 1fr; } }
+.hero-copy { display: grid; gap: 14px; padding-bottom: 34px; align-content: center; min-width: 0; }
+.hero-copy h4 { font: 800 clamp(2rem, 4.2vw, 3.3rem)/0.95 var(--display); letter-spacing: -0.035em; margin: 0; }
+.hero-copy p { font-size: .95rem; max-width: 40ch; }
+.ctas { display: flex; flex-wrap: wrap; gap: 8px; }
+.photo { position: relative; min-width: 0; }
+.photo img { display: block; width: 100%; aspect-ratio: 760 / 800; object-fit: cover; object-position: top; border-radius: 16px 16px 0 0; }
+.phone { width: 100%; max-width: 300px; aspect-ratio: 9 / 18.5; border-radius: 34px; padding: 10px; background: #111; }
+.screen { width: 100%; height: 100%; border-radius: 26px; overflow: hidden; position: relative; display: flex; flex-direction: column; }
+.notch { width: 90px; height: 22px; border-radius: 0 0 14px 14px; background: #111; margin: 0 auto; flex: 0 0 auto; }
+.dash { border-radius: 14px; overflow: hidden; min-width: 0; }
+
+/* ───── A · Clean receipts ───── */
+.a-field { background:
+  radial-gradient(60% 55% at 85% 20%, rgb(212 237 111 / .55), transparent 70%),
+  radial-gradient(55% 60% at 10% 90%, rgb(37 211 102 / .22), transparent 70%),
+  radial-gradient(50% 50% at 50% 0%, rgb(255 241 226 / .9), transparent 70%), var(--slate); }
+.a-seal { width: 104px; height: 104px; border-radius: 50%; background: var(--green); color: var(--deep); display: grid; place-items: center; text-align: center; font: 700 10px/1.2 var(--mono); letter-spacing: .12em; text-transform: uppercase; position: absolute; box-shadow: 0 10px 22px -10px rgb(4 46 27 / .6); transform: rotate(-14deg); }
+.a-seal::before { content: ""; position: absolute; inset: 6px; border-radius: 50%; border: 1.5px dashed rgb(4 46 27 / .55); }
+.a-seal svg { width: 18px; height: 18px; display: block; margin: 0 auto 3px; }
+.a-poster { aspect-ratio: 4 / 5; position: relative; overflow: hidden; display: flex; flex-direction: column; justify-content: space-between; padding: 26px; }
+.a-poster h3 { font: 800 2.7rem/0.9 var(--display); letter-spacing: -0.035em; margin: 0; color: var(--deep); max-width: 7ch; position: relative; z-index: 2; }
+.a-poster .pic { position: absolute; right: 0; bottom: 0; width: 66%; height: 72%; object-fit: cover; object-position: top; border-radius: 18px 0 0 0; }
+.a-poster .receipt { position: absolute; left: 22px; bottom: 70px; width: 52%; transform: rotate(-3deg); z-index: 2; box-shadow: 0 14px 28px -14px rgb(0 0 0 / .5); }
+.a-poster .a-seal { left: 44%; bottom: 46px; z-index: 3; width: 86px; height: 86px; font-size: 8.5px; }
+.a-poster .foot { position: relative; z-index: 2; display: flex; justify-content: space-between; align-items: end; }
+.a-poster .foot img { height: 20px; width: auto; }
+.a-hero .hero-copy h4 { color: var(--deep); }
+.a-hero .btn.p { background: var(--deep); color: var(--lime); } .a-hero .btn.s { background: var(--white); color: var(--deep); }
+.a-hero .receipt { position: absolute; left: -30px; bottom: 6%; width: 200px; transform: rotate(-4deg); box-shadow: 0 14px 28px -14px rgb(0 0 0 / .5); }
+.a-hero .a-seal { left: 120px; bottom: 4%; width: 84px; height: 84px; font-size: 8.5px; }
+.a-screen { background: var(--white); }
+.a-screen .top { padding: 10px 18px 0; display: grid; gap: 14px; flex: 1; }
+.a-screen .bar { height: 3px; background: var(--slate); border-radius: 3px; } .a-screen .bar i { display: block; height: 100%; width: 45%; background: var(--green); border-radius: 3px; }
+.a-screen .face { width: 40px; height: 40px; border-radius: 50%; background: var(--deep); color: var(--lime); display: grid; place-items: center; font: 800 16px/1 var(--display); margin: 8px auto 0; }
+.a-screen .q { text-align: center; font: 700 1.25rem/1.15 var(--display); letter-spacing: -0.02em; color: var(--deep); }
+.a-screen .react { text-align: center; font-size: .78rem; color: var(--muted); }
+.a-screen .ans { border-bottom: 2px solid var(--green); padding: 6px 2px; font: 600 1rem/1 var(--mono); color: var(--deep); }
+.a-screen .picks { display: flex; gap: 6px; flex-wrap: wrap; justify-content: center; }
+.a-screen .picks span { font: 600 10.5px/1 var(--mono); padding: 7px 9px; border-radius: 999px; background: var(--slate); color: var(--deep); }
+.a-screen .next { align-self: center; background: var(--deep); color: var(--lime); font: 600 12px/1 var(--body); padding: 10px 18px; border-radius: 999px; }
+.a-screen .tray { margin-top: auto; padding: 12px 14px 16px; }
+.a-screen .tray small { display: block; text-align: center; font: 600 9px/1 var(--mono); letter-spacing: .1em; text-transform: uppercase; color: var(--muted); margin-bottom: 6px; }
+.a-screen .receipt { font-size: 9.5px; box-shadow: 0 8px 20px -12px rgb(0 0 0 / .45); }
+.a-dash { padding: 22px; display: grid; gap: 14px; }
+.a-dash .card { background: var(--white); border-radius: 14px; padding: 20px; display: grid; grid-template-columns: 1fr auto; gap: 16px; align-items: center; position: relative; }
+.a-dash .card .eyebrow { font: 600 10.5px/1 var(--mono); letter-spacing: .1em; text-transform: uppercase; color: var(--muted); }
+.a-dash .card .big { font: 700 2.1rem/1 var(--mono); color: var(--deep); letter-spacing: -0.02em; }
+.a-dash .card .a-seal { position: relative; transform: rotate(-10deg); width: 92px; height: 92px; font-size: 8.5px; }
+.a-dash .slips { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+.a-dash .slip { background: var(--white); border-radius: 10px; padding: 12px; display: grid; gap: 6px; font-size: .82rem; min-width: 0; }
+.a-dash .slip b { font: 700 .95rem/1.1 var(--display); }
+.a-dash .slip .m { height: 4px; background: var(--slate); border-radius: 4px; } .a-dash .slip .m i { display: block; height: 100%; background: var(--green); border-radius: 4px; }
+@media (max-width: 560px) { .a-dash .slips { grid-template-columns: 1fr; } .a-dash .card { grid-template-columns: 1fr; } }
+
+/* ───── B · Worn ledger ───── */
+.grain { position: relative; }
+.grain::after { content: ""; position: absolute; inset: 0; pointer-events: none; opacity: .32; mix-blend-mode: multiply;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .35 0 0 0 0 .3 0 0 0 0 .22 0 0 0 .35 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"); }
+.b-field { background:
+  radial-gradient(60% 50% at 90% 10%, rgb(212 237 111 / .35), transparent 70%),
+  radial-gradient(60% 60% at 0% 100%, rgb(37 211 102 / .14), transparent 70%), var(--ember); }
+.ruled { background-color: var(--paper-b); background-image: linear-gradient(transparent 23px, var(--rule) 24px); background-size: 100% 24px; position: relative; }
+.ruled::before { content: ""; position: absolute; top: 0; bottom: 0; left: 34px; width: 1px; background: #E7A9A3; }
+.b-stamp { position: absolute; width: 112px; height: 112px; border-radius: 50%; border: 3px solid var(--ink-b); color: var(--ink-b); display: grid; place-items: center; text-align: center; font: 700 11px/1.2 var(--mono); letter-spacing: .12em; text-transform: uppercase; transform: rotate(-14deg); filter: url(#rough); opacity: .88; mix-blend-mode: multiply; }
+.b-stamp::before { content: ""; position: absolute; inset: 6px; border-radius: 50%; border: 1.5px solid var(--ink-b); }
+.b-stamp b { display: block; font: 800 15px/1 var(--display); letter-spacing: .02em; }
+.carbon { background: #F7F2E8; color: #34406B; }
+.carbon .hd, .carbon .tot { border-color: #9AA3C4; }
+.carbon .sub { color: #6A739A; }
+.b-poster { aspect-ratio: 4 / 5; position: relative; overflow: hidden; display: flex; flex-direction: column; justify-content: space-between; padding: 26px; }
+.b-poster h3 { font: 800 2.55rem/0.92 var(--display); letter-spacing: -0.03em; margin: 0; color: var(--deep); max-width: 8ch; position: relative; z-index: 2; }
+.b-poster .pic { position: absolute; right: 20px; top: 30px; width: 46%; aspect-ratio: 3/4; object-fit: cover; object-position: top; transform: rotate(4deg); border: 7px solid var(--white); box-shadow: 0 14px 26px -14px rgb(0 0 0 / .55); }
+.b-poster .tape { position: absolute; right: 70px; top: 18px; width: 70px; height: 22px; background: rgb(212 237 111 / .75); transform: rotate(-6deg); z-index: 3; }
+.b-poster .receipt { position: absolute; left: 22px; bottom: 64px; width: 56%; transform: rotate(-2deg); box-shadow: 0 12px 24px -14px rgb(0 0 0 / .45); z-index: 2; }
+.b-poster .b-stamp { right: 34px; bottom: 74px; z-index: 3; }
+.b-poster .foot { position: relative; z-index: 2; display: flex; justify-content: space-between; align-items: end; }
+.b-poster .foot img { height: 20px; width: auto; }
+.b-poster .foot span { font: 500 10px/1.3 var(--mono); color: var(--muted); text-align: right; }
+.b-hero .hero-copy h4 { color: var(--deep); }
+.b-hero .btn.p { background: var(--deep); color: var(--ember); } .b-hero .btn.s { background: transparent; color: var(--deep); border: 1.5px solid var(--deep); }
+.b-hero .photo img { border: 8px solid var(--white); border-bottom: 0; border-radius: 4px 4px 0 0; transform: rotate(1.5deg); transform-origin: bottom; }
+.b-hero .receipt { position: absolute; left: -34px; bottom: 6%; width: 206px; transform: rotate(-3deg); box-shadow: 0 12px 24px -14px rgb(0 0 0 / .45); }
+.b-hero .b-stamp { left: 118px; bottom: 3%; width: 92px; height: 92px; font-size: 9px; }
+.b-hero .b-stamp b { font-size: 12px; }
+.b-screen { background: var(--paper-b); }
+.b-screen .top { padding: 10px 18px 0 46px; display: grid; gap: 14px; flex: 1; position: relative; z-index: 1; }
+.b-screen .count { font: 600 10px/1 var(--mono); letter-spacing: .1em; text-transform: uppercase; color: var(--muted); }
+.b-screen .face { width: 40px; height: 40px; border-radius: 50%; background: var(--deep); color: var(--ember); display: grid; place-items: center; font: 800 16px/1 var(--display); }
+.b-screen .q { font: 700 1.25rem/1.15 var(--display); letter-spacing: -0.02em; color: var(--deep); }
+.b-screen .react { font-size: .78rem; color: var(--muted); }
+.b-screen .ans { padding: 4px 2px; font: 600 1.05rem/1 var(--mono); color: #34406B; border-bottom: 2px solid var(--deep); }
+.b-screen .picks { display: flex; gap: 6px; flex-wrap: wrap; }
+.b-screen .picks span { font: 600 10.5px/1 var(--mono); padding: 7px 9px; border: 1.5px solid var(--deep); color: var(--deep); border-radius: 999px; }
+.b-screen .next { justify-self: start; background: var(--deep); color: var(--ember); font: 600 12px/1 var(--body); padding: 10px 18px; border-radius: 999px; }
+.b-screen .tray { margin-top: auto; padding: 10px 14px 16px; position: relative; z-index: 1; }
+.b-screen .tray small { display: block; font: 600 9px/1 var(--mono); letter-spacing: .1em; text-transform: uppercase; color: var(--muted); margin-bottom: 6px; padding-left: 32px; }
+.b-screen .receipt { font-size: 9.5px; box-shadow: 0 8px 20px -12px rgb(0 0 0 / .4); }
+.b-dash { padding: 22px; display: grid; gap: 14px; }
+.b-dash .page-card { padding: 20px 20px 20px 50px; display: grid; grid-template-columns: 1fr auto; gap: 16px; align-items: center; box-shadow: 0 12px 26px -18px rgb(0 0 0 / .45); position: relative; }
+.b-dash .eyebrow { font: 600 10.5px/24px var(--mono); letter-spacing: .1em; text-transform: uppercase; color: var(--muted); }
+.b-dash .big { font: 700 2.1rem/48px var(--mono); color: var(--deep); letter-spacing: -0.02em; }
+.b-dash .meta { font-size: .85rem; line-height: 24px; color: #34406B; }
+.b-dash .b-stamp { position: relative; width: 98px; height: 98px; font-size: 9px; }
+.b-dash .b-stamp b { font-size: 12px; }
+.b-dash .tabs { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+.b-dash .tab { background: var(--paper-b); padding: 12px; display: grid; gap: 6px; font-size: .82rem; border-top: 4px solid var(--deep); box-shadow: 0 8px 18px -14px rgb(0 0 0 / .45); min-width: 0; }
+.b-dash .tab:nth-child(2) { border-top-color: var(--green); } .b-dash .tab:nth-child(3) { border-top-color: var(--lime); }
+.b-dash .tab b { font: 700 .95rem/1.1 var(--display); }
+@media (max-width: 560px) { .b-dash .tabs { grid-template-columns: 1fr; } .b-dash .page-card { grid-template-columns: 1fr; } }
+
+.close { display: grid; gap: 12px; background: var(--white); padding: 24px; border-radius: 12px; }
+.close h2 { font-size: 1.6rem; }
+.close ul { margin: 0; padding-left: 18px; display: grid; gap: 6px; }
+.note { font-size: .88rem; color: var(--muted); }
+</style>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="ck-arrow" viewBox="0 0 100 100"><path d="M0 0H100V32H54L94 72L72 94L32 54V100H0Z" fill="currentColor"/></symbol>
+  <filter id="rough"><feTurbulence type="fractalNoise" baseFrequency=".9" numOctaves="2" seed="4"/><feDisplacementMap in="SourceGraphic" scale="3.2"/></filter>
+</svg>
+
+<div class="wrap">
+
+  <header class="intro">
+    <h1>Bring the receipts</h1>
+    <p>"Receipts" means proof. Capstack turns the paper trail every owner already has (POS slips, transfer alerts, sales notebooks) into one stamped number with every reason listed. The seller says one thing, the buyer another: Capstack brings the receipts. Two ways to dress it below, both image-led, both on Capstack's soft gradients.</p>
+    <div class="rules">
+      <div><b>It prints</b><span>Every answer in onboarding adds a line to your receipt.</span></div>
+      <div><b>It stacks</b><span>Each document you add slides onto your pile: Cap<i>stack</i>.</span></div>
+      <div><b>It gets stamped</b><span>When the valuation is ready, the seal lands.</span></div>
+      <div><b>It tears off</b><span>The report is the receipt you hand to a buyer or bank.</span></div>
+    </div>
+  </header>
+
+  <!-- ───────── A · CLEAN RECEIPTS ───────── -->
+  <section class="dir">
+    <div class="dir-head">
+      <span class="k">Direction A</span>
+      <h2>Clean receipts</h2>
+      <p>Crisp, white and digital, closest to Deel. Real owners in big photos on soft green and lime gradient fields; the receipt is a sharp POS slip; the stamp is a solid green seal carrying the arrow. Modern, quick, confident.</p>
+    </div>
+    <div class="grid4">
+      <div>
+        <span class="label">Poster</span>
+        <div class="a-poster a-field shadow">
+          <h3>Bring the receipts.</h3>
+          <img class="pic" src="maker.jpg" alt="A craftsman measuring wood in his workshop">
+          <div class="receipt">
+            <div class="hd">OKAFOR WOODWORKS</div>
+            <div class="row"><span>MONEY IN</span><span>₦3.5M</span></div>
+            <div class="row"><span>WHAT'S LEFT</span><span>₦890k</span></div>
+            <div class="row"><span>YEARS</span><span>6</span></div>
+            <div class="row tot"><span>VALUE</span><span>₦28–36M</span></div>
+          </div>
+          <div class="a-seal"><span><svg style="color:var(--deep)"><use href="#ck-arrow"/></svg>Valued<br>Capstack</span></div>
+          <div class="foot"><img src="logo-capstack.png" alt="Capstack"><span></span></div>
+        </div>
+      </div>
+      <div>
+        <span class="label">Website hero · the receipt prints, then the seal lands</span>
+        <div class="browser shadow">
+          <div class="chrome"><i></i><i></i><i></i><span>capstack.co</span></div>
+          <div class="page a-hero a-field">
+            <div class="nav"><img src="logo-capstack.png" alt="Capstack"><ul><li>How it works</li><li>For brokers</li><li>Pricing</li></ul><span class="btn" style="background:var(--deep);color:var(--lime)">Value my business</span></div>
+            <div class="hero">
+              <div class="hero-copy">
+                <h4>Your receipts already know what you're worth.</h4>
+                <p>Tell us what comes in and what goes out, in your own words. Get a stamped valuation with every reason listed.</p>
+                <div class="ctas"><span class="btn p">Get my free estimate</span><span class="btn s">See a sample report</span></div>
+              </div>
+              <div class="photo">
+                <img src="maker.jpg" alt="A craftsman measuring wood in his workshop">
+                <div class="receipt live">
+                  <div class="hd">OKAFOR WOODWORKS</div>
+                  <div class="row"><span>MONEY IN / MO</span><span>₦3,500,000</span></div>
+                  <div class="row"><span>MONEY OUT / MO</span><span>₦2,610,000</span></div>
+                  <div class="row"><span>WHAT'S LEFT</span><span>₦890,000</span></div>
+                  <div class="row"><span>YEARS TRADING</span><span>6</span></div>
+                  <div class="row"><span>REPEAT BUYERS</span><span>YES</span></div>
+                  <div class="row"><span>DEBT</span><span>₦1,200,000</span></div>
+                  <div class="row tot"><span>VALUE</span><span>₦28M–36M</span></div>
+                  <div class="sub">7 REASONS · SEE REPORT</div>
+                </div>
+                <div class="a-seal live-seal"><span><svg style="color:var(--deep)"><use href="#ck-arrow"/></svg>Valued<br>Capstack</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="row2">
+        <div>
+          <span class="label">Onboarding · answers print onto your receipt</span>
+          <div class="phone shadow">
+            <div class="screen a-screen">
+              <div class="notch"></div>
+              <div class="top">
+                <div class="bar"><i></i></div>
+                <div class="face">S</div>
+                <div class="react">Six years on the same street. Solid.</div>
+                <div class="q">Roughly what came in last month?</div>
+                <div class="ans">₦ 3,500,000</div>
+                <div class="picks"><span>Under ₦1M</span><span>₦1–5M</span><span>Over ₦5M</span></div>
+                <div class="next">Next →</div>
+              </div>
+              <div class="tray">
+                <small>Your receipt so far</small>
+                <div class="receipt">
+                  <div class="row"><span>BUSINESS</span><span>Okafor Woodworks</span></div>
+                  <div class="row"><span>SECTOR</span><span>Furniture</span></div>
+                  <div class="row"><span>YEARS</span><span>6</span></div>
+                  <div class="row"><span>MONEY IN</span><span>…</span></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div>
+          <span class="label">Dashboard · the value, sealed; tasks as slips</span>
+          <div class="dash a-field shadow">
+            <div class="a-dash">
+              <div class="card">
+                <div style="display:grid;gap:8px"><span class="eyebrow">Okafor Woodworks · estimated value</span><span class="big">₦28M – ₦36M</span><span style="font-size:.85rem;color:var(--muted)">Confidence medium · 7 reasons on your receipt</span></div>
+                <div class="a-seal"><span><svg style="color:var(--deep)"><use href="#ck-arrow"/></svg>Valued<br>Capstack</span></div>
+              </div>
+              <div class="slips">
+                <div class="slip"><b>How you make money</b><div class="m"><i style="width:55%"></i></div><span style="color:var(--muted)">5 of 9 lines</span></div>
+                <div class="slip"><b>Your numbers</b><div class="m"><i style="width:30%"></i></div><span style="color:var(--muted)">Estimates only</span></div>
+                <div class="slip"><b>Add receipts</b><div class="m"><i style="width:10%"></i></div><span style="color:var(--muted)">Statements raise confidence</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ───────── B · WORN LEDGER ───────── -->
+  <section class="dir">
+    <div class="dir-head">
+      <span class="k">Direction B</span>
+      <h2>Worn ledger</h2>
+      <p>Warmer and more tactile. Photos pinned like snapshots, an exercise-book page, carbon-copy receipts in blue ink, and a real rubber stamp with uneven edges. More character, more of the Lagos shop counter; still clean in layout.</p>
+    </div>
+    <div class="grid4">
+      <div>
+        <span class="label">Poster</span>
+        <div class="b-poster b-field grain shadow">
+          <h3>Your receipts already know.</h3>
+          <span class="tape"></span>
+          <img class="pic" src="maker.jpg" alt="A craftsman measuring wood in his workshop">
+          <div class="receipt carbon">
+            <div class="hd">OKAFOR WOODWORKS</div>
+            <div class="row"><span>MONEY IN</span><span>₦3.5M</span></div>
+            <div class="row"><span>WHAT'S LEFT</span><span>₦890k</span></div>
+            <div class="row"><span>YEARS</span><span>6</span></div>
+            <div class="row tot"><span>VALUE</span><span>₦28–36M</span></div>
+          </div>
+          <div class="b-stamp"><span>Valued<b>CAPSTACK</b>26 · 11 · 26</span></div>
+          <div class="foot"><img src="logo-capstack.png" alt="Capstack"><span>Know what your<br>business is worth.</span></div>
+        </div>
+      </div>
+      <div>
+        <span class="label">Website hero · the carbon slip prints, then the stamp lands</span>
+        <div class="browser shadow">
+          <div class="chrome"><i></i><i></i><i></i><span>capstack.co</span></div>
+          <div class="page b-hero b-field grain">
+            <div class="nav"><img src="logo-capstack.png" alt="Capstack"><ul><li>How it works</li><li>For brokers</li><li>Pricing</li></ul><span class="btn" style="background:var(--deep);color:var(--ember)">Start free</span></div>
+            <div class="hero">
+              <div class="hero-copy">
+                <h4>Show us the receipts. We'll show you the number.</h4>
+                <p>Your sales book, your POS slips, your bank alerts. Capstack turns them into a valuation you can hand to a buyer or a bank.</p>
+                <div class="ctas"><span class="btn p">Start my valuation</span><span class="btn s">See a sample report</span></div>
+              </div>
+              <div class="photo">
+                <img src="maker.jpg" alt="A craftsman measuring wood in his workshop">
+                <div class="receipt carbon live">
+                  <div class="hd">OKAFOR WOODWORKS</div>
+                  <div class="row"><span>MONEY IN / MO</span><span>₦3,500,000</span></div>
+                  <div class="row"><span>MONEY OUT / MO</span><span>₦2,610,000</span></div>
+                  <div class="row"><span>WHAT'S LEFT</span><span>₦890,000</span></div>
+                  <div class="row"><span>YEARS TRADING</span><span>6</span></div>
+                  <div class="row"><span>REPEAT BUYERS</span><span>YES</span></div>
+                  <div class="row"><span>DEBT</span><span>₦1,200,000</span></div>
+                  <div class="row tot"><span>VALUE</span><span>₦28M–36M</span></div>
+                  <div class="sub">CUSTOMER COPY</div>
+                </div>
+                <div class="b-stamp live-seal"><span>Valued<b>CAPSTACK</b>26 · 11 · 26</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="row2">
+        <div>
+          <span class="label">Onboarding · a page in your book fills as you answer</span>
+          <div class="phone shadow">
+            <div class="screen b-screen ruled">
+              <div class="notch"></div>
+              <div class="top">
+                <span class="count">Question 4 of 8</span>
+                <div class="face">S</div>
+                <div class="react">Six years on the same street. Solid.</div>
+                <div class="q">Roughly what came in last month?</div>
+                <div class="ans">₦ 3,500,000</div>
+                <div class="picks"><span>Under ₦1M</span><span>₦1–5M</span><span>Over ₦5M</span></div>
+                <div class="next">Next →</div>
+              </div>
+              <div class="tray">
+                <small>Your slip so far</small>
+                <div class="receipt carbon">
+                  <div class="row"><span>BUSINESS</span><span>Okafor Woodworks</span></div>
+                  <div class="row"><span>SECTOR</span><span>Furniture</span></div>
+                  <div class="row"><span>YEARS</span><span>6</span></div>
+                  <div class="row"><span>MONEY IN</span><span>…</span></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div>
+          <span class="label">Dashboard · your ledger page, stamped; tasks as tabbed sheets</span>
+          <div class="dash b-field grain shadow">
+            <div class="b-dash">
+              <div class="page-card ruled">
+                <div style="display:grid"><span class="eyebrow">Okafor Woodworks · estimated value</span><span class="big">₦28M – ₦36M</span><span class="meta">Confidence medium · 7 reasons, all written down</span></div>
+                <div class="b-stamp"><span>Valued<b>CAPSTACK</b>26 · 11 · 26</span></div>
+              </div>
+              <div class="tabs">
+                <div class="tab"><b>How you make money</b><span style="color:var(--muted)">5 of 9 lines filled</span></div>
+                <div class="tab"><b>Your numbers</b><span style="color:var(--muted)">Estimates only</span></div>
+                <div class="tab"><b>Add receipts</b><span style="color:var(--muted)">Statements raise confidence</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="close">
+    <h2>What to react to</h2>
+    <ul>
+      <li>A or B, or a mix (for example A's clean layout with B's ink stamp and pinned photos).</li>
+      <li>The living receipt: does printing → stacking → stamping → tearing off feel like Capstack's "crystal"?</li>
+      <li>The stamp as a signature mark: green seal with the arrow (A) or ink rubber stamp (B)?</li>
+    </ul>
+    <p class="note">Photography: only one real photo exists so far (the craftsman). An image-heavy brand needs a set of owners across sectors (tailor, pharmacy, food vendor, mechanic, salon). We'd source or shoot those next.</p>
+  </section>
+
+</div>

@@ -131,7 +131,7 @@ function sectorFor(industry: string | null) {
   return DEFAULT_SECTOR;
 }
 
-function round(n: number, to = 1000) {
+function round(n: number, to = 10_000) {
   return Math.max(0, Math.round(n / to) * to);
 }
 
@@ -210,7 +210,7 @@ export function computeValuation(input: ValuationInput): ValuationResult {
     low: round(equity * 0.85),
     mid: round(equity),
     high: round(equity * 1.15),
-    currency: "USD",
+    currency: "NGN",
     annualRevenue: round(annualRevenue),
     annualNetProfit: round(annualNetProfit),
     netMargin,
@@ -224,8 +224,8 @@ export function computeValuation(input: ValuationInput): ValuationResult {
   };
 }
 
-export function formatCurrency(n: number, currency = "USD"): string {
-  return new Intl.NumberFormat("en-US", {
+export function formatCurrency(n: number, currency = "NGN"): string {
+  return new Intl.NumberFormat(currency === "NGN" ? "en-NG" : "en-US", {
     style: "currency",
     currency,
     maximumFractionDigits: 0,

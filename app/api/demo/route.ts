@@ -25,7 +25,7 @@ Voice and rules:
 Work through these topics in order, adapting the wording to the conversation:
 ${INTAKE_STAGES.map((s, i) => `${i + 1}. ${s.title}\n${s.questions.map((q) => `   - ${q}`).join("\n")}`).join("\n")}
 
-When you have gathered enough to value the business — at minimum a business name, industry, and some sense of revenue and profit — call the \`submit_valuation\` tool with your best structured reading of everything discussed. Annualize the monthly revenue/profit figures into \`annualRevenue\` and \`annualNetProfit\` yourself (e.g. a steady ~$10k/month ≈ $120k/year). Use null for anything genuinely unknown. After calling the tool, do not write anything else.`;
+When you have gathered enough to value the business — at minimum a business name, industry, and some sense of revenue and profit — call the \`submit_valuation\` tool with your best structured reading of everything discussed. Annualize the monthly revenue/profit figures into \`annualRevenue\` and \`annualNetProfit\` yourself (e.g. a steady ~₦1M/month ≈ ₦12M/year). Amounts are in Nigerian Naira unless the owner says otherwise. Use null for anything genuinely unknown. After calling the tool, do not write anything else.`;
 
 const VALUATION_TOOL: Anthropic.Tool = {
   name: "submit_valuation",

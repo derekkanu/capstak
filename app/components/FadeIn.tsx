@@ -29,12 +29,8 @@ export default function FadeIn({
       return;
     }
     const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setVisible(true);
-          observer.disconnect();
-        }
-      },
+      // soft in and out: things ease in as they enter and drift back out as they leave, every time
+      ([entry]) => setVisible(entry.isIntersecting),
       { threshold: amount, rootMargin: "0px 0px -8% 0px" },
     );
     observer.observe(el);

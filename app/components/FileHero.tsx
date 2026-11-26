@@ -1,0 +1,135 @@
+"use client";
+
+import { useEffect, useState } from "react";
+import { Folder, Seal } from "./FilePieces";
+import Conveyor from "./Conveyor";
+
+/* The hero's living file: back folders, the owner's photo clipped in as the first page, and the dark
+   green lid with the value. In the hero (intro) bundles of paperwork flow into it (Conveyor) and the lid
+   opens a touch and closes behind each one. Outside the hero it plays the older loop (receipt in, report
+   up, stamp). The figures are an illustration; the same business appears across the page. */
+
+// the owners pinned in as the first page, one per bundle filed
+const PHOTOS = [
+  { src: "/maker.jpg", pos: "50% 12%", grade: false },
+  { src: "/owners/caterer.jpg", pos: "50% 12%", grade: true },
+  { src: "/owners/florist.jpg", pos: "50% 12%", grade: true },
+  { src: "/owners/trader.jpg", pos: "50% 12%", grade: true },
+];
+
+// the inner folder's colour
+const INNER = "#93b99b"; // sage: quiet, now that the documents carry the colour
+
+export default function FileHero({ intro = false }: { intro?: boolean }) {
+  // intro: the folder builds itself around the first page after the logo sheet lands on it
+  const fx = (ms: number) =>
+    intro ? { className: "hero-card absolute inset-0", style: { animationDelay: `${ms}ms` } } : { className: "absolute inset-0" };
+
+  // each time a bundle fully covers the first page, the photo underneath cross-fades to the next owner
+  const [tint, setTint] = useState(0);
+  useEffect(() => {
+    if (!intro) return;
+    const onCover = () => setTint((t) => t + 1);
+    window.addEventListener("capstack:cover", onCover);
+    return () => window.removeEventListener("capstack:cover", onCover);
+  }, [intro]);
+  const shown = tint % PHOTOS.length;
+
+  // the lid: opens slightly when a bundle arrives, closes once it is in
+  const [lidOpen, setLidOpen] = useState(false);
+  useEffect(() => {
+    if (!intro) return;
+    let close: number | undefined;
+    const onLid = (e: Event) => {
+      const ms = (e as CustomEvent<number>).detail ?? 900;
+      setLidOpen(true);
+      window.clearTimeout(close);
+      close = window.setTimeout(() => setLidOpen(false), ms * 0.8);
+    };
+    window.addEventListener("capstack:lid", onLid);
+    return () => {
+      window.removeEventListener("capstack:lid", onLid);
+      window.clearTimeout(close);
+    };
+  }, [intro]);
+
+  return (
+    <div
+      className="relative mx-auto aspect-[10/9.4] w-full max-w-[560px] [clip-path:inset(-400px_-2400px_0_-2400px)]"
+      aria-label="An example valuation file for Okafor Woodworks, valued at ₦28M to ₦36M"
+      role="img"
+    >
+      {/* back folders */}
+      <div {...fx(4250)}>
+        <div className="absolute left-[2%] top-[6%] aspect-[500/320] w-[92%]">
+          <Folder w={500} h={320} tx={0.5} tw={0.3} th={36} fill="#fbfaf6" stroke="#1d2a22" />
+        </div>
+        <div className="absolute left-[4%] top-0 aspect-[500/320] w-[92%] [&_path]:transition-[fill] [&_path]:duration-700">
+          <Folder w={500} h={320} tx={0.22} tw={0.3} th={36} fill={INNER} />
+        </div>
+      </div>
+
+      {/* the owner's photo, clipped in: it comes in with the folder, so the inner folder never sits empty */}
+      <div {...fx(4350)}>
+      <div
+        data-deck-front=""
+        className="absolute left-[12%] top-[9%] h-[60%] w-[60%] -rotate-3 rounded-[4px] bg-white p-2 shadow-[0_10px_24px_-14px_rgba(0,0,0,0.45)]"
+      >
+        <span aria-hidden className="absolute -top-3 left-6 h-11 w-4 rounded-[10px] border-[2.5px] border-[#9aa39c]" />
+        <span className="relative block h-full w-full overflow-hidden rounded-[2px]">
+          {PHOTOS.map((ph, n) => (
+            <span key={ph.src} className="absolute inset-0 transition-opacity duration-200 ease-out" style={{ opacity: n === shown ? 1 : 0 }}>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={ph.src} alt="" className="h-full w-full object-cover" style={{ objectPosition: ph.pos, filter: ph.grade ? "saturate(0.8) contrast(1.06) brightness(0.97)" : undefined }} />
+              {/* the same green cast as the first photo, so the set feels shot together */}
+              {ph.grade ? <span aria-hidden className="absolute inset-0 bg-[#1f6b3f] mix-blend-soft-light opacity-70" /> : null}
+            </span>
+          ))}
+        </span>
+      </div>
+      </div>
+
+      {/* the paperwork flowing in: over the first page, always under the lid */}
+      {intro ? <Conveyor /> : null}
+
+      {intro ? null : (
+        <>
+          {/* the A4 report, rising out of the file */}
+          <div className="file-a4 absolute right-[8%] top-[28%] grid aspect-[1/1.3] w-[44%] content-start gap-1.5 rounded-[3px] bg-white p-3.5 shadow-[0_10px_24px_-14px_rgba(0,0,0,0.45)]">
+            <span className="tab-label !text-[8px] text-ink/50">Valuation report · File №0142</span>
+            <b className="text-[17px] font-semibold leading-tight tracking-[-0.02em]">Okafor Woodworks</b>
+            <span className="h-[5px] rounded bg-[#ecebe5]" />
+            <span className="h-[5px] w-[70%] rounded bg-[#ecebe5]" />
+            <span className="num mt-1 font-mono text-[17px] font-medium text-green">₦28M – ₦36M</span>
+            <Seal id="hero" className="file-seal absolute bottom-3 right-3 h-16 w-16 text-seal" />
+          </div>
+
+          {/* a POS receipt, dropping in */}
+          <div className="file-receipt receipt absolute left-[30%] top-[2%] w-[34%] px-3 pb-4 pt-2.5 font-mono text-[10px] leading-[1.7] text-ink shadow-[0_10px_20px_-12px_rgba(0,0,0,0.45)]">
+            <div className="mb-1 border-b border-dashed border-ink/25 pb-1 text-center font-semibold tracking-[0.12em]">POS · MAY</div>
+            <div className="flex justify-between"><span>SALES</span><span>₦3.5M</span></div>
+            <div className="flex justify-between"><span>COSTS</span><span>₦2.6M</span></div>
+            <div className="flex justify-between"><span>LEFT</span><span>₦890k</span></div>
+          </div>
+        </>
+      )}
+
+      {/* the lid (front of the folder) */}
+      <div {...fx(4450)}>
+        <div
+          className="absolute inset-x-0 bottom-0 h-[47%] origin-bottom transition-transform duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]"
+          style={{ transform: lidOpen ? "perspective(900px) rotateX(-16deg)" : "perspective(900px) rotateX(0deg)" }}
+        >
+          <Folder w={560} h={250} tx={0.06} tw={0.34} th={40} fill="#042e1b" />
+          <div className="absolute inset-0 flex flex-col justify-between px-6 pb-5 pt-[54px] text-cream">
+            <div className="flex justify-between text-sage-soft">
+              <span className="tab-label">( Okafor Woodworks )</span>
+              <span className="tab-label">File №0142</span>
+            </div>
+            <span className="num font-mono text-[clamp(24px,4vw,34px)] font-medium tracking-[-0.03em] text-white">₦28M – ₦36M</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}

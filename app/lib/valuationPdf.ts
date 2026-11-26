@@ -23,7 +23,7 @@ export function generatePdf(input: ValuationInput, result: ValuationResult) {
   doc.setTextColor(200, 224, 67);
   doc.setFont("helvetica", "bold");
   doc.setFontSize(20);
-  doc.text("Capstak", margin, 46);
+  doc.text("Capstack", margin, 46);
   doc.setFont("helvetica", "normal");
   doc.setFontSize(10);
   doc.setTextColor(220, 230, 200);

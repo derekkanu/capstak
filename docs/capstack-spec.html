@@ -1,0 +1,439 @@
+<title>Capstack Product Spec</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: a single reading column (a ledger) with full-width diagram bands; figures in mono like a statement. */
+:root {
+  --paper: #F5F6F2;
+  --card: #FFFFFF;
+  --ink: #15201A;
+  --muted: #5B6760;
+  --line: #D9DED7;
+  --forest: #1E4D36;
+  --forest-soft: #E3ECE5;
+  --lime: #C6EE6A;
+  --amber: #B7791F;
+  --amber-soft: #F6ECD9;
+  --on-forest: #F2F6EE;
+  --display: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --body: "Inter", system-ui, -apple-system, sans-serif;
+  --mono: "JetBrains Mono", ui-monospace, Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #101612; --card: #172019; --ink: #E7EDE6; --muted: #9AA69E; --line: #2A362E;
+    --forest: #7FC497; --forest-soft: #1D2E23; --lime: #C6EE6A; --amber: #E0A84D; --amber-soft: #2C2416; --on-forest: #0F1A13;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #101612; --card: #172019; --ink: #E7EDE6; --muted: #9AA69E; --line: #2A362E;
+  --forest: #7FC497; --forest-soft: #1D2E23; --lime: #C6EE6A; --amber: #E0A84D; --amber-soft: #2C2416; --on-forest: #0F1A13;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body { background: var(--paper); color: var(--ink); font: 400 16px/1.6 var(--body); }
+.wrap { max-width: 980px; margin: 0 auto; padding-block: 48px 96px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); display: grid; gap: 72px; }
+h1, h2, h3 { font-family: var(--display); line-height: 1.08; text-wrap: balance; margin: 0; }
+h1 { font-size: clamp(2.4rem, 6vw, 4rem); font-weight: 800; letter-spacing: -0.02em; }
+h2 { font-size: clamp(1.6rem, 3.4vw, 2.2rem); font-weight: 700; letter-spacing: -0.01em; }
+h3 { font-size: 1.15rem; font-weight: 700; }
+p { margin: 0; max-width: 66ch; }
+.eyebrow { font: 600 12px/1 var(--mono); letter-spacing: 0.12em; text-transform: uppercase; color: var(--forest); }
+.lede { font-size: 1.2rem; color: var(--muted); max-width: 60ch; }
+section { display: grid; gap: 20px; }
+.muted { color: var(--muted); }
+.mono { font-family: var(--mono); font-variant-numeric: tabular-nums; }
+.box { background: var(--card); border: 1px solid var(--line); padding: 20px; }
+.grid { display: grid; gap: 16px; }
+.g2 { grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); }
+.g3 { grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); }
+.g3 > *, .g2 > * { min-width: 0; }
+.tag { display: inline-block; font: 600 11px/1 var(--mono); letter-spacing: 0.08em; text-transform: uppercase; padding: 6px 8px; border-radius: 999px; background: var(--forest-soft); color: var(--forest); }
+.tag.open { background: var(--amber-soft); color: var(--amber); }
+.hl { background: linear-gradient(transparent 60%, color-mix(in srgb, var(--lime) 70%, transparent) 60%); }
+.scroll { overflow-x: auto; }
+
+/* hero */
+.hero { display: grid; gap: 22px; }
+.oneliner { border-left: 3px solid var(--forest); padding-left: 16px; font-size: 1.1rem; }
+
+/* tiers ladder */
+.ladder { display: grid; grid-template-columns: repeat(3, minmax(220px, 1fr)); gap: 0; min-width: 680px; }
+.step { padding: 22px; border: 1px solid var(--line); background: var(--card); display: grid; gap: 10px; align-content: start; position: relative; }
+.step:nth-child(2) { transform: translateY(-14px); border-color: var(--forest); }
+.step:nth-child(3) { transform: translateY(-28px); background: var(--forest); color: var(--on-forest); border-color: var(--forest); }
+.step:nth-child(3) .muted, .step:nth-child(3) .eyebrow { color: var(--on-forest); opacity: 0.8; }
+.price { font: 600 1.6rem/1 var(--mono); }
+.step ul { margin: 0; padding-left: 18px; }
+
+/* journey */
+.journey { display: flex; align-items: stretch; gap: 0; min-width: 820px; }
+.node { flex: 1; background: var(--card); border: 1px solid var(--line); padding: 16px; display: grid; gap: 6px; align-content: start; }
+.node.dash { background: var(--forest-soft); border-color: var(--forest); }
+.node b { font-family: var(--display); font-size: 1.05rem; }
+.arrow { width: 28px; flex: 0 0 28px; display: grid; place-items: center; color: var(--muted); }
+.time { font: 500 12px/1 var(--mono); color: var(--forest); }
+
+/* questions before/after */
+.qa { display: grid; grid-template-columns: 1fr 1fr; gap: 0; border: 1px solid var(--line); }
+.qa > div { padding: 14px 16px; border-top: 1px solid var(--line); min-width: 0; }
+.qa > div:nth-child(-n+2) { border-top: 0; font: 600 11px/1 var(--mono); letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); padding-block: 12px; }
+.qa > div:nth-child(odd) { border-right: 1px solid var(--line); color: var(--muted); }
+.qa > div:nth-child(even):not(:nth-child(2)) { background: var(--card); }
+
+/* BMC */
+.bmc { display: grid; grid-template-columns: repeat(5, 1fr); grid-template-rows: auto auto auto; gap: 1px; background: var(--line); border: 1px solid var(--line); min-width: 860px; }
+.bmc > div { background: var(--card); padding: 14px; display: grid; gap: 6px; align-content: start; }
+.bmc .kp { grid-row: 1 / 3; } .bmc .vp { grid-row: 1 / 3; } .bmc .cs { grid-row: 1 / 3; }
+.bmc .cost { grid-column: 1 / 3; } .bmc .rev { grid-column: 3 / 6; }
+.bmc h4 { margin: 0; font: 700 0.95rem/1.2 var(--display); }
+.bmc .ask { font-size: 0.9rem; }
+.bmc .fx { font: 500 11px/1.4 var(--mono); color: var(--forest); }
+.bmc .fx.edu { color: var(--muted); }
+
+/* engine */
+.engine svg text { font-family: var(--body); }
+.legend { display: flex; flex-wrap: wrap; gap: 16px; font-size: 0.9rem; color: var(--muted); }
+
+/* confidence */
+.meter { display: grid; gap: 10px; }
+.bar { height: 10px; background: var(--forest-soft); position: relative; }
+.bar i { position: absolute; inset: 0 auto 0 0; background: var(--forest); }
+.boost { display: flex; justify-content: space-between; gap: 12px; padding: 10px 0; border-top: 1px dashed var(--line); font-size: 0.95rem; }
+.boost:first-child { border-top: 0; }
+
+/* dashboard mock */
+.mock { display: grid; grid-template-columns: 200px 1fr; border: 1px solid var(--line); background: var(--card); min-width: 760px; }
+.rail { border-right: 1px solid var(--line); padding: 18px; display: grid; gap: 14px; align-content: start; background: var(--paper); }
+.guide { display: flex; align-items: center; gap: 10px; font-weight: 600; }
+.face { width: 34px; height: 34px; border-radius: 50%; background: var(--forest); color: var(--on-forest); display: grid; place-items: center; font: 700 14px/1 var(--display); }
+.rail ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; font-size: 0.92rem; color: var(--muted); }
+.rail li.on { color: var(--ink); font-weight: 600; }
+.rail li.on::before { content: "● "; color: var(--forest); }
+.main { padding: 20px; display: grid; gap: 14px; }
+.valuecard { display: grid; grid-template-columns: 1fr auto; gap: 8px; align-items: end; padding: 18px; border: 1px solid var(--line); }
+.big { font: 700 2rem/1 var(--mono); }
+.chapters { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+.chap { border: 1px solid var(--line); padding: 12px; display: grid; gap: 6px; font-size: 0.9rem; }
+.chap .bar { height: 6px; }
+.why { border: 1px solid var(--line); padding: 14px; display: grid; gap: 6px; background: var(--paper); font-size: 0.92rem; }
+.why .eyebrow { font-size: 10px; }
+
+/* flywheel */
+.fly text { font-family: var(--body); }
+
+/* decisions */
+.dec { display: grid; gap: 0; border: 1px solid var(--line); }
+.dec > div { display: grid; grid-template-columns: 1fr auto; gap: 12px; padding: 14px 16px; border-top: 1px solid var(--line); background: var(--card); align-items: start; }
+.dec > div:first-child { border-top: 0; }
+.dec p { font-size: 0.95rem; }
+ol.next { margin: 0; padding-left: 20px; display: grid; gap: 10px; }
+footer { font-size: 0.85rem; color: var(--muted); border-top: 1px solid var(--line); padding-top: 16px; }
+
+@media (max-width: 640px) {
+  .qa { grid-template-columns: 1fr; }
+  .qa > div:nth-child(odd) { border-right: 0; }
+  .qa > div:nth-child(2) { display: none; }
+  .step:nth-child(2), .step:nth-child(3) { transform: none; }
+}
+@media (prefers-reduced-motion: no-preference) { .step { transition: transform .2s; } }
+</style>
+
+<div class="wrap">
+
+<header class="hero">
+  <span class="eyebrow">Product spec · draft 1 · 26 Nov 2026</span>
+  <h1>Capstack</h1>
+  <p class="lede">What your business is worth, in plain words. A guided valuation for African small businesses that ends in a number you can defend, and later, a marketplace of businesses ready for investment.</p>
+  <p class="oneliner">A guide you chat with helps an owner value their business on their phone, without a consultant and without knowing finance. The AI gathers the story; fixed, documented rules do the maths.</p>
+</header>
+
+<section>
+  <span class="eyebrow">Why it exists</span>
+  <h2>Owners decide without a number</h2>
+  <div class="grid g3">
+    <div class="box"><h3>Cost</h3><p class="muted">A consultant's valuation costs thousands of dollars. Most SME owners will never pay that.</p></div>
+    <div class="box"><h3>Language</h3><p class="muted">Global tools assume spreadsheets and finance words: EBITDA, net margin, discount rate.</p></div>
+    <div class="box"><h3>Context</h3><p class="muted">Nothing is built for Naira, informal records, mixed personal and business money, or phone-first owners.</p></div>
+  </div>
+  <p class="muted">Market figures in the current pitch (SME counts, failure rates, market size, competitor names) still need sources before they go in front of investors.</p>
+</section>
+
+<section>
+  <span class="eyebrow">The business</span>
+  <h2>Three tiers, one engine</h2>
+  <p>Each tier is the same engine with more of it switched on. Free gets people in; owners pay once; brokers pay monthly and make the whole thing more accurate.</p>
+  <div class="scroll" style="padding-top:30px">
+    <div class="ladder">
+      <div class="step">
+        <span class="eyebrow">Free</span>
+        <span class="price">₦0</span>
+        <p class="muted">Anyone curious about their number.</p>
+        <ul><li>Quick calculator (the home page)</li><li>Comparison method only</li><li>A rough range, no report</li><li>Job: leads and trust</li></ul>
+      </div>
+      <div class="step">
+        <span class="eyebrow">Premium · per valuation</span>
+        <span class="price">₦15k–35k<span class="muted" style="font-size:.9rem"> to test</span></span>
+        <p class="muted">Owners doing it themselves.</p>
+        <ul><li>The full guided conversation</li><li>Business model chapter (BMC)</li><li>All methods + confidence score</li><li>A report to share with a buyer or bank</li></ul>
+      </div>
+      <div class="step">
+        <span class="eyebrow">Brokers · subscription</span>
+        <span class="price">₦100k–250k<span style="font-size:.9rem;opacity:.8"> /mo, to test</span></span>
+        <p class="muted">Brokers and advisers valuing many businesses.</p>
+        <ul><li>Many clients in one place</li><li>Reports with the broker's brand</li><li>Saved comparisons</li><li>Partner discounts; closed deals feed the benchmarks</li></ul>
+      </div>
+    </div>
+  </div>
+  <p class="muted">Later payers to explore: banks and lenders, microfinance, accelerators and SME programmes buying valuations in bulk.</p>
+</section>
+
+<section>
+  <span class="eyebrow">The experience</span>
+  <h2>A quick onboarding, then everything happens on the dashboard</h2>
+  <p>One long chat is a long form in disguise. So onboarding only collects the basics and gets the owner to their dashboard fast. The deeper work (how the business makes money, the numbers, documents) lives on the dashboard as tasks they do at their own pace. When enough is in, the dashboard unlocks the next stage: the valuation.</p>
+  <div class="scroll">
+    <div class="journey">
+      <div class="node"><span class="time">~3 min · full screen</span><b>Onboarding</b><span class="muted">Phone number + code (or WhatsApp). The guide asks the basics one at a time: name, business, sector, location, years trading, rough size.</span></div>
+      <div class="arrow" aria-hidden="true">→</div>
+      <div class="node dash" style="flex:2.4"><span class="time">home base · own pace</span><b>Dashboard</b><span class="muted">Review the profile, then work through the tasks the guide lays out:</span>
+        <span class="muted">· <b style="font-size:.95rem">How you make money</b> (business model, ends in a one-page canvas)<br>· <b style="font-size:.95rem">Your numbers</b> (money in, out, what's left, debts, assets; rough is fine)<br>· <b style="font-size:.95rem">Documents</b> (statements, receipts, stock lists; optional, they raise confidence)</span></div>
+      <div class="arrow" aria-hidden="true">→</div>
+      <div class="node"><span class="time">unlocks when ready</span><b>Your value</b><span class="muted">A range, a confidence score, the reasons and a report. Then the next stage (sharing with a broker or buyer, later the marketplace).</span></div>
+    </div>
+  </div>
+  <div class="grid g2" style="align-items:start">
+    <div class="box" style="display:grid;gap:12px">
+      <span class="tag">Onboarding · from Jack &amp; Jill</span>
+      <h3>One question, full screen, then Next</h3>
+      <p class="muted">Used for onboarding only: the basics, then straight to the dashboard. Not a chat window. The guide's face sits at the top centre, one question below it in large type, the answer field (text, quick picks or voice) under that, and a Next button. The question slides away and the next arrives. A thin progress line shows how far along the chapter is; Back changes an answer. The guide can still react in one line or explain when the owner taps "What do you mean?".</p>
+    </div>
+    <div class="box" style="display:grid;gap:14px;justify-items:center;text-align:center;padding:28px 20px" role="img" aria-label="Sketch of the one-question stage">
+      <div class="bar" style="width:100%;height:4px"><i style="width:40%"></i></div>
+      <span class="face" style="width:44px;height:44px;font-size:16px">S</span>
+      <span class="muted" style="font-size:.85rem">Nice, six years is a solid track record.</span>
+      <b style="font-family:var(--display);font-size:1.35rem;line-height:1.2;max-width:22ch">Roughly what came into the business last month?</b>
+      <div style="width:100%;max-width:280px;border-bottom:2px solid var(--forest);padding:8px 0;text-align:left" class="mono">₦ 3,500,000</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:center"><span class="tag">About ₦1M</span><span class="tag">₦1–5M</span><span class="tag">Over ₦5M</span></div>
+      <div style="display:flex;gap:16px;align-items:center"><span class="muted" style="font-size:.85rem">What do you mean?</span><span style="background:var(--forest);color:var(--on-forest);padding:8px 18px;font-weight:600;font-size:.9rem">Next →</span></div>
+    </div>
+  </div>
+  <div class="grid g2">
+    <div class="box" style="display:grid;gap:10px">
+      <span class="tag open">Decision open</span>
+      <h3>One guide, or a team of three?</h3>
+      <p class="muted">Proposed: Sarah (anchor), John (business model), Hassan (finance). Recommended: Sarah alone, changing hats per chapter, with specialists only as short cameos ("I've asked Hassan to check these numbers"). One voice means no hand-offs and one relationship to trust right before money questions. Names should be chosen on purpose for who the product is for, possibly per country.</p>
+    </div>
+    <div class="box" style="display:grid;gap:10px">
+      <span class="tag">Principle</span>
+      <h3>Every task pays something back</h3>
+      <p class="muted">Onboarding → a clean business profile and a first rough range. Business model → a one-page canvas they can show a bank. Numbers and documents → a sharper range and higher confidence. Stopping halfway still leaves the owner with something useful.</p>
+    </div>
+  </div>
+</section>
+
+<section>
+  <span class="eyebrow">The core idea</span>
+  <h2>Questions in everyday language</h2>
+  <p>This is the moat. Owners answer accurately when the question matches how they already think about their shop, and they <span class="hl">learn the finance without noticing</span>. They can always ask "what do you mean?" and the guide explains in plain words.</p>
+  <div class="scroll">
+    <div class="qa">
+      <div>Finance asks</div><div>Capstack asks</div>
+      <div>What is your net profit?</div><div>Roughly what came in last month? What went out? What's left?</div>
+      <div>What is your revenue growth rate?</div><div>Is this month busier than the same month last year? By about how much?</div>
+      <div>What are your liabilities?</div><div>Do you owe anyone money for the business? A loan, a supplier, equipment?</div>
+      <div>Describe your customer concentration.</div><div>If your biggest customer stopped buying tomorrow, how much would you lose?</div>
+      <div>Is owner compensation normalised?</div><div>Do you pay yourself a salary, or take money when you need it?</div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <span class="eyebrow">Chapter 2</span>
+  <h2>The business model, in plain questions</h2>
+  <p>The Business Model Canvas has nine boxes. Capstack asks each one as a normal question, fills in what earlier answers already told it, and lets the owner finish the rest later. The important part: most boxes <b>change the value</b>, because they show risk.</p>
+  <div class="scroll">
+    <div class="bmc">
+      <div class="kp"><h4>Key partners</h4><span class="ask">"If your main supplier stopped selling to you, would you be in trouble?"</span><span class="fx">→ supplier risk · multiple ±</span></div>
+      <div><h4>Key activities</h4><span class="ask">"What do you do every day that keeps the business running?"</span><span class="fx">→ owner dependence</span></div>
+      <div class="vp"><h4>Value proposition</h4><span class="ask">"Why do customers buy from you and not the shop next door?"</span><span class="fx edu">→ report story, edge</span></div>
+      <div><h4>Customer relationships</h4><span class="ask">"Do the same customers come back? How often?"</span><span class="fx">→ repeat revenue · multiple ±</span></div>
+      <div class="cs"><h4>Customer segments</h4><span class="ask">"Who buys from you most? Is one customer a big share of sales?"</span><span class="fx">→ concentration risk · multiple ±</span></div>
+      <div><h4>Key resources</h4><span class="ask">"What could you not run without? Equipment, a licence, a location, a person?"</span><span class="fx">→ asset value + key-person risk</span></div>
+      <div><h4>Channels</h4><span class="ask">"How do people find you and pay you? Walk-in, WhatsApp, Instagram, transfer?"</span><span class="fx edu">→ often auto-filled</span></div>
+      <div class="cost"><h4>Cost structure</h4><span class="ask">"What are your biggest costs each month? Which ones stay the same even in a slow month?"</span><span class="fx">→ fixed vs variable · income method</span></div>
+      <div class="rev"><h4>Revenue streams</h4><span class="ask">"What are all the ways money comes in? Which is the biggest?"</span><span class="fx">→ diversification · comparison + income methods</span></div>
+    </div>
+  </div>
+  <div class="legend"><span><span class="mono" style="color:var(--forest)">green</span> changes the number</span><span><span class="mono">grey</span> context and education</span></div>
+</section>
+
+<section class="engine">
+  <span class="eyebrow">The engine</span>
+  <h2>Run every method the data allows, then blend by confidence</h2>
+  <p>No single method is best for every African SME; it depends on the records. So the engine routes. It runs each method only when it has enough to stand on, weighs each by how good its inputs are, and shows one range with a confidence score.</p>
+  <div class="scroll box" style="padding:12px">
+    <svg viewBox="0 0 900 360" width="100%" style="min-width:720px;display:block" role="img" aria-label="Engine diagram: answers flow into a router that runs the comparison, income and asset methods, then a confidence blend produces a range">
+      <defs><marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="var(--muted)"/></marker></defs>
+      <!-- inputs -->
+      <rect x="10" y="120" width="150" height="120" fill="var(--forest-soft)" stroke="var(--forest)"/>
+      <text x="85" y="150" text-anchor="middle" font-weight="700" fill="var(--ink)" font-size="15">The story</text>
+      <text x="85" y="174" text-anchor="middle" fill="var(--muted)" font-size="12">profile</text>
+      <text x="85" y="192" text-anchor="middle" fill="var(--muted)" font-size="12">business model</text>
+      <text x="85" y="210" text-anchor="middle" fill="var(--muted)" font-size="12">numbers, documents</text>
+      <line x1="160" y1="180" x2="215" y2="180" stroke="var(--muted)" stroke-width="1.5" marker-end="url(#ah)"/>
+      <!-- router -->
+      <polygon points="285,110 355,180 285,250 215,180" fill="var(--card)" stroke="var(--ink)"/>
+      <text x="285" y="176" text-anchor="middle" font-weight="700" fill="var(--ink)" font-size="14">Router</text>
+      <text x="285" y="194" text-anchor="middle" fill="var(--muted)" font-size="11">enough data?</text>
+      <!-- methods -->
+      <line x1="345" y1="170" x2="420" y2="62" stroke="var(--muted)" stroke-width="1.5" marker-end="url(#ah)"/>
+      <line x1="355" y1="180" x2="420" y2="180" stroke="var(--muted)" stroke-width="1.5" marker-end="url(#ah)"/>
+      <line x1="345" y1="190" x2="420" y2="298" stroke="var(--muted)" stroke-width="1.5" marker-end="url(#ah)"/>
+      <rect x="422" y="22" width="230" height="80" fill="var(--card)" stroke="var(--forest)" stroke-width="2"/>
+      <text x="436" y="48" font-weight="700" fill="var(--ink)" font-size="14">Comparison (market)</text>
+      <text x="436" y="68" fill="var(--muted)" font-size="12">sector multiple × profit, adjusted</text>
+      <text x="436" y="86" fill="var(--forest)" font-size="12">runs: always · the backbone</text>
+      <rect x="422" y="140" width="230" height="80" fill="var(--card)" stroke="var(--line)"/>
+      <text x="436" y="166" font-weight="700" fill="var(--ink)" font-size="14">Income (future cash)</text>
+      <text x="436" y="186" fill="var(--muted)" font-size="12">forecast, discounted for risk + time</text>
+      <text x="436" y="204" fill="var(--forest)" font-size="12">runs: 2+ yrs of believable numbers</text>
+      <rect x="422" y="258" width="230" height="80" fill="var(--card)" stroke="var(--line)"/>
+      <text x="436" y="284" font-weight="700" fill="var(--ink)" font-size="14">Assets</text>
+      <text x="436" y="304" fill="var(--muted)" font-size="12">what it owns minus what it owes</text>
+      <text x="436" y="322" fill="var(--forest)" font-size="12">runs: always · the floor</text>
+      <!-- blend -->
+      <line x1="652" y1="62" x2="712" y2="160" stroke="var(--muted)" stroke-width="1.5" marker-end="url(#ah)"/>
+      <line x1="652" y1="180" x2="712" y2="180" stroke="var(--muted)" stroke-width="1.5" marker-end="url(#ah)"/>
+      <line x1="652" y1="298" x2="712" y2="200" stroke="var(--muted)" stroke-width="1.5" marker-end="url(#ah)"/>
+      <rect x="714" y="110" width="176" height="140" fill="var(--forest)"/>
+      <text x="802" y="140" text-anchor="middle" font-weight="700" fill="var(--on-forest)" font-size="14">Confidence blend</text>
+      <text x="802" y="178" text-anchor="middle" fill="var(--on-forest)" font-size="20" font-family="JetBrains Mono, monospace" font-weight="600">₦30M–38M</text>
+      <text x="802" y="204" text-anchor="middle" fill="var(--on-forest)" font-size="12">confidence: medium</text>
+      <text x="802" y="226" text-anchor="middle" fill="var(--on-forest)" font-size="12">+ the reasons</text>
+    </svg>
+  </div>
+  <div class="grid g3">
+    <div class="box"><h3>Same answers, same result</h3><p class="muted">The AI never invents the number. It only gathers and explains. The rules are fixed and documented, which is what brokers and banks need to trust it.</p></div>
+    <div class="box"><h3>Risk moves the number</h3><p class="muted">Business-model answers lower or raise the multiple (comparison) and the discount (income). One big customer or one supplier = riskier = lower value.</p></div>
+    <div class="box"><h3>Africa-specific inputs</h3><p class="muted">Naira and local benchmarks, inflation in the income method, adjustments for informal records and owners who mix personal and business money.</p></div>
+  </div>
+</section>
+
+<section>
+  <span class="eyebrow">Confidence</span>
+  <h2>Missing data becomes the next step</h2>
+  <p>Instead of failing when records are thin, the engine says how sure it is and what would make it surer. That is the switching logic made visible, and it is also the natural upgrade path.</p>
+  <div class="grid g2">
+    <div class="box meter">
+      <div style="display:flex;justify-content:space-between;align-items:baseline"><b>Riverside Pharmacy · example</b><span class="mono">58%</span></div>
+      <div class="bar"><i style="width:58%"></i></div>
+      <span class="muted" style="font-size:.9rem">Medium confidence: numbers are estimates, one year of history.</span>
+    </div>
+    <div class="box">
+      <div class="boost"><span>Upload 6 months of bank statements</span><span class="mono" style="color:var(--forest)">+18%</span></div>
+      <div class="boost"><span>Add last year's sales, even rough</span><span class="mono" style="color:var(--forest)">+12%</span></div>
+      <div class="boost"><span>List equipment and stock</span><span class="mono" style="color:var(--forest)">+6%</span></div>
+      <div class="boost"><span>Finish the business model chapter</span><span class="mono" style="color:var(--forest)">+6%</span></div>
+    </div>
+  </div>
+  <p class="muted">Until real sale prices prove it, the claim is "the most explainable valuation". "The most accurate" is earned by checking estimates against closed deals.</p>
+</section>
+
+<section>
+  <span class="eyebrow">Dashboard</span>
+  <h2>The guide's desk, not a settings page</h2>
+  <p>Borrowed from Jack &amp; Jill: the guide lives in the left rail with a short menu, and the main area is what the guide has prepared, each item with a "why" underneath. The owner always sees the value, the chapters, and one clear next step.</p>
+  <div class="scroll">
+    <div class="mock" role="img" aria-label="Dashboard sketch: guide rail on the left, value card, chapter progress and the guide's suggestion on the right">
+      <div class="rail">
+        <div class="guide"><span class="face">S</span>Sarah</div>
+        <ul>
+          <li class="on">My value</li>
+          <li>Chapters</li>
+          <li>Business canvas</li>
+          <li>Documents</li>
+          <li>Report</li>
+          <li>Ask Sarah</li>
+        </ul>
+      </div>
+      <div class="main">
+        <div class="valuecard">
+          <div style="display:grid;gap:6px"><span class="eyebrow">Mama Tunde Foods · estimated value</span><span class="big">₦30M – ₦38M</span><span class="muted" style="font-size:.9rem">Confidence medium · comparison + assets · income method locked until 2 years of numbers</span></div>
+          <span class="tag">Draft</span>
+        </div>
+        <div class="chapters">
+          <div class="chap"><b>About you</b><div class="bar"><i style="width:100%"></i></div><span class="muted">Done</span></div>
+          <div class="chap"><b>How you make money</b><div class="bar"><i style="width:55%"></i></div><span class="muted">5 of 9 boxes</span></div>
+          <div class="chap"><b>Your numbers</b><div class="bar"><i style="width:30%"></i></div><span class="muted">Estimates only</span></div>
+        </div>
+        <div class="why">
+          <span class="eyebrow">Sarah suggests</span>
+          <b>Tell me about your two biggest customers (4 questions, ~3 min)</b>
+          <span class="muted">Why: one hotel buys about half your trays. Knowing how steady that is could move your range by ₦4M either way.</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  <p class="muted">Jack &amp; Jill's onboarding is behind a sign-up, so this draws on their public product views. Screens from Derek's own account would sharpen the onboarding part.</p>
+</section>
+
+<section>
+  <span class="eyebrow">The long game</span>
+  <h2>Brokers make it accurate; accuracy makes the marketplace</h2>
+  <p>Brokers aren't competition. They are the distribution, the credibility and the data. Every closed deal tells Capstack whether its benchmarks were right.</p>
+  <div class="scroll box" style="padding:12px">
+    <svg class="fly" viewBox="0 0 900 330" width="100%" style="min-width:700px;display:block" role="img" aria-label="Flywheel: brokers use Capstack, closed deals improve benchmarks, valuations get more accurate, more brokers and owners trust it, which leads to a broker-led marketplace">
+      <defs><marker id="ah2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" fill="var(--forest)"/></marker></defs>
+      <circle cx="300" cy="165" r="118" fill="none" stroke="var(--line)" stroke-width="2"/>
+      <path d="M300 47 A118 118 0 0 1 418 165" fill="none" stroke="var(--forest)" stroke-width="2.5" marker-end="url(#ah2)"/>
+      <path d="M418 165 A118 118 0 0 1 300 283" fill="none" stroke="var(--forest)" stroke-width="2.5" marker-end="url(#ah2)"/>
+      <path d="M300 283 A118 118 0 0 1 182 165" fill="none" stroke="var(--forest)" stroke-width="2.5" marker-end="url(#ah2)"/>
+      <path d="M182 165 A118 118 0 0 1 300 47" fill="none" stroke="var(--forest)" stroke-width="2.5" marker-end="url(#ah2)"/>
+      <g font-size="13" fill="var(--ink)">
+        <rect x="225" y="14" width="150" height="34" fill="var(--card)" stroke="var(--line)"/><text x="300" y="36" text-anchor="middle" font-weight="600">Brokers use Capstack</text>
+        <rect x="400" y="148" width="170" height="34" fill="var(--card)" stroke="var(--line)"/><text x="485" y="170" text-anchor="middle" font-weight="600">Closed deals feed data</text>
+        <rect x="215" y="282" width="170" height="34" fill="var(--card)" stroke="var(--line)"/><text x="300" y="304" text-anchor="middle" font-weight="600">Benchmarks get sharper</text>
+        <rect x="24" y="148" width="170" height="34" fill="var(--card)" stroke="var(--line)"/><text x="109" y="170" text-anchor="middle" font-weight="600">More trust, more users</text>
+      </g>
+      <text x="300" y="160" text-anchor="middle" font-size="12" fill="var(--muted)">the data nobody</text>
+      <text x="300" y="178" text-anchor="middle" font-size="12" fill="var(--muted)">else can copy</text>
+      <line x1="580" y1="165" x2="660" y2="165" stroke="var(--muted)" stroke-width="1.5" marker-end="url(#ah2)"/>
+      <rect x="664" y="105" width="226" height="120" fill="var(--forest)"/>
+      <text x="777" y="138" text-anchor="middle" font-weight="700" fill="var(--on-forest)" font-size="15">The marketplace</text>
+      <text x="777" y="164" text-anchor="middle" fill="var(--on-forest)" font-size="12">valued businesses meet investors</text>
+      <text x="777" y="184" text-anchor="middle" fill="var(--on-forest)" font-size="12">broker-led: brokers list,</text>
+      <text x="777" y="202" text-anchor="middle" fill="var(--on-forest)" font-size="12">Capstack sends buyers</text>
+    </svg>
+  </div>
+</section>
+
+<section>
+  <span class="eyebrow">Open questions</span>
+  <h2>Decisions still to make</h2>
+  <div class="dec">
+    <div><p><b>One guide or three?</b> Sarah alone with chapters (recommended) or Sarah, John and Hassan. And which names, for which countries.</p><span class="tag open">Derek</span></div>
+    <div><p><b>Does the business model chapter change the number, or only teach?</b> Recommended: it changes it (risk), so every question must earn its place.</p><span class="tag open">Derek + advisor</span></div>
+    <div><p><b>Where do the comparison benchmarks come from on day one?</b> Public sector data, advisor experience, first broker partners. Each needs a documented source.</p><span class="tag open">Advisor</span></div>
+    <div><p><b>How to value informal businesses fairly:</b> mixed personal money, cash sales, no records. Which adjustments, and how they're explained.</p><span class="tag open">Advisor</span></div>
+    <div><p><b>Who pays first?</b> Owners per valuation, brokers monthly, or a bank or SME programme in bulk. Prices above are guesses to test.</p><span class="tag open">Derek</span></div>
+    <div><p><b>Sign-in:</b> phone number + one-time code, WhatsApp, or both.</p><span class="tag open">Derek</span></div>
+  </div>
+</section>
+
+<section>
+  <span class="eyebrow">What happens next</span>
+  <h2>The order of work</h2>
+  <ol class="next">
+    <li><b>Brand rethink</b> with our brand process: kickoff questions, the feeling in words, concept zones, two directions, a real story concept (as with Battle Grid). Fix the name everywhere: <b>Capstack</b>.</li>
+    <li><b>Home page update</b> to match this spec: Africa-first, Naira, plain-language questions, the free calculator as the way in, one main action.</li>
+    <li><b>Experience structure:</b> the full-screen onboarding (basics only), then the dashboard with its tasks and progress, and the gate that unlocks the valuation.</li>
+    <li><b>Build the business model chapter</b> and the dashboard, then the numbers chapter and the engine's router, blend and confidence score.</li>
+  </ol>
+</section>
+
+<footer>Draft for Derek and the Capstack advisor. Figures in examples (Mama Tunde Foods, Riverside Pharmacy, prices, confidence boosts) are illustrations, not data.</footer>
+
+</div>

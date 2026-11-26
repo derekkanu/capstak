@@ -9,7 +9,7 @@ import { INTAKE_STAGES, type ValuationInput, type ValuationResult } from "../lib
 type ChatMessage = { role: "user" | "assistant"; content: string };
 
 const GREETING =
-  "Hi! I'm Capstak's valuation assistant. I'll ask a few simple questions about your business — no finance background needed, and you can ask me anything you don't understand along the way. The more accurate your answers, the more accurate your valuation. To start: what's the name of your business?";
+  "Hi! I'm Capstack's valuation assistant. I'll ask a few simple questions about your business — no finance background needed, and you can ask me anything you don't understand along the way. The more accurate your answers, the more accurate your valuation. To start: what's the name of your business?";
 
 const QUICK_REPLIES = ["What does that mean?", "I'm not sure, can I estimate?"];
 

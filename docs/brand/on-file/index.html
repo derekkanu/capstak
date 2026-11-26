@@ -1,0 +1,507 @@
+<title>Capstack On File</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Sans:ital,wght@0,400..700;1,400..700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<style>
+/* Layout: one direction, "The File". Intro (the system), then pieces in a review grid:
+   cover poster + index poster, website hero with the living file, onboarding phone, dashboard with edge tabs.
+   One deliberate light look; colours explicit. Capstack greens + reference sage and file-folder greys. */
+:root {
+  --board: #E7E6DD; --paper: #F7F5EF; --ink: #0F1B14; --muted: #64706A; --line: #1D2A22;
+  --pop: #FF6A1A; /* signal orange: the urgent tab, the highlighter. Used sparingly. */
+  --deep: #042E1B; --sage: #93B99B; --sage-soft: #C9DCCB; --grey: #CFC8C0; --lime: #D4ED6F; --green: #25D366; --white: #FFFFFF; --blue-ink: #2C3E86;
+  --sans: "Instrument Sans", "Helvetica Neue", system-ui, sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, Menlo, monospace;
+  color-scheme: light;
+}
+* { box-sizing: border-box; }
+body { background: var(--board); color: var(--ink); font: 400 15px/1.55 var(--sans); }
+.wrap { max-width: 1240px; margin: 0 auto; padding-block: 40px 96px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); display: grid; gap: 64px; }
+h1, h2, h3, h4 { margin: 0; font-family: var(--sans); text-wrap: balance; }
+p { margin: 0; }
+em { font-style: italic; }
+.mono { font-family: var(--mono); font-variant-numeric: tabular-nums; }
+.lbl { font: 500 11px/1 var(--mono); letter-spacing: .1em; text-transform: uppercase; }
+.label { font: 500 11px/1 var(--mono); letter-spacing: .1em; text-transform: uppercase; color: var(--muted); display: block; margin-bottom: 8px; }
+.shadow { box-shadow: 0 1px 0 rgb(0 0 0 / .05), 0 22px 44px -26px rgb(0 0 0 / .4); }
+/* the stack gradient: paper deepening to sage in flat bands, like the edges of filed folders seen from the side.
+   Calm, structured, one direction only. Bands soften by 1px so they read as layers, not stripes. */
+.field { background: linear-gradient(180deg,
+  #F5F4EE 0 44%, #EEF0E8 calc(44% + 1px) 60%, #E4EADF calc(60% + 1px) 73%, #D8E3D6 calc(73% + 1px) 84%, #CADBCB calc(84% + 1px) 93%, #BCD2BF calc(93% + 1px) 100%); }
+.field-dark { background: linear-gradient(180deg,
+  #042E1B 0 52%, #07361F calc(52% + 1px) 68%, #0B3F25 calc(68% + 1px) 80%, #11492C calc(80% + 1px) 90%, #185434 calc(90% + 1px) 100%); }
+
+/* intro */
+.intro { display: grid; gap: 22px; }
+.intro h1 { font-size: clamp(2.6rem, 6vw, 4.6rem); font-weight: 500; letter-spacing: -0.035em; line-height: .95; }
+.intro h1 em { font-weight: 400; }
+.intro > p { color: var(--muted); font-size: 1.05rem; max-width: 70ch; }
+.parts { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 10px; }
+.parts div { background: var(--paper); padding: 14px; border-radius: 12px; display: grid; gap: 4px; min-width: 0; }
+.parts b { font-weight: 600; font-size: 1rem; }
+.parts span { font-size: .86rem; color: var(--muted); }
+.kit { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 16px; }
+@media (max-width: 760px) { .kit { grid-template-columns: 1fr; } }
+.gradcard { border-radius: 12px; overflow: hidden; display: grid; grid-template-columns: 1fr 1fr; min-height: 150px; }
+.gradcard div { padding: 12px; display: flex; align-items: flex-end; font: 500 10px/1.3 var(--mono); letter-spacing: .06em; }
+.swatches { display: grid; grid-template-columns: repeat(6, 1fr); border-radius: 12px; overflow: hidden; min-height: 120px; }
+.swatches div { padding: 10px; display: flex; flex-direction: column; justify-content: flex-end; gap: 2px; font: 500 9.5px/1.2 var(--mono); }
+.typecard { background: var(--paper); border-radius: 12px; padding: 18px; display: grid; gap: 10px; }
+.typecard .t { font-size: 2.3rem; line-height: 1; letter-spacing: -0.03em; font-weight: 500; }
+.typecard .t em { font-weight: 400; }
+.sel { background: color-mix(in srgb, var(--pop) 26%, transparent); position: relative; padding: 0 .08em; }
+.sel::before, .sel::after { content: ""; position: absolute; width: 2px; background: var(--pop); top: -.08em; bottom: -.08em; }
+.sel::before { left: -1px; } .sel::after { right: -1px; }
+.sel i { position: absolute; width: 7px; height: 7px; border-radius: 50%; background: var(--pop); }
+/* the full stop: Capstack ends a statement with conviction. Orange punctuation is the pop. */
+.fs { color: var(--pop); font-style: normal; }
+/* (highlighter swipe kept only for reference, not used) */
+.hl { background: linear-gradient(transparent 58%, var(--pop) 58%, var(--pop) 92%, transparent 92%); padding: 0 .06em; }
+.dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: var(--pop); vertical-align: middle; }
+/* pop options */
+.pops { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 14px; }
+.popcard { border-radius: 12px; overflow: hidden; background: var(--paper); display: grid; }
+.popcard .top { background: var(--deep); color: var(--paper); padding: 22px 20px; display: grid; gap: 14px; }
+.popcard .top b { font-size: 1.5rem; font-weight: 500; letter-spacing: -0.03em; line-height: 1.05; }
+.popcard .top b em { font-weight: 400; }
+.popcard .bot { padding: 16px 20px; display: grid; gap: 10px; }
+.popcard .val { font: 500 1.4rem/1 var(--mono); color: var(--deep); }
+.popcard .tag { justify-self: start; font: 500 10px/1 var(--mono); letter-spacing: .08em; padding: 7px 10px; border-radius: 999px; color: var(--deep); }
+.popcard .name { display: flex; justify-content: space-between; align-items: center; font-size: .9rem; }
+.popcard .name span { font: 500 10px/1 var(--mono); color: var(--muted); }
+.popcard.rec { outline: 2px solid var(--deep); outline-offset: 3px; }
+.sel i:first-child { left: -3.5px; top: -.3em; } .sel i:last-child { right: -3.5px; bottom: -.3em; }
+
+/* folders (paths drawn by script to the element's real size) */
+svg.fold { position: absolute; overflow: visible; display: block; inset: 0; width: 100%; height: 100%; }
+svg.fold path { vector-effect: non-scaling-stroke; }
+.o path { fill: none; stroke: var(--line); stroke-width: 1; }
+.o-fill path { fill: var(--paper); stroke: var(--line); stroke-width: 1; }
+.solid path { fill: var(--deep); }
+.sage path { fill: var(--sage); }
+.greyf path { fill: var(--grey); }
+
+/* seal */
+.seal { display: block; color: var(--green); }
+.seal.ink { color: var(--blue-ink); filter: url(#rough); mix-blend-mode: multiply; opacity: .9; }
+
+/* section */
+.sec { display: grid; gap: 20px; }
+.sec-head { display: grid; gap: 6px; }
+.sec-head h2 { font-size: clamp(1.7rem, 3.4vw, 2.4rem); font-weight: 500; letter-spacing: -0.03em; line-height: 1; }
+.sec-head p { color: var(--muted); max-width: 72ch; }
+.two { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 20px; align-items: start; }
+@media (max-width: 820px) { .two { grid-template-columns: 1fr; } }
+
+/* poster 1 · cover */
+.poster { aspect-ratio: 4 / 5; position: relative; overflow: hidden; border-radius: 6px; }
+.cover .stackwrap { position: absolute; left: 7%; right: 7%; top: 12%; bottom: 16%; }
+.cover .layer { position: absolute; left: 0; right: 0; }
+.cover .l1 { top: 0; height: 62%; } .cover .l2 { top: 9%; height: 62%; } .cover .l3 { top: 20%; bottom: 0; }
+.cover .front { position: absolute; left: 0; right: 0; top: 20%; bottom: 0; padding: 26% 8% 8%; display: flex; flex-direction: column; justify-content: space-between; color: var(--paper); }
+.cover .front h3 { font-size: clamp(1.9rem, 3.4vw, 2.5rem); font-weight: 400; letter-spacing: -0.03em; line-height: 1.02; }
+.cover .front .meta { display: flex; justify-content: space-between; align-items: end; gap: 10px; color: var(--sage-soft); }
+.cover .seal { position: absolute; right: 7%; top: 30%; width: 66px; height: 66px; color: var(--lime); }
+.cover .foot { position: absolute; left: 7%; right: 7%; bottom: 5%; display: flex; justify-content: space-between; align-items: center; }
+.cover .foot img { height: 18px; width: auto; }
+
+/* poster 2 · index */
+.index { background: var(--paper); }
+.index .files { position: absolute; left: 50%; transform: translateX(-50%); top: 9%; width: 78%; height: 74%; }
+.index .row { position: absolute; left: 0; right: 0; height: 22%; }
+.index .tabtext { position: absolute; top: 0; font: 500 9.5px/1 var(--mono); letter-spacing: .08em; text-transform: uppercase; white-space: nowrap; transform: translate(-50%, 9px); color: var(--ink); }
+.index .tabtext.dark { color: var(--deep); background: var(--pop); padding: 6px 16px; line-height: 10px; transform: translate(-50%, 0); clip-path: polygon(10px 0, calc(100% - 10px) 0, 100% 100%, 0 100%); z-index: 2; }
+.index .base { position: absolute; left: -3%; right: -3%; bottom: 0; height: 22%; border: 1px solid var(--line); border-radius: 10px; background: var(--paper); display: grid; place-items: center; font: 500 10px/1 var(--mono); letter-spacing: .1em; color: var(--muted); }
+.index .foot { position: absolute; left: 7%; right: 7%; bottom: 5%; display: flex; justify-content: space-between; align-items: center; }
+.index .foot img { height: 18px; width: auto; }
+.index h3 { position: absolute; left: 7%; top: 3.2%; font-size: 1rem; font-weight: 500; letter-spacing: -0.01em; }
+.index h3 em { font-weight: 400; }
+
+/* browser */
+.browser { background: var(--paper); border-radius: 10px; overflow: hidden; min-width: 0; }
+.chrome { height: 30px; background: #EEECE5; display: flex; align-items: center; gap: 6px; padding: 0 12px; border-bottom: 1px solid #DDDAD1; }
+.chrome i { width: 9px; height: 9px; border-radius: 50%; background: #CFCBC2; }
+.chrome span { margin-left: 12px; font: 500 11px/1 var(--mono); color: var(--muted); }
+.nav { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 22px 48px; position: relative; z-index: 5; }
+.nav img { height: 19px; width: auto; }
+.nav ul { display: flex; gap: 20px; list-style: none; margin: 0; padding: 0; font-size: 13px; }
+@media (max-width: 640px) { .nav ul { display: none; } }
+/* buttons: a plain rectangle (works anywhere), with a second sheet filed behind it. The idea of the file lives
+   in that sheet, not in the shape: on hover the button lifts and more of the sheet shows. */
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 10px; font: 600 13.5px/1 var(--sans); letter-spacing: -0.005em; padding: 15px 22px; border-radius: 10px;
+  transition: transform .16s ease, box-shadow .16s ease; cursor: pointer; margin-bottom: 4px; }
+.btn:hover { transform: translateY(-2px); }
+.btn:active { transform: translateY(2px); }
+.btn .ar { width: 10px; height: 10px; flex: 0 0 auto; }
+.btn.p { background: var(--deep); color: var(--paper); box-shadow: 0 4px 0 0 var(--sage); }
+.btn.p:hover { box-shadow: 0 6px 0 0 var(--sage); } .btn.p:active { box-shadow: 0 2px 0 0 var(--sage); }
+.btn.p .ar { color: var(--lime); }
+.btn.s { background: var(--paper); color: var(--deep); box-shadow: inset 0 0 0 1px var(--deep), 0 4px 0 0 var(--grey); }
+.btn.s:hover { box-shadow: inset 0 0 0 1px var(--deep), 0 6px 0 0 var(--grey); }
+.btn.sm { font-size: 12.5px; padding: 12px 18px; }
+
+/* hero with the living file */
+.hero { display: grid; grid-template-columns: .9fr 1.1fr; gap: 56px; padding: 40px 48px 64px; align-items: center; }
+@media (max-width: 700px) { .hero { grid-template-columns: 1fr; padding: 24px 20px 40px; gap: 32px; } .nav { padding: 18px 20px; } }
+.hero-copy { display: grid; gap: 22px; min-width: 0; }
+.hero-copy .lbl { color: var(--muted); }
+.hero-copy h4 { font-size: clamp(2.2rem, 4.4vw, 3.6rem); font-weight: 500; letter-spacing: -0.04em; line-height: .96; color: var(--deep); }
+.hero-copy h4 em { font-weight: 400; }
+.hero-copy p { max-width: 36ch; color: #2B3A31; font-size: 1rem; line-height: 1.6; }
+.ctas { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 6px; }
+.file { position: relative; height: 460px; min-width: 0; }
+.file svg.back { inset: auto; top: 0; left: 4%; width: 92%; height: 70%; }
+.file svg.back2 { inset: auto; top: 6%; left: 2%; width: 92%; height: 70%; }
+.file .sheet { position: absolute; left: 12%; width: 62%; top: 9%; height: 66%; background: var(--white); border-radius: 4px; padding: 8px; box-shadow: 0 10px 24px -14px rgb(0 0 0 / .45); transform: rotate(-3deg); }
+.file .sheet img { width: 100%; height: 100%; object-fit: cover; object-position: top; border-radius: 2px; }
+.file .clip { position: absolute; top: -12px; left: 22px; width: 16px; height: 44px; border: 2.5px solid #9AA39C; border-radius: 10px; }
+.file .a4 { position: absolute; right: 9%; width: 44%; top: 30%; aspect-ratio: 1 / 1.3; background: var(--white); border-radius: 3px; padding: 14px 14px; box-shadow: 0 10px 24px -14px rgb(0 0 0 / .45); display: grid; align-content: start; gap: 6px; transform: rotate(4deg) translateY(30%); }
+.file .a4 .lbl { font-size: 8px; color: var(--muted); }
+.file .a4 b { font-size: 1.05rem; font-weight: 600; letter-spacing: -0.02em; line-height: 1.1; }
+.file .a4 .v { font: 600 1.05rem/1 var(--mono); color: var(--deep); margin-top: 4px; }
+.file .a4 .ln { height: 5px; background: #ECEBE5; border-radius: 3px; } .file .a4 .ln.s { width: 70%; }
+.file .a4 .seal { position: absolute; right: 10px; bottom: 12px; width: 64px; height: 64px; }
+.receipt { background: var(--white); font: 500 9.5px/1.7 var(--mono); padding: 11px 11px 15px; color: var(--ink);
+  -webkit-mask: conic-gradient(from -45deg at bottom, #0000, #000 1deg 89deg, #0000 90deg) 50% / 10px 100%;
+          mask: conic-gradient(from -45deg at bottom, #0000, #000 1deg 89deg, #0000 90deg) 50% / 10px 100%; }
+.receipt .hd { text-align: center; font-weight: 600; letter-spacing: .12em; border-bottom: 1px dashed #B9BEB7; padding-bottom: 5px; margin-bottom: 5px; }
+.receipt .r { display: flex; justify-content: space-between; gap: 8px; }
+.file .receipt { position: absolute; left: 30%; width: 34%; top: 2%; transform: rotate(-7deg); box-shadow: 0 10px 20px -12px rgb(0 0 0 / .45); }
+.file svg.front { inset: auto; left: 0; bottom: 0; width: 100%; height: 47%; }
+.file .front-txt { position: absolute; left: 0; right: 0; bottom: 0; height: 47%; padding: 52px 24px 20px; display: flex; flex-direction: column; justify-content: space-between; color: var(--paper); z-index: 4; }
+.file .front-txt .top { display: flex; justify-content: space-between; color: var(--sage-soft); }
+.file .front-txt .big { font: 500 2rem/1 var(--mono); letter-spacing: -0.03em; color: var(--white); }
+.file .front-txt .sub { color: var(--sage-soft); font-size: .85rem; }
+.z1 { z-index: 1; } .z2 { z-index: 2; } .z3 { z-index: 3; } .z4 { z-index: 4; }
+/* the loop: a receipt drops into the file, then the stamped A4 slides out */
+.live .receipt { animation: drop 10s infinite; }
+.live .a4 { animation: rise 10s infinite; }
+.live .a4 .seal { animation: stamp 10s infinite; }
+@keyframes drop { 0% { transform: translateY(-120px) rotate(-14deg); opacity: 0; } 6% { opacity: 1; } 16% { transform: translateY(0) rotate(-7deg); } 34% { transform: translateY(130px) rotate(-4deg); opacity: 1; } 38%, 100% { transform: translateY(150px) rotate(-4deg); opacity: 0; } }
+@keyframes rise { 0%, 36% { transform: rotate(4deg) translateY(40%); } 52%, 88% { transform: rotate(4deg) translateY(-38%); } 100% { transform: rotate(4deg) translateY(40%); } }
+@keyframes stamp { 0%, 56% { opacity: 0; transform: scale(1.9) rotate(-18deg); } 60% { opacity: 1; transform: scale(.92) rotate(-12deg); } 62%, 86% { opacity: 1; transform: scale(1) rotate(-12deg); } 90%, 100% { opacity: 0; transform: scale(1) rotate(-12deg); } }
+@media (prefers-reduced-motion: reduce) {
+  .live .receipt { animation: none; } .live .a4 { animation: none; transform: rotate(4deg) translateY(-38%); } .live .a4 .seal { animation: none; transform: rotate(-12deg); }
+}
+
+/* phone */
+.phone { width: 100%; max-width: 310px; aspect-ratio: 9 / 18.6; border-radius: 36px; padding: 10px; background: #111; }
+.screen { width: 100%; height: 100%; border-radius: 27px; overflow: hidden; position: relative; display: flex; flex-direction: column; }
+.notch { width: 90px; height: 22px; border-radius: 0 0 14px 14px; background: #111; margin: 0 auto; flex: 0 0 auto; position: relative; z-index: 3; }
+.ob { background: var(--board); }
+.ob .card { position: relative; margin: 34px 12px 0; flex: 1; display: flex; flex-direction: column; }
+.ob .card .fold { inset: 0; }
+.ob .card .in { position: relative; z-index: 1; padding: 54px 18px 16px 30px; display: grid; gap: 13px; align-content: start; height: 100%; }
+.ob .tabtxt { position: absolute; top: 9px; left: 24px; z-index: 2; font: 500 9px/1 var(--mono); letter-spacing: .08em; color: var(--paper); }
+.ob .holes { position: absolute; left: 10px; top: 60px; bottom: 20px; width: 8px; background: radial-gradient(circle, var(--board) 3.2px, transparent 3.6px) 0 0 / 8px 34px repeat-y; z-index: 1; }
+.ob .prog { display: flex; justify-content: space-between; color: var(--muted); }
+.ob .face { width: 38px; height: 38px; border-radius: 50%; background: var(--deep); color: var(--lime); display: grid; place-items: center; font: 600 15px/1 var(--sans); }
+.ob .react { font-size: .78rem; color: var(--muted); }
+.ob .q { font-size: 1.35rem; font-weight: 500; letter-spacing: -0.025em; line-height: 1.1; color: var(--deep); }
+.ob .q em { font-weight: 400; }
+.ob .ans { border-bottom: 1.5px solid var(--deep); padding: 5px 0; font: 500 1rem/1 var(--mono); }
+.ob .picks { display: flex; gap: 6px; flex-wrap: wrap; }
+.ob .picks span { font: 500 10px/1 var(--mono); padding: 7px 9px; border: 1px solid var(--line); border-radius: 999px; }
+.ob .next { justify-self: start; margin-top: 4px; }
+.ob .tray { padding: 10px 16px 14px; position: relative; z-index: 2; }
+.ob .tray .lbl { color: var(--muted); font-size: 8.5px; display: block; margin-bottom: 5px; }
+
+/* dashboard */
+.dash { position: relative; padding: 40px 64px 40px 40px; border-radius: 12px; min-width: 0; }
+.dash .doc { position: relative; background: var(--paper); border-radius: 6px; padding: 32px 36px 32px 60px; display: grid; gap: 24px; box-shadow: 0 16px 34px -22px rgb(0 0 0 / .45); }
+.dash .doc .holes { position: absolute; left: 14px; top: 20px; bottom: 20px; width: 10px; background: radial-gradient(circle, rgb(15 27 20 / .85) 4px, transparent 4.5px) 0 0 / 10px 68px repeat-y; }
+.dash .top { display: flex; justify-content: space-between; gap: 12px; align-items: start; color: var(--muted); }
+.dash .fileno { border: 1px solid var(--blue-ink); color: var(--blue-ink); padding: 5px 8px; font: 500 10px/1 var(--mono); letter-spacing: .08em; }
+.dash h4 { font-size: 2rem; font-weight: 500; letter-spacing: -0.035em; line-height: 1; color: var(--deep); }
+.dash h4 em { font-weight: 400; }
+.dash .valrow { display: grid; grid-template-columns: 1fr auto; gap: 16px; align-items: center; }
+.dash .big { font: 500 2.4rem/1 var(--mono); letter-spacing: -0.04em; color: var(--deep); }
+.dash .why { border-top: 1px solid #DEDBD2; padding-top: 20px; }
+@media (max-width: 560px) { .dash { padding: 24px 52px 24px 16px; } .dash .doc { padding: 24px 20px 24px 44px; } }
+.dash ul { gap: 12px !important; }
+.dash .margin { font: 400 10px/1.45 var(--mono); color: var(--muted); }
+.dash ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 7px; font-size: .92rem; }
+.dash li { display: flex; justify-content: space-between; gap: 10px; }
+.dash li b { font: 500 .9rem/1.4 var(--mono); color: var(--deep); }
+.dash .doc .receipt { position: absolute; right: 18px; bottom: -18px; width: 150px; transform: rotate(5deg); box-shadow: 0 10px 20px -12px rgb(0 0 0 / .45); }
+.dash .doc .pc { position: absolute; right: 64px; bottom: 74px; width: 14px; height: 40px; border: 2.5px solid #9AA39C; border-radius: 9px; transform: rotate(5deg); z-index: 2; }
+.edge { position: absolute; right: 8px; top: 40px; display: grid; gap: 6px; }
+.edge span { writing-mode: vertical-rl; font: 500 10.5px/1 var(--sans); padding: 14px 9px; border-radius: 0 10px 10px 0; color: var(--deep); background: var(--grey); }
+.edge span.on { background: var(--deep); color: var(--lime); }
+.edge span:nth-child(2) { background: var(--sage); } .edge span:nth-child(4) { background: var(--sage-soft); }
+
+/* how it works · spines */
+.spines { display: flex; gap: 10px; align-items: flex-end; padding: 24px; border-radius: 12px; min-height: 280px; overflow-x: auto; }
+.spine { width: 74px; flex: 0 0 auto; border-radius: 6px 6px 3px 3px; padding: 14px 0; display: flex; flex-direction: column; align-items: center; justify-content: space-between; color: var(--paper); }
+.spine span { writing-mode: vertical-rl; transform: rotate(180deg); font-size: 1.2rem; font-weight: 500; letter-spacing: -0.02em; }
+.spine span em { font-weight: 400; }
+.spine small { font: 500 10px/1 var(--mono); }
+.spines .note { align-self: center; max-width: 34ch; margin-left: 18px; color: #2B3A31; display: grid; gap: 8px; }
+.spines .note b { font-size: 1.3rem; font-weight: 500; letter-spacing: -0.02em; line-height: 1.1; color: var(--deep); }
+
+.close { display: grid; gap: 12px; background: var(--paper); padding: 24px; border-radius: 12px; }
+.close h2 { font-size: 1.5rem; font-weight: 500; letter-spacing: -0.02em; }
+.close ul { margin: 0; padding-left: 18px; display: grid; gap: 6px; }
+.close .n { color: var(--muted); font-size: .9rem; }
+</style>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <filter id="rough"><feTurbulence type="fractalNoise" baseFrequency=".9" numOctaves="2" seed="7"/><feDisplacementMap in="SourceGraphic" scale="2.6"/></filter>
+    <path id="ring" d="M50 50 m-35 0 a35 35 0 1 1 70 0 a35 35 0 1 1 -70 0"/>
+  </defs>
+  <symbol id="ck-arrow" viewBox="0 0 100 100"><path d="M0 0H100V32H54L94 72L72 94L32 54V100H0Z" fill="currentColor"/></symbol>
+  <symbol id="seal" viewBox="0 0 100 100">
+    <circle cx="50" cy="50" r="47" fill="none" stroke="currentColor" stroke-width="3"/>
+    <circle cx="50" cy="50" r="26" fill="none" stroke="currentColor" stroke-width="1.5"/>
+    <text font-family="IBM Plex Mono, monospace" font-size="9.6" font-weight="600" letter-spacing="2.2" fill="currentColor"><textPath href="#ring">VALUED · ON FILE · CAPSTACK ·</textPath></text>
+    <g transform="translate(39 39) scale(.22)"><path d="M0 0H100V32H54L94 72L72 94L32 54V100H0Z" fill="currentColor"/></g>
+  </symbol>
+</svg>
+
+<div class="wrap">
+
+  <header class="intro">
+    <span class="label">Capstack · brand direction · draft</span>
+    <h1>Your business, <em>on file</em><span class="fs">.</span></h1>
+    <p>Every business has a paper trail. Capstack gives it a proper file: receipts go in, a stamped valuation comes out, and every tab is something you know about your business that you didn't have written down before. The witty broker, organised.</p>
+    <div class="parts">
+      <div><b>The folder</b><span>Your business's file. Its tabs stack up: Cap<em>stack</em>. The tabs are the dashboard's menu.</span></div>
+      <div><b>Receipts</b><span>The evidence going in. Every answer prints a line; every document drops into the file.</span></div>
+      <div><b>The A4</b><span>What comes out: the valuation report, ready to hand to a buyer or a bank.</span></div>
+      <div><b>The seal</b><span>"Valued · on file". Your arrow inside a round stamp. Green when digital, ink when printed.</span></div>
+    </div>
+    <div class="kit">
+      <div class="swatches shadow">
+        <div style="background:var(--deep);color:var(--sage-soft)">DEEP<br>#042E1B</div>
+        <div style="background:var(--sage);color:var(--deep)">SAGE<br>#93B99B</div>
+        <div style="background:var(--grey);color:var(--deep)">FILE GREY<br>#CFC8C0</div>
+        <div style="background:var(--paper);color:var(--deep)">PAPER<br>#F7F5EF</div>
+        <div style="background:var(--lime);color:var(--deep)">LIME<br>#D4ED6F</div>
+        <div style="background:var(--green);color:var(--deep)">SEAL GREEN<br>#25D366</div>
+      </div>
+      <div class="swatches shadow" style="grid-template-columns:5fr 1fr;min-height:0">
+        <div style="background:var(--paper);color:var(--muted);justify-content:center">THE POP · the full stop. Orange punctuation that ends a statement with conviction, the "new" dot, one urgent tab. One per screen.</div>
+        <div style="background:var(--pop);color:var(--deep)">POP<br>#FF6A1A</div>
+      </div>
+      <div class="gradcard shadow">
+        <div class="field" style="color:var(--deep)">STACK GRADIENT · LIGHT<br>paper → sage, in filed bands</div>
+        <div class="field-dark" style="color:var(--sage-soft)">STACK GRADIENT · DARK<br>deep → forest</div>
+      </div>
+      <div class="typecard shadow" style="grid-column:1 / -1">
+        <span class="label" style="margin:0">Type: one sans, upright + italic, plus a typewriter mono for labels</span>
+        <div class="t">What's your business <em>worth</em><span class="fs">?</span></div>
+        <span class="mono" style="font-size:12px;letter-spacing:.08em">( PROFILE )&nbsp; ( YOUR NUMBERS )&nbsp; FILE №0142</span>
+      </div>
+    </div>
+  </header>
+
+  <section class="sec">
+    <div class="sec-head"><h2>The pop colour</h2><p>Signal orange, used as punctuation: the full stop or question mark that ends a headline, the small "new" dot, and at most one urgent tab. Never underlines or swipes. One mark per screen.</p></div>
+    <div class="pops">
+      <div class="popcard shadow" style="--pop:#FF6A1A;max-width:420px">
+        <div class="top"><span class="lbl" style="color:var(--sage-soft)">( Valuation ) <span class="dot"></span></span><b>Your business, <em>on file</em><span class="fs">.</span></b></div>
+        <div class="bot"><span class="val">₦28M – ₦36M</span><span class="tag" style="background:var(--pop)">NEW RECEIPT ADDED</span><div class="name"><b>Signal orange</b><span>#FF6A1A</span></div><span style="font-size:.85rem;color:var(--muted)">The urgent file tab. Opposite green on the colour wheel, so even a full stop is enough. Warm, African, energetic.</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec">
+    <div class="sec-head"><h2>Posters</h2><p>The cover: outline folders behind one solid one, roman and italic in the same line. The index: a business's file as a stack of tabs, which is also how the product is organised.</p></div>
+    <div class="two">
+      <div>
+        <span class="label">Cover</span>
+        <div class="poster cover field shadow">
+          <div class="stackwrap">
+            <div class="layer l1"><svg class="fold o" data-tx=".36" data-tw=".34"></svg></div>
+            <div class="layer l2"><svg class="fold o" data-tx=".18" data-tw=".34"></svg></div>
+            <div class="layer l3"><svg class="fold solid" data-tx=".04" data-tw=".32"></svg>
+              <div class="front" style="top:0">
+                <h3>Everything your business is <em>worth,</em> on file<span class="fs">.</span></h3>
+                <div class="meta"><span class="lbl">( Okafor Woodworks )</span><span class="lbl">File №0142</span></div>
+              </div>
+            </div>
+          </div>
+          <svg class="seal" style="position:absolute;right:11%;top:42%;width:62px;height:62px;color:var(--lime)"><use href="#seal"/></svg>
+          <div class="foot"><img src="logo-capstack.png" alt="Capstack"><span class="lbl" style="color:var(--muted)">capstack.co</span></div>
+        </div>
+      </div>
+      <div>
+        <span class="label">Index</span>
+        <div class="poster index shadow">
+          <h3>One business. <em>Five files.</em></h3>
+          <div class="files" id="idx"></div>
+          <div class="foot"><img src="logo-capstack.png" alt="Capstack"><span class="lbl" style="color:var(--muted)">Valued · on file</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec">
+    <div class="sec-head"><h2>Website hero · the file is alive</h2><p>A receipt drops into the file, then the stamped A4 report slides out. The photo is pinned inside like the first page. It loops gently; it holds still for people who turn off motion.</p></div>
+    <div class="browser shadow">
+      <div class="chrome"><i></i><i></i><i></i><span>capstack.co</span></div>
+      <div class="field">
+        <div class="nav"><img src="logo-capstack.png" alt="Capstack"><ul><li>How it works</li><li>For brokers</li><li>Pricing</li></ul><span class="btn p sm"><svg class="ar"><use href="#ck-arrow"/></svg>Open my file</span></div>
+        <div class="hero">
+          <div class="hero-copy">
+            <span class="lbl">( Business valuation, for Africa )</span>
+            <h4>Your business, <em>on file</em><span class="fs">.</span></h4>
+            <p>Answer a few plain questions, drop in your receipts if you have them, and get a stamped valuation with every reason written down.</p>
+            <div class="ctas"><span class="btn p"><svg class="ar"><use href="#ck-arrow"/></svg>Get my free estimate</span><span class="btn s">See a sample file</span></div>
+          </div>
+          <div class="file live">
+            <svg class="fold o-fill back2 z1" data-tx=".5" data-tw=".3"></svg>
+            <svg class="fold sage back z1" data-tx=".22" data-tw=".3"></svg>
+            <div class="sheet z2"><span class="clip"></span><img src="maker.jpg" alt="A craftsman measuring wood in his workshop"></div>
+            <div class="a4 z2">
+              <span class="lbl">Valuation report · File №0142</span>
+              <b>Okafor Woodworks</b>
+              <span class="ln"></span><span class="ln s"></span>
+              <span class="v">₦28M – ₦36M</span>
+              <svg class="seal"><use href="#seal"/></svg>
+            </div>
+            <div class="receipt z3"><div class="hd">POS · MAY</div><div class="r"><span>SALES</span><span>₦3.5M</span></div><div class="r"><span>COSTS</span><span>₦2.6M</span></div><div class="r"><span>LEFT</span><span>₦890k</span></div></div>
+            <svg class="fold solid front z4" data-tx=".06" data-tw=".34"></svg>
+            <div class="front-txt">
+              <div class="top"><span class="lbl">( Okafor Woodworks )</span><span class="lbl">File №0142</span></div>
+              <div class="big">₦28M – ₦36M</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec">
+    <div class="sec-head"><h2>Inside the product</h2><p>Onboarding opens a new file, one question at a time, and prints your receipt as you go. The dashboard is the open file: a hole-punched page with the stamped value, mono notes in the margin, and the tabs sticking out of the right edge as the menu.</p></div>
+    <div class="two" style="grid-template-columns:minmax(0,310px) minmax(0,1fr)">
+      <div>
+        <span class="label">Onboarding · opening your file</span>
+        <div class="phone shadow">
+          <div class="screen ob">
+            <div class="notch"></div>
+            <div class="card">
+              <svg class="fold o-fill" data-tx=".06" data-tw=".46" data-th="34"></svg>
+              <span class="tabtxt" style="color:var(--ink)">( PROFILE ) 4 / 6</span>
+              <span class="holes"></span>
+              <div class="in">
+                <div class="face">S</div>
+                <div class="react">Six years on the same street. Solid.</div>
+                <div class="q">Roughly what came in <em>last month?</em></div>
+                <div class="ans">₦ 3,500,000</div>
+                <div class="picks"><span>Under ₦1M</span><span>₦1–5M</span><span>Over ₦5M</span></div>
+                <span class="btn p sm next"><svg class="ar"><use href="#ck-arrow"/></svg>Next</span>
+              </div>
+            </div>
+            <div class="tray">
+              <span class="lbl">Your receipt so far</span>
+              <div class="receipt" style="box-shadow:0 8px 18px -12px rgb(0 0 0 / .45)"><div class="r"><span>BUSINESS</span><span>Okafor Woodworks</span></div><div class="r"><span>SECTOR</span><span>Furniture</span></div><div class="r"><span>YEARS</span><span>6</span></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div>
+        <span class="label">Dashboard · the open file</span>
+        <div class="dash field shadow">
+          <div class="doc">
+            <span class="holes"></span>
+            <div class="top"><span class="lbl">( Valuation )&nbsp; Okafor Woodworks</span><span class="fileno">FILE №0142</span></div>
+            <h4>What your business is <em>worth</em> today <span class="dot" title="Updated"></span></h4>
+            <div class="valrow">
+              <div style="display:grid;gap:8px"><span class="big">₦28M – ₦36M</span><span style="font-size:.88rem;color:var(--muted)">Confidence: medium. Add 3 months of statements to sharpen it.</span></div>
+              <svg class="seal ink" style="width:92px;height:92px"><use href="#seal"/></svg>
+            </div>
+            <div class="why">
+              <ul>
+                <li><span>Six years on the same street</span><b>+₦4.4M</b></li>
+                <li><span>Customers come back</span><b>+₦3.1M</b></li>
+                <li><span>One big timber supplier</span><b>−₦1.2M</b></li>
+                <li><span>Equipment loan</span><b>−₦1.2M</b></li>
+              </ul>
+            </div>
+          </div>
+          <div class="edge"><span>Profile</span><span>How you make money</span><span class="on">Valuation</span><span>Your numbers</span><span>Receipts</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec">
+    <div class="sec-head"><h2>How it works · four folders on a shelf</h2><p>Process steps as spines, roman and italic, the way a broker's shelf would hold them.</p></div>
+    <div class="spines field shadow">
+      <div class="spine" style="height:230px;background:var(--paper);color:var(--deep);border:1px solid var(--line)"><small>01</small><span>Tell us <em>your story</em></span></div>
+      <div class="spine" style="height:250px;background:var(--sage);color:var(--deep)"><small>02</small><span>Add your <em>receipts</em></span></div>
+      <div class="spine" style="height:240px;background:var(--deep)"><small>03</small><span>Get it <em>stamped</em></span></div>
+      <div class="spine" style="height:226px;background:var(--grey);color:var(--deep);transform:rotate(5deg);transform-origin:bottom left"><small>04</small><span>Hand it <em>over</em></span></div>
+      <div class="note"><b>From a drawer of receipts to a file a buyer can read.</b><span>About 20 minutes, rough numbers welcome.</span></div>
+    </div>
+  </section>
+
+  <section class="close">
+    <h2>What to react to</h2>
+    <ul>
+      <li>Does "Your business, on file" feel like the witty, organised broker?</li>
+      <li>The type: one sans in upright + italic (replacing Playfair), with a typewriter mono for tabs and labels.</li>
+      <li>The palette: deeper and calmer (deep green, sage, file grey, paper), with lime and seal green kept as accents.</li>
+      <li>The seal: "Valued · on file" with your arrow. Green on screen, blue ink on paper.</li>
+    </ul>
+    <p class="n">Photography still to come: a set of owners across sectors, pinned into their files like the craftsman here.</p>
+  </section>
+
+</div>
+
+<script>
+(function () {
+  function path(w, h, tx, tw, th) {
+    var r = Math.min(14, h / 6), a = tx * w, b = Math.min(w - 6, a + tw * w), s = th * 0.62, o = 0.5;
+    w -= o; h -= o;
+    return "M" + o + " " + (th + r) + " Q" + o + " " + th + " " + (r + o) + " " + th +
+      " H" + Math.max(r, a - 6) + " Q" + (a + 1) + " " + th + " " + (a + 5) + " " + (th - 6) +
+      " L" + (a + s - 5) + " " + (6 + o) + " Q" + (a + s) + " " + o + " " + (a + s + 9) + " " + o +
+      " H" + (b - s - 9) + " Q" + (b - s) + " " + o + " " + (b - s + 5) + " " + (6 + o) +
+      " L" + (b - 5) + " " + (th - 6) + " Q" + (b - 1) + " " + th + " " + Math.min(w - r, b + 6) + " " + th +
+      " H" + (w - r) + " Q" + w + " " + th + " " + w + " " + (th + r) +
+      " V" + (h - r) + " Q" + w + " " + h + " " + (w - r) + " " + h +
+      " H" + (r + o) + " Q" + o + " " + h + " " + o + " " + (h - r) + " Z";
+  }
+  function draw(svg) {
+    var box = svg.getBoundingClientRect();
+    var w = box.width, h = box.height;
+    if (!w || !h) return;
+    var th = +(svg.dataset.th || Math.max(26, Math.min(48, h * 0.12)));
+    svg.setAttribute("viewBox", "0 0 " + w + " " + h);
+    var p = svg.querySelector("path") || svg.appendChild(document.createElementNS("http://www.w3.org/2000/svg", "path"));
+    p.setAttribute("d", path(w, h, +(svg.dataset.tx || .05), +(svg.dataset.tw || .3), th));
+  }
+  // the index poster: a stack of files, each tab a section of the business's file
+  var idx = document.getElementById("idx");
+  if (idx) {
+    var rows = [["( Profile )", .08, 0], ["A–F", .58, 1], ["( How you make money )", .34, 0], ["( Your numbers )", .12, 0], ["G–R", .62, 1], ["( Receipts · 7 )", .40, 0], ["( Valuation )", .06, 1]];
+    var n = rows.length, step = 66 / n;
+    rows.forEach(function (r, i) {
+      var row = document.createElement("div");
+      row.className = "row";
+      row.style.top = (i * step) + "%";
+      row.style.left = (-i * 0.9) + "%";
+      row.style.right = (-i * 0.9) + "%";
+      row.style.height = "26%";
+      var dark = r[2] === 1;
+      var last = i === n - 1, divider = dark && !last;
+      row.innerHTML = (divider ? "" : '<svg class="fold ' + (last ? "solid" : "o-fill") + '" data-tx="' + r[1] + '" data-tw="' + (r[0].length > 12 ? .38 : .2) + '" data-th="22"></svg>') +
+        (divider ? '<svg class="fold o-fill" data-tx="0.9" data-tw="0.05" data-th="22" style="top:22px;height:calc(100% - 22px)"></svg>' : "") +
+        '<span class="tabtext' + (dark ? " dark" : "") + '" style="left:' + ((r[1] + (r[0].length > 12 ? .19 : .1)) * 100) + '%">' + r[0] + '</span>';
+      idx.appendChild(row);
+    });
+    var base = document.createElement("div");
+    base.className = "base";
+    base.textContent = "OKAFOR WOODWORKS / 05 FILES";
+    idx.appendChild(base);
+  }
+  var all = Array.prototype.slice.call(document.querySelectorAll("svg.fold"));
+  function redraw() { all.forEach(draw); }
+  redraw();
+  if (window.ResizeObserver) { var ro = new ResizeObserver(redraw); all.forEach(function (s) { ro.observe(s); }); }
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(redraw);
+})();
+</script>

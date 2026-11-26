@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { INDUSTRY_MULTIPLES, computeValuation } from "../lib/valuation";
 
 /* Exa-style split: dark story panel with tabs on the left, a clean chart on the
@@ -28,15 +28,25 @@ type TabKey = (typeof TABS)[number]["key"];
 
 export default function ValuationMethod() {
   const [active, setActive] = useState<TabKey>("sectors");
+  const [held, setHeld] = useState(false);
+
+  // walk through the three views by itself until someone picks one
+  useEffect(() => {
+    if (held) return;
+    const id = window.setInterval(() => {
+      setActive((k) => TABS[(TABS.findIndex((t) => t.key === k) + 1) % TABS.length].key);
+    }, 5200);
+    return () => window.clearInterval(id);
+  }, [held]);
 
   return (
-    <section id="method" className="scroll-mt-28 px-4 py-6 md:px-6 md:py-10">
-      <div className="mx-auto grid max-w-[1400px] grid-cols-1 overflow-hidden rounded-[28px] lg:grid-cols-[minmax(0,5fr)_minmax(0,8fr)]">
+    <section id="method" className="scroll-mt-28 px-5 py-6 md:px-10 md:py-10">
+      <div className="mx-auto grid max-w-[1320px] grid-cols-1 overflow-hidden rounded-[6px] shadow-[0_24px_50px_-34px_rgba(4,46,27,0.55)] lg:grid-cols-[minmax(0,5fr)_minmax(0,8fr)]">
         {/* Story panel */}
-        <div className="grain flex flex-col justify-center bg-[#0d1d13] px-7 py-14 text-cream md:px-14 md:py-20">
+        <div className="grain flex flex-col justify-center bg-green px-7 py-14 text-cream md:px-14 md:py-20">
           <div className="relative z-10">
             <h2 className="display max-w-[14ch] text-[38px] md:text-[52px]">
-              How your number is made
+              How your number is made<span className="stop">.</span>
             </h2>
             <p className="mt-5 max-w-[34ch] text-[16px] leading-[1.6] text-cream/60 md:text-[17px]">
               The AI gathers your story. A transparent, rule-based engine does the maths, so the same
@@ -52,7 +62,10 @@ export default function ValuationMethod() {
                       type="button"
                       role="tab"
                       aria-selected={on}
-                      onClick={() => setActive(t.key)}
+                      onClick={() => {
+                        setHeld(true);
+                        setActive(t.key);
+                      }}
                       className={`relative w-full border-l-2 py-3 pl-6 text-left transition-colors ${
                         on ? "border-cream" : "border-transparent"
                       }`}
@@ -83,7 +96,7 @@ export default function ValuationMethod() {
         </div>
 
         {/* Chart panel */}
-        <div className="flex min-h-[520px] flex-col bg-[#f8f6f1] px-5 py-10 md:px-12 md:py-14">
+        <div className="flex min-h-[520px] flex-col bg-cream px-5 py-10 md:px-12 md:py-14">
           <div key={active} className="playground-in flex flex-1 flex-col">
             {active === "sectors" && <SectorChart />}
             {active === "adjust" && <AdjustmentChart />}
@@ -245,10 +258,10 @@ function ValueChart() {
     yearsInOperation: 6,
     revenueThreeMonthsAgo: null,
     revenueLastMonth: null,
-    annualRevenue: 480_000,
-    annualNetProfit: 86_400,
+    annualRevenue: 48_000_000,
+    annualNetProfit: 8_640_000,
     costStructure: null,
-    liabilities: 20_000,
+    liabilities: 2_000_000,
     growthTrend: "increasing",
     growthRatePct: null,
     competitors: null,
@@ -265,46 +278,45 @@ function ValueChart() {
   const revenue = r.revenueValue * 0.3;
   const debt = r.liabilities;
   const top = earnings + revenue;
-  const steps = [
-    { label: "Earnings view, 70%", from: 0, to: earnings, color: ACCENT, value: earnings },
-    { label: "Revenue view, 30%", from: earnings, to: top, color: "#7fc794", value: revenue },
-    { label: "Less debt", from: top - debt, to: top, color: "#d9a184", value: -debt },
-    { label: "Estimated value", from: 0, to: r.mid, color: "#0d1d13", value: r.mid },
+  const afterDebt = top - debt;
+  const adj = r.mid - afterDebt; // the engine's own nudges (growth, years, risk)
+  type Row = { label: string; from: number; to: number; color: string; value: number; total?: boolean };
+  const rows: Row[] = [
+    { label: "Earnings view (70%)", from: 0, to: earnings, color: ACCENT, value: earnings },
+    { label: "Revenue view (30%)", from: earnings, to: top, color: "#7fc794", value: revenue },
+    { label: "Less debt", from: afterDebt, to: top, color: "#d9a184", value: -debt },
   ];
-  const max = Math.ceil((top * 1.12) / 50_000) * 50_000;
-  const k = (n: number) => `$${Math.round(Math.abs(n) / 1000)}k`;
+  if (Math.abs(adj) > 50_000)
+    rows.push({ label: adj > 0 ? "Growth and track record" : "Risk", from: Math.min(afterDebt, r.mid), to: Math.max(afterDebt, r.mid), color: adj > 0 ? "#b9d77a" : "#e3b9a3", value: adj });
+  rows.push({ label: "Estimated value", from: 0, to: r.mid, color: "#042e1b", value: r.mid, total: true });
+  const max = Math.max(top, r.mid) * 1.04;
+  const pct = (n: number) => `${(n / max) * 100}%`;
+  const k = (n: number) => `₦${(Math.abs(n) / 1_000_000).toFixed(1).replace(/\.0$/, "")}M`;
   return (
     <div className="flex flex-1 flex-col">
-      <div className="flex flex-wrap items-baseline justify-between gap-3">
-        <p className="text-[14px] text-ink/60">
-          Example: café, $480k revenue, 18% margin, growing, six years trading
-        </p>
-        <p className="num text-[14px] font-medium text-ink">
-          Range {k(r.low)} – {k(r.high)}
-        </p>
-      </div>
-      <div className="relative mt-8 flex min-h-[300px] flex-1 items-end justify-around gap-3 border-b border-ink/30 md:gap-8">
-        {steps.map((s) => (
-          <div key={s.label} className="relative flex h-full flex-1 flex-col justify-end">
-            <div className="relative w-full" style={{ height: `${(s.to / max) * 100}%` }}>
-              <div
-                className="bar-grow absolute inset-x-0 rounded-[3px]"
-                style={{ top: 0, height: `${((s.to - s.from) / s.to) * 100}%`, background: s.color }}
+      <p className="text-[14px] text-ink/60">Example: Lagos restaurant, ₦48M a year in sales, 18% kept as profit, growing, six years trading</p>
+      {/* a ledger, read top to bottom: each line adds or takes away, the total sits under a rule */}
+      <div className="mt-8 flex flex-1 flex-col justify-center font-mono">
+        {rows.map((s, i) => (
+          <div key={s.label} className={`grid grid-cols-[minmax(0,10.5rem)_minmax(0,1fr)_5rem] items-center gap-4 py-3 ${s.total ? "mt-2 border-t border-ink/40 pt-5" : "border-b border-dashed border-ink/15"}`}>
+            <span className={`text-[12px] leading-tight md:text-[13px] ${s.total ? "font-semibold text-ink" : "text-ink/70"}`}>{s.label}</span>
+            <span className="relative block h-5">
+              {/* where the previous line ended: a hairline the next bar starts from */}
+              {i > 0 && !s.total ? <span aria-hidden className="absolute -top-3 bottom-0 w-px bg-ink/25" style={{ left: pct(s.value < 0 ? s.to : s.from) }} /> : null}
+              <span
+                className="bar-grow-x absolute inset-y-0 rounded-[2px]"
+                style={{ left: pct(s.from), width: pct(s.to - s.from), background: s.color }}
               />
-              <span className="num absolute -top-6 left-1/2 -translate-x-1/2 whitespace-nowrap text-[13px] font-medium text-ink">
-                {s.value < 0 ? "−" : ""}
-                {k(s.value)}
-              </span>
-            </div>
+            </span>
+            <span className={`num text-right text-[13px] ${s.total ? "font-semibold text-green" : "text-ink"}`}>
+              {s.value < 0 ? "−" : s.total ? "" : "+"}
+              {k(s.value)}
+            </span>
           </div>
         ))}
-      </div>
-      <div className="flex justify-around gap-3 pt-3 md:gap-8">
-        {steps.map((s) => (
-          <span key={s.label} className="flex-1 text-center text-[12px] leading-tight text-ink/70 md:text-[14px]">
-            {s.label}
-          </span>
-        ))}
+        <p className="mt-4 text-right text-[13px] text-ink/60">
+          Range <span className="num font-medium text-ink">{k(r.low)} – {k(r.high)}</span>
+        </p>
       </div>
     </div>
   );
