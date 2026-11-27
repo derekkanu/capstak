@@ -197,16 +197,17 @@ export default function ChapterPage() {
         </div>
 
         {suggestion && (
+          // only the amount and its button are green: the action point stands out, the rest stays quiet
           <div className="-mt-2 flex flex-wrap items-center justify-between gap-x-4 gap-y-3 rounded-[14px] bg-[#f3f3ed] px-4 py-3.5">
             <span className="flex max-w-[44ch] flex-col gap-0.5">
               <span className="text-[13px] text-[#5d6a61]">Based on what you&rsquo;ve told us</span>
-              <span className="text-[17px]">About {naira(suggestion.value)}</span>
+              <span className="text-[19px] font-medium text-[#1a6b33]">About {naira(suggestion.value)}</span>
               <span className="text-[13px] leading-[1.45] text-[#5d6a61]">{suggestion.why}</span>
             </span>
             {value === suggestion.value ? (
-              <span className="text-[13px] text-[#3d4a42]">Using this estimate</span>
+              <span className="text-[13px] font-medium text-[#1a6b33]">Using this estimate</span>
             ) : (
-              <button type="button" onClick={() => set(suggestion.value)} className="min-h-10 rounded-full bg-ink px-4 text-[13px] font-medium text-cream">
+              <button type="button" onClick={() => set(suggestion.value)} className="min-h-10 rounded-full bg-[#1a6b33] px-4 text-[13px] font-medium text-white hover:bg-[#145529]">
                 Use {naira(suggestion.value)}
               </button>
             )}
