@@ -1,6 +1,7 @@
 "use client";
 
 import { useSyncExternalStore } from "react";
+import { toBenchmarkRecord } from "./benchmark";
 import { SAMPLE_BASICS, SAMPLE_MODEL, SAMPLE_NUMBERS, sampleDocs } from "./sample";
 import type { OwnerFile } from "./types";
 
@@ -53,7 +54,7 @@ export function hasFile(email: string) {
 }
 
 /** signs in (or up): opens this email's file, starting a new one if there isn't one */
-export function signIn(name: string, email: string) {
+export function signIn(name: string, email: string, shareFigures = false) {
   const s = read();
   const key = normaliseEmail(email);
   const now = new Date().toISOString();
@@ -66,6 +67,7 @@ export function signIn(name: string, email: string) {
     numbers: null,
     model: {},
     docs: [],
+    consent: { benchmarks: shareFigures, at: now },
     createdAt: now,
     updatedAt: now,
   };
@@ -102,6 +104,27 @@ export function setPreview(mode: Preview) {
           updatedAt: now,
         };
   write({ ...s, files: { ...s.files, [s.session]: shown }, preview: mode, stash: real });
+}
+
+/** The owner's choice to let Capstack use their figures, without their name, for benchmarks. */
+export function setConsent(on: boolean) {
+  updateFile((f) => ({ ...f, consent: { benchmarks: on, at: new Date().toISOString() } }));
+  if (on) shareFigures();
+}
+
+/** Sends this file's anonymised record, only if the owner agreed, and never from a testing preview. */
+export function shareFigures() {
+  const s = read();
+  if (!s.session || (s.preview && s.preview !== "mine")) return;
+  let f = s.files[s.session];
+  if (!f?.consent?.benchmarks) return;
+  if (!f.benchmarkId) {
+    updateFile((x) => ({ ...x, benchmarkId: crypto.randomUUID() }));
+    f = read().files[s.session];
+  }
+  const record = toBenchmarkRecord(f, f.benchmarkId!);
+  if (!record) return;
+  fetch("/api/benchmarks", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(record) }).catch(() => {});
 }
 
 export function usePreview(): Preview {

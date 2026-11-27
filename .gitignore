@@ -42,3 +42,6 @@ next-env.d.ts
 
 # claude code (local-only)
 .claude/settings.local.json
+
+# anonymised benchmark records kept locally until there's a database
+/.data

@@ -4,6 +4,7 @@ import Link from "next/link";
 import AppHeader from "../../components/product/AppHeader";
 import { Arrowhead, Lock, SarahAvatar } from "../../components/product/Bits";
 import BusinessChart, { ChartLegend } from "../../components/product/BusinessChart";
+import SarahsReport from "../../components/product/SarahsReport";
 import { boosts, confidenceLabel, sectorOf, valuate } from "../../lib/capstack/engine";
 import { naira, nairaRange } from "../../lib/capstack/format";
 import { MODEL, showAnswer } from "../../lib/capstack/questions";
@@ -23,7 +24,17 @@ export default function ReportPage() {
       <div className="bg-[#ecebe2] px-5 md:px-16 print:bg-transparent">
         <AppHeader file={file} />
       </div>
-      {ready ? <Report file={file} /> : <Locked file={file} />}
+      {ready ? (
+        <Report file={file} />
+      ) : (
+        <>
+          <Locked file={file} />
+          {/* Sarah's findings don't wait for the full report: they start once the numbers are in */}
+          <div className="pb-20">
+            <SarahsReport file={file} />
+          </div>
+        </>
+      )}
     </>
   );
 }
@@ -222,6 +233,8 @@ function Report({ file }: { file: OwnerFile }) {
           </div>
         </section>
       )}
+
+      <SarahsReport file={file} />
 
       <p className="m-0 mt-14 max-w-[80ch] px-5 text-[12px] leading-[1.6] text-[#7a857c] md:px-16">
         An estimate from the answers and documents in this file, worked out with fixed rules: what similar businesses sell for (small-business sale data,

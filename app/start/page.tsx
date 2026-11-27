@@ -21,6 +21,7 @@ export default function StartPage() {
   const step: Step = ready && file && !file.purpose && chosen !== "code" ? "purpose" : chosen;
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
+  const [share, setShare] = useState(false);
   const [error, setError] = useState("");
 
   // signed in (just now, or from an earlier visit): owners who've told Sarah why they came go to their desk;
@@ -42,7 +43,7 @@ export default function StartPage() {
   }
 
   function verified() {
-    signIn(name || "there", email);
+    signIn(name || "there", email, share);
   }
 
   return (
@@ -88,6 +89,12 @@ export default function StartPage() {
                 className="min-h-[52px] rounded-[12px] border border-[#d7d9cd] bg-cream-soft px-4 text-[16px] font-normal outline-none focus:border-ink"
               />
             </label>
+            {!returning && (
+              <label className="flex cursor-pointer items-start gap-3 text-[14px] leading-[1.5] text-[#3d4a42]">
+                <input type="checkbox" checked={share} onChange={(e) => setShare(e.target.checked)} className="mt-1 h-4 w-4 shrink-0 accent-[#042e1b]" />
+                <span>Help make Capstack better for businesses like mine: use my figures, without my name or business name, to build benchmarks.</span>
+              </label>
+            )}
             {error && (
               <p role="alert" className="m-0 text-[14px] text-[#a33a12]">
                 {error}

@@ -139,7 +139,7 @@ function FileList({ file }: { file: OwnerFile }) {
           Your file
         </h2>
         <span className="text-[14px] text-[#5d6a61]">
-          {done === 3 ? "All done. Update anything that changes, so your value stays current." : done ? `${done} of 3 chapters done` : "Do them in any order. Everything saves as you go."}
+          {done === 3 ? "All done. Update anything that changes." : done ? `${done} of 3 done` : "Any order. Everything saves as you go."}
         </span>
       </div>
       <ul className="m-0 list-none border-b border-[#e3e4dc] p-0">
@@ -162,9 +162,9 @@ function Row({ c, isNext }: { c: Chapter; isNext: boolean }) {
       </span>
       <span className="flex flex-col gap-1">
         <span className={`text-[18px] font-medium ${locked ? "text-[#5d6a61]" : ""}`}>{c.title}</span>
-        <span className={`text-[14px] ${locked ? "text-[#9aa39b]" : "text-[#5d6a61]"}`}>{c.detail ?? c.covers}</span>
+        {/* one line: what it gives you before it's done, what's in it once it is */}
+        <span className={`text-[14px] ${locked ? "text-[#9aa39b]" : "text-[#5d6a61]"}`}>{c.status === "done" || c.status === "started" ? (c.detail ?? c.gives) : c.gives}</span>
       </span>
-      <span className={`text-[14px] ${locked ? "text-[#9aa39b]" : "text-[#3d4a42]"}`}>{c.gives}</span>
       <span className="justify-self-start md:justify-self-end">
         {c.status === "done" && c.key !== "report" ? (
           // a finished chapter stays live: the owner updates it as the business changes
@@ -187,7 +187,7 @@ function Row({ c, isNext }: { c: Chapter; isNext: boolean }) {
       </span>
     </>
   );
-  const grid = "grid grid-cols-[48px_minmax(0,1fr)] items-center gap-x-5 gap-y-2 py-5 md:grid-cols-[56px_minmax(0,2fr)_minmax(0,2fr)_190px] [&>*:nth-child(n+3)]:col-start-2 md:[&>*:nth-child(n+3)]:col-start-auto";
+  const grid = "grid grid-cols-[48px_minmax(0,1fr)] items-center gap-x-5 gap-y-2 py-5 md:grid-cols-[56px_minmax(0,1fr)_auto] [&>*:nth-child(n+3)]:col-start-2 md:[&>*:nth-child(n+3)]:col-start-auto";
   return locked ? (
     <div className={grid}>{body}</div>
   ) : (

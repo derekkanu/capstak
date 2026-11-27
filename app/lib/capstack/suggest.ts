@@ -13,7 +13,7 @@ import type { Basics } from "./types";
    - kept: what's left for the owner out of each ₦1 of sales
    - fixed: the part of monthly costs that doesn't move with sales (rent, salaries)
    - stockMonths: stock usually on hand, in months of the costs that move with sales */
-const TRADE: Record<SectorKey, { kept: number; fixed: number; stockMonths: number; noun: string }> = {
+export const TRADE: Record<SectorKey, { kept: number; fixed: number; stockMonths: number; noun: string }> = {
   food: { kept: 0.15, fixed: 0.45, stockMonths: 0.25, noun: "food businesses" },
   trade: { kept: 0.1, fixed: 0.15, stockMonths: 1, noun: "shops and traders" },
   beauty: { kept: 0.3, fixed: 0.45, stockMonths: 1, noun: "fashion and beauty businesses" },

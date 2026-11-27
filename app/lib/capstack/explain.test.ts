@@ -14,18 +14,18 @@ describe("what the numbers mean, stage by stage", () => {
     expect(explainValue({ ...base, basics: SAMPLE_BASICS })).toContain("wide");
   });
 
-  test("with numbers, the value is put in the owner's terms, and says what's left to do", () => {
-    const mid = explainValue({ ...base, basics: SAMPLE_BASICS, numbers: SAMPLE_NUMBERS });
+  test("with numbers, the value is put in the owner's terms, in one sentence", () => {
+    const mid = explainValue({ ...base, basics: SAMPLE_BASICS, numbers: SAMPLE_NUMBERS })!;
     expect(mid).toMatch(/years of what's left for you/);
-    expect(mid).toContain("How you make money");
-    const done = explainValue({ ...base, basics: SAMPLE_BASICS, numbers: SAMPLE_NUMBERS, model: SAMPLE_MODEL, docs: sampleDocs() });
-    expect(done).toContain("you'd keep about");
+    // one sentence per block on the desk
+    expect(mid.split(". ").length).toBe(1);
+    const done = explainValue({ ...base, basics: SAMPLE_BASICS, numbers: SAMPLE_NUMBERS, model: SAMPLE_MODEL, docs: sampleDocs() })!;
+    expect(done.split(". ").length).toBe(1);
   });
 
-  test("the chart line reads as a sentence and speaks to the owner's audience", () => {
+  test("the chart line is one sentence", () => {
     const s = explainNumbers({ ...base, basics: SAMPLE_BASICS, numbers: SAMPLE_NUMBERS })!;
-    expect(s).toMatch(/of every ₦100 that comes in/);
-    expect(s).toContain("a buyer");
+    expect(s).toMatch(/of every ₦100 that comes in\.$/);
     expect(s).not.toMatch(/You keep/); // when a trend leads, it continues the sentence
   });
 });

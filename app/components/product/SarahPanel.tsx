@@ -64,11 +64,20 @@ export default function SarahPanel({ file, button = true }: { file: OwnerFile; b
     setMessages([...base, { from: "owner", reply: { text: t } }]);
     setDraft("");
     setTyping(true);
-    // a short pause, so it reads as a reply rather than an instant lookup
-    window.setTimeout(() => {
-      setMessages((m) => [...m, { from: "sarah", reply: sarahReply(t, file) }]);
+    const history = base.slice(-8).map((m) => ({ role: m.from === "sarah" ? ("assistant" as const) : ("user" as const), content: m.reply.text }));
+    // the server words the reply with whichever brain is switched on; if that fails, the built-in reply stands in.
+    // A short pause at least, so it reads as a reply rather than an instant lookup.
+    const reply = fetch("/api/sarah", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ task: "chat", file, message: t, history }),
+    })
+      .then((r) => (r.ok ? (r.json() as Promise<Reply>) : Promise.reject(new Error(String(r.status)))))
+      .catch(() => sarahReply(t, file));
+    Promise.all([reply, new Promise((r) => window.setTimeout(r, 500))]).then(([r]) => {
+      setMessages((m) => [...m, { from: "sarah", reply: { text: r.text, action: r.action } }]);
       setTyping(false);
-    }, 650);
+    });
   }
 
   return (

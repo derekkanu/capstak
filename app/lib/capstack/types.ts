@@ -78,6 +78,12 @@ export type OwnerFile = {
   docs: Doc[];
   /** when each chapter was last saved: the file is kept up to date over time, not filled once */
   chapterUpdatedAt?: Partial<Record<"basics" | "numbers" | "model", string>>;
+  /** ids of Sarah's findings the owner has seen (clears the notification bar) */
+  seenInsights?: string[];
+  /** whether the owner lets Capstack use their figures, without their name, to build benchmarks */
+  consent?: { benchmarks: boolean; at: string };
+  /** a random id the anonymised record goes under, so an updated file replaces its earlier record */
+  benchmarkId?: string;
   createdAt: string;
   updatedAt: string;
 };

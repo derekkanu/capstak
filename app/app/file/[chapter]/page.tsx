@@ -19,7 +19,7 @@ import { naira, nairaRange } from "../../../lib/capstack/format";
 import { CHAPTERS, forBusiness, type ChapterKey, type Question } from "../../../lib/capstack/questions";
 import { audience } from "../../../lib/capstack/sarah";
 import { suggestFor } from "../../../lib/capstack/suggest";
-import { updateFile, useOwnerFile } from "../../../lib/capstack/store";
+import { shareFigures, updateFile, useOwnerFile } from "../../../lib/capstack/store";
 import type { Basics, Model, Numbers, OwnerFile } from "../../../lib/capstack/types";
 
 /* One chapter, full screen: one question at a time, Sarah reacting as you go, Back to change an answer, and
@@ -122,6 +122,7 @@ export default function ChapterPage() {
       updateFile((f) => ({ ...f, numbers, chapterUpdatedAt: stamp(f) }));
     }
     setFinished(true);
+    shareFigures();
   }
 
   const progress = ((i + (ok ? 1 : 0)) / qs.length) * 100;
