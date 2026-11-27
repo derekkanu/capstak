@@ -16,7 +16,8 @@ export default function HeroDeck() {
   const [open, setOpen] = useState(false);
 
   // scroll-out: --p goes 0 → 1 as the hero leaves the screen; sheets fold together, the text lifts and fades,
-  // the file shrinks and fades, all gone before the next section arrives
+  // the file shrinks and fades. Both hold full strength for the first stretch of scroll and fade late, so the top
+  // of the screen still has the hero in it as the next section comes up
   const ref = useRef<HTMLElement>(null);
   useEffect(() => {
     const el = ref.current;
@@ -70,7 +71,7 @@ export default function HeroDeck() {
         <div className="flex flex-1 items-center justify-center py-4">
           <div
             className="relative w-[min(81vw,486px,calc((100svh-420px)*0.98))] min-w-[280px] will-change-transform"
-            style={{ transform: "scale(calc(1 - var(--p) * 0.42))", opacity: "calc(1 - var(--p) * 1.5)", transformOrigin: "50% 40%" }}
+            style={{ transform: "scale(calc(1 - var(--p) * 0.42))", opacity: "calc(1.25 - var(--p) * 1.35)", transformOrigin: "50% 40%" }}
           >
             <div className="relative z-10" onPointerMove={tilt} onPointerLeave={untilt}>
               {/* hover tilt: sets --rx/--ry; FileHero tilts only the folder (and the bundle inside it) with them,
@@ -85,7 +86,7 @@ export default function HeroDeck() {
         {/* one baseline along the bottom: the question on the left, what it is + the buttons on the right */}
         <div
           className="grid grid-cols-1 items-start gap-8 will-change-transform lg:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)] lg:gap-16"
-          style={{ transform: "translateY(calc(var(--p) * -140px))", opacity: "calc(1 - var(--p) * 1.9)" }}
+          style={{ transform: "translateY(calc(var(--p) * -140px))", opacity: "calc(1.2 - var(--p) * 1.6)" }}
         >
           <h1
             className={`hero-word display relative z-20 text-[44px] text-green sm:text-[60px] lg:text-[clamp(42px,4.1vw,66px)] ${open ? "is-in" : ""}`}
@@ -100,8 +101,11 @@ export default function HeroDeck() {
 
           <div className={`hero-word relative z-20 flex max-w-[27rem] flex-col gap-6 lg:justify-self-end lg:pt-2 ${open ? "is-in" : ""}`} data-side="right">
             <p className="text-[17px] leading-[1.6] text-ink/70">
-              Answer a few simple questions about your business and get a value range in Naira, with every reason explained.
-              The same method brokers use, in words you already use. No spreadsheets, right from your phone.
+              {/* speaks to the three people who land here: the curious owner, the one getting ready to sell, and the one
+                  who needs a value for a loan, an investor or a partner */}
+              <span className="font-medium text-ink">Just curious, getting ready to sell, or need it for a loan or an investor?</span>{" "}
+              With just a few questions and under three minutes, know what your business is worth. No finance background
+              needed.
             </p>
             <div className="flex flex-wrap items-center gap-3">
               <a href="#estimate" className="btn btn-p btn-lg">

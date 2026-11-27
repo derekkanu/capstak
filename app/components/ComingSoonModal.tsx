@@ -70,7 +70,10 @@ export default function ComingSoonModal({ open, onClose }: { open: boolean; onCl
           </div>
         ) : (
           <>
-            <span className="tab-label inline-block rounded-full bg-lime px-2.5 py-1 text-green">Coming soon</span>
+            {/* the quiet way in: the pill opens the product's sign-up, for testing before launch */}
+            <a href="/start" className="tab-label inline-block rounded-full bg-lime px-2.5 py-1 text-green no-underline">
+              Coming soon
+            </a>
             <h3 id="coming-soon-title" className="display mt-4 text-[30px] leading-[1.1] text-green md:text-[34px]">
               The full valuation is almost ready
             </h3>

@@ -1,5 +1,6 @@
 "use client";
 
+import { usePathname } from "next/navigation";
 import { useEffect, useId, useState } from "react";
 import { ARROW, ARROW_FILL, INK, LETTERS } from "../lib/logoIntroData";
 import { END_MS, FPS, INTRO_MS, PEN_WIDTH, SHEETS, VIEWBOX, introState } from "../lib/logoIntro";
@@ -14,7 +15,12 @@ const penPath = (points: string) => "M" + points.split(" ").join(" L");
  * drifts in, then the C and the arrow squeeze the word down to the Ck mark, which scales out and fades while the
  * paper dissolves and the hero assembles underneath. Drawn as SVG from the same shapes and timeline as the Cavalry scene.
  */
+/** The intro plays on the home page only; the product (/start, /app) opens straight away. */
 export default function LoadingScreen() {
+  return usePathname() === "/" ? <Intro /> : null;
+}
+
+function Intro() {
   const [frame, setFrame] = useState(0);
   const [leaving, setLeaving] = useState(false);
   const [hidden, setHidden] = useState(false);
