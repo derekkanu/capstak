@@ -1,25 +1,24 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useId, useState } from "react";
+import { ARROW, ARROW_FILL, INK, LETTERS } from "../lib/logoIntroData";
+import { END_MS, FPS, INTRO_MS, PEN_WIDTH, SHEETS, VIEWBOX, introState } from "../lib/logoIntro";
 
-const C_FADE_MS = 350;
-const K_DELAY_MS = 250;
-const K_FADE_MS = 350;
-const ARROW_DELAY_MS = 250;
-const ARROW_CYCLE_MS = 800;
-const ARROW_CYCLES = 3;
-const FADE_OUT_MS = 650;
+const PAPER_FADE_MS = 1000; // the paper dissolves while the Ck is still scaling out
+const STILL_FRAME = 134; // reduced motion: the written word with its arrow, held still
 
-const ARROW_TOTAL = ARROW_CYCLE_MS * ARROW_CYCLES;
-const SEQUENCE_TOTAL = C_FADE_MS + K_DELAY_MS + K_FADE_MS + ARROW_DELAY_MS + ARROW_TOTAL;
+const penPath = (points: string) => "M" + points.split(" ").join(" L");
 
 /**
- * The logo intro. When it ends, the logo fades and the paper it sits on dissolves away (no box, no
- * movement), so you just see the hero assemble underneath: the documents drifting in, the folder building.
+ * The logo intro: the pen writes "Capstack" with the homepage's sage sheets running ahead of the ink, the arrow
+ * drifts in, then the C and the arrow squeeze the word down to the Ck mark, which scales out and fades while the
+ * paper dissolves and the hero assembles underneath. Drawn as SVG from the same shapes and timeline as the Cavalry scene.
  */
 export default function LoadingScreen() {
-  const [phase, setPhase] = useState<"intro" | "lift" | "fade">("intro");
+  const [frame, setFrame] = useState(0);
+  const [leaving, setLeaving] = useState(false);
   const [hidden, setHidden] = useState(false);
+  const uid = useId().replace(/:/g, "");
 
   // a reload always starts at the hero: the browser would otherwise restore the old scroll position, and a
   // #section left in the address by the nav links would jump there. Clear both.
@@ -30,47 +29,107 @@ export default function LoadingScreen() {
   }, []);
 
   useEffect(() => {
+    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     const timers: number[] = [];
-    // no box, no shrink: the logo fades, then the paper dissolves away while the hero assembles underneath
-    timers.push(
-      window.setTimeout(() => {
-        setPhase("fade");
-        timers.push(window.setTimeout(() => setHidden(true), FADE_OUT_MS + 50));
-      }, SEQUENCE_TOTAL),
-    );
-    return () => timers.forEach((t) => window.clearTimeout(t));
+    let raf = 0;
+    if (reduce) {
+      raf = requestAnimationFrame(() => setFrame(STILL_FRAME));
+    } else {
+      const start = performance.now();
+      const tick = (now: number) => {
+        const f = ((now - start) / 1000) * FPS;
+        setFrame(f);
+        if (now - start < END_MS) raf = requestAnimationFrame(tick);
+      };
+      raf = requestAnimationFrame(tick);
+    }
+    const handoff = reduce ? 900 : INTRO_MS;
+    timers.push(window.setTimeout(() => setLeaving(true), handoff));
+    timers.push(window.setTimeout(() => setHidden(true), Math.max(reduce ? 0 : END_MS, handoff + PAPER_FADE_MS) + 50));
+    return () => {
+      cancelAnimationFrame(raf);
+      timers.forEach((t) => window.clearTimeout(t));
+    };
   }, []);
 
   if (hidden) return null;
 
-  const arrowDelayMs = C_FADE_MS + K_DELAY_MS + K_FADE_MS + ARROW_DELAY_MS;
-  const leaving = phase !== "intro";
+  const s = introState(frame);
+  const { x, y, w, h } = VIEWBOX;
+  const ax = (ARROW.box[0] + ARROW.box[2]) / 2;
+  const ay = (ARROW.box[1] + ARROW.box[3]) / 2;
+  // the letters the C and k squeeze sit underneath them
+  const squeezer = (n: string) => n === "C" || n === "k";
+  const order = LETTERS.map((L, i) => ({ L, i })).sort((p, q) => Number(squeezer(p.L.name)) - Number(squeezer(q.L.name)));
 
   return (
     <div
       aria-hidden={leaving}
-      className={`fixed inset-0 z-[100] flex items-center justify-center bg-paper ${leaving ? "pointer-events-none" : ""} ${
-        phase === "lift" ? "loader-lift" : ""
-      }`}
-      style={{ opacity: phase === "fade" ? 0 : 1, transition: `opacity ${FADE_OUT_MS}ms cubic-bezier(0.4, 0, 0.2, 1)` }}
+      className={`fixed inset-0 z-[100] flex items-center justify-center overflow-hidden ${leaving ? "pointer-events-none" : ""}`}
     >
+      {/* the paper, on its own so it can dissolve while the logo is still leaving */}
       <div
-        className="relative aspect-[1614/992] w-[130px] transition-opacity duration-200 md:w-[170px]"
-        style={{ opacity: leaving ? 0 : 1 }}
+        className="absolute inset-0 bg-paper"
+        style={{ opacity: leaving ? 0 : 1, transition: `opacity ${PAPER_FADE_MS}ms cubic-bezier(0.4, 0, 0.2, 1)` }}
+      />
+      <svg
+        viewBox={`${x} ${y} ${w} ${h}`}
+        className="relative w-[min(38.5vw,334px)] overflow-visible"
+        style={{ opacity: s.logo.opacity }}
+        role="img"
+        aria-label="Capstack"
       >
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src="/icon-c-only.png" alt="Capstack" draggable={false} className="capstack-fade-c absolute inset-0 h-full w-full select-none" />
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src="/icon-k-only.png" alt="" draggable={false} className="capstack-fade-k absolute inset-0 h-full w-full select-none" />
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src="/icon-arrow.png"
-          alt=""
-          draggable={false}
-          className="capstack-arrow-grow absolute inset-0 h-full w-full select-none"
-          style={{ animationDelay: `${arrowDelayMs}ms` }}
-        />
-      </div>
+        <defs>
+          {order.map(({ L, i }) =>
+            s.letters[i].layers.map((strokes, layer) => (
+              <mask key={`${i}-${layer}`} id={`${uid}-${i}-${layer}`} maskUnits="userSpaceOnUse" x={x - w} y={y - h} width={w * 3} height={h * 3}>
+                {L.pens.map((pen, j) => (
+                  <path
+                    key={j}
+                    d={penPath(pen)}
+                    pathLength={1}
+                    fill="none"
+                    stroke="white"
+                    strokeWidth={PEN_WIDTH}
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeDasharray={`${strokes[j]} 2`}
+                    // a zero-length dash still draws its round cap, so hide strokes the pen hasn't reached
+                    opacity={strokes[j] > 0 ? 1 : 0}
+                  />
+                ))}
+              </mask>
+            )),
+          )}
+        </defs>
+        <g transform={`translate(${s.logo.cx} ${s.logo.cy + s.logo.dy}) scale(${s.logo.scale}) translate(${-s.logo.cx} ${-s.logo.cy})`}>
+          {order.map(({ L, i }) => {
+            const st = s.letters[i];
+            if (st.opacity <= 0) return null;
+            return (
+              <g key={L.name} transform={`translate(${st.dx} 0)`} opacity={st.opacity}>
+                {[...SHEETS, INK].map((colour, layer) => (
+                  <path
+                    key={layer}
+                    d={L.d}
+                    fill={colour}
+                    // the traced outlines and their counters wind the same way, so even-odd keeps the holes open
+                    fillRule="evenodd"
+                    mask={`url(#${uid}-${i}-${layer})`}
+                    opacity={layer < SHEETS.length ? st.sheetOpacity : 1}
+                  />
+                ))}
+              </g>
+            );
+          })}
+          <g
+            opacity={s.arrow.opacity}
+            transform={`translate(${ax + s.arrow.dx} ${ay + s.arrow.dy}) scale(${s.arrow.scale}) translate(${-ax} ${-ay})`}
+          >
+            <path d={ARROW.d} fill={ARROW_FILL} fillRule="evenodd" />
+          </g>
+        </g>
+      </svg>
     </div>
   );
 }

@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { Folder, Seal, TILT } from "./FilePieces";
 import Conveyor from "./Conveyor";
 import { quickEstimate, type QuickInput } from "../lib/quickEstimate";
+import { INTRO_MS } from "../lib/logoIntro";
 
 /* The hero's living file: back folders, the owner's photo clipped in as the first page, and the dark
    green lid with the value. In the hero (intro) bundles of paperwork flow into it (Conveyor) and the lid
@@ -95,7 +96,7 @@ export default function FileHero({ intro = false }: { intro?: boolean }) {
       role="img"
     >
       {/* back folders */}
-      <div {...fx(4250)}>
+      <div {...fx(INTRO_MS + 650)}>
       <Tilt>
         <div className="absolute left-[2%] top-[6%] aspect-[500/320] w-[92%]">
           <Folder w={500} h={320} tx={0.5} tw={0.3} th={36} fill="#fbfaf6" stroke="#1d2a22" />
@@ -107,7 +108,7 @@ export default function FileHero({ intro = false }: { intro?: boolean }) {
       </div>
 
       {/* the owner's photo, clipped in: it comes in with the folder, so the inner folder never sits empty */}
-      <div {...fx(4350)}>
+      <div {...fx(INTRO_MS + 750)}>
       <Tilt>
       <div
         data-deck-front=""
@@ -154,7 +155,7 @@ export default function FileHero({ intro = false }: { intro?: boolean }) {
       )}
 
       {/* the lid (front of the folder) */}
-      <div {...fx(4450)}>
+      <div {...fx(INTRO_MS + 850)}>
       <Tilt>
         <div
           className="absolute inset-x-0 bottom-0 h-[47%] origin-bottom transition-transform duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]"

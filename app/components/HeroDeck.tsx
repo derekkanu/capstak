@@ -3,13 +3,14 @@
 import { useEffect, useRef, useState } from "react";
 import FileHero from "./FileHero";
 import { Arrow } from "./FilePieces";
+import { INTRO_MS } from "../lib/logoIntro";
 
 /* Hero (PostGeneric structure): the living file centred in the space above; along the bottom, one baseline with
    the question on the left and the text + buttons on the right. The intro's paper sheet shrinks down onto the
    file's first page (LoadingScreen lands on `data-deck-front`), the folder builds itself around it,
    the two halves of the headline slide in, and the background sheets rise and keep drifting. */
 
-const INTRO_DONE_MS = 4250; // LoadingScreen hands over at ~3.6s and shrinks for ~0.65s
+const INTRO_DONE_MS = INTRO_MS + 650; // after the logo intro hands over and its paper dissolves
 
 export default function HeroDeck() {
   const [open, setOpen] = useState(false);
@@ -143,7 +144,7 @@ function Layers() {
             {
               background: s.c,
               boxShadow: "0 -1px 0 rgba(15,27,20,0.05)",
-              animationDelay: `${3800 + i * 120}ms, ${4600 + i * 120}ms`,
+              animationDelay: `${INTRO_MS + 200 + i * 120}ms, ${INTRO_MS + 1000 + i * 120}ms`,
               "--drift": `${s.amp}px`,
               "--dur": `${s.dur}s`,
             } as React.CSSProperties

@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { Seal, TILT } from "./FilePieces";
+import { INTRO_MS } from "../lib/logoIntro";
 
 /* Business paperwork passing through the hero's file in tidy bundles of three.
 
@@ -288,7 +289,7 @@ function place(k: number, sub: Sub) {
   return table[k];
 }
 
-export default function Conveyor({ startAfter = 4400 }: { startAfter?: number }) {
+export default function Conveyor({ startAfter = INTRO_MS + 800 }: { startAfter?: number }) {
   const [step, setStep] = useState(0);
   const [sub, setSub] = useState<Sub>("rise");
   const [assembled, setAssembled] = useState(false);
