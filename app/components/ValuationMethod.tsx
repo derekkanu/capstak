@@ -10,16 +10,16 @@ const TABS = [
   {
     key: "sectors",
     title: "What buyers pay in your trade",
-    body: "Every estimate starts from what small businesses in your trade sell for: a number of years of what's left for the owner, and a ceiling on a year's sales.",
+    body: "Every estimate starts from what small businesses in your trade sell for: a few years of what's left for the owner, and a ceiling on a year's sales.",
   },
   {
     key: "adjust",
-    title: "What moves your multiple",
-    body: "Size, years trading, growth against rising prices, whether it runs without you and how good your records are each move it up or down.",
+    title: "What moves the price up or down",
+    body: "Size, years trading, growth after price rises, whether it runs without you and how good your records are. Each one moves the multiple, the years of earnings a buyer will pay.",
   },
   {
     key: "value",
-    title: "From multiple to value",
+    title: "Putting it together",
     body: "What's left for you in a year, times your multiple, checked against the ceiling on sales. The full valuation then takes off debts and counts equipment and stock.",
   },
 ] as const;
@@ -46,7 +46,7 @@ export default function ValuationMethod() {
         <div className="grain flex flex-col justify-center bg-green px-7 py-14 text-cream md:px-14 md:py-20">
           <div className="relative z-10">
             <h2 className="display max-w-[14ch] text-[38px] md:text-[52px]">
-              How your number is made<span className="stop">.</span>
+              How we work out what it&rsquo;s worth<span className="stop">.</span>
             </h2>
             <p className="mt-5 max-w-[34ch] text-[16px] leading-[1.6] text-cream/60 md:text-[17px]">
               The way small businesses are priced when they change hands. Fixed rules do the maths, so the same
@@ -217,8 +217,8 @@ function AdjustmentChart() {
     <div className="flex flex-1 flex-col">
       <Legend
         items={[
-          { color: ACCENT, label: "Raises multiple" },
-          { color: "#d9a184", label: "Lowers multiple" },
+          { color: ACCENT, label: "Pushes it up" },
+          { color: "#d9a184", label: "Pulls it down" },
         ]}
       />
       <div className="mt-6 flex flex-1 flex-col justify-center gap-2.5">

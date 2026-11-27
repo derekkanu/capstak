@@ -1,6 +1,7 @@
 "use client";
 
-import { useMemo, useState, type ReactNode } from "react";
+import { useEffect, useMemo, useState, type ReactNode } from "react";
+import { Seal } from "./FilePieces";
 import ComingSoonModal from "./ComingSoonModal";
 import {
   quickEstimate,
@@ -84,6 +85,20 @@ export default function ValuationPlayground() {
     () => quickEstimate({ sector, monthlySales, monthlyLeft, tenure, trend, withoutYou, records }),
     [sector, monthlySales, monthlyLeft, tenure, trend, withoutYou, records],
   );
+
+  // the seal comes down again once the number stops moving (not on every slider tick)
+  const mid = r.ok ? r.mid : 0;
+  const [settled, setSettled] = useState(mid);
+  useEffect(() => {
+    const t = window.setTimeout(() => setSettled(mid), 450);
+    return () => window.clearTimeout(t);
+  }, [mid]);
+
+  const share = () => {
+    if (!r.ok) return;
+    const text = `My business could be worth ${money(r.low)} – ${money(r.high)}, says a free Capstack quick estimate. What's yours worth? ${window.location.origin}/#estimate`;
+    window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, "_blank", "noopener,noreferrer");
+  };
 
   return (
     <div className="relative mx-auto w-full max-w-[1120px] text-left">
@@ -171,7 +186,7 @@ export default function ValuationPlayground() {
           <Field label="How long have you been trading?">
             <Segmented value={tenure} onChange={setTenure} options={TENURE} full />
           </Field>
-          <Field label="Sales compared with a year ago, against rising prices">
+          <Field label="Sales compared with a year ago, after price rises">
             <Segmented value={trend} onChange={setTrend} options={TRENDS} full />
           </Field>
           <Field label="Could it run for a month without you?">
@@ -206,21 +221,33 @@ export default function ValuationPlayground() {
             {!r.ok ? (
               <div className="rounded-[14px] border border-ink/[0.08] bg-white p-5">
                 <p className="text-[14px] text-ink/50">Estimated value · {r.sector.label}</p>
-                <p className="display num mt-1 text-[40px] leading-none text-ink/40">No number yet</p>
+                <p className="display num mt-1 text-[40px] leading-none text-ink/40">No value yet</p>
                 <p className="mt-4 max-w-[46ch] text-[15px] leading-[1.55] text-ink/65">{r.reason}</p>
               </div>
             ) : null}
 
             {r.ok && tab === "range" && (
               <>
-                <div className="rounded-[14px] border border-ink/[0.08] bg-white p-5">
-                  <p className="text-[14px] text-ink/50">Rough value before debts · {r.sector.label}</p>
+                {/* the result is a file: named, numbered, and stamped once the number settles */}
+                <div className="relative overflow-hidden rounded-[4px] bg-white p-5 shadow-[0_14px_30px_-22px_rgba(4,46,27,0.6)] ring-1 ring-ink/[0.06]">
+                  <div className="flex items-center justify-between gap-3 text-ink/45">
+                    <span className="tab-label truncate">( {prompt.trim() || "Your business"} )</span>
+                    <span className="tab-label shrink-0">Quick estimate</span>
+                  </div>
+                  <p className="mt-4 text-[14px] text-ink/50">Rough value before debts · {r.sector.label}</p>
                   <p className="display num mt-1 text-[48px] leading-none text-ink md:text-[56px]">{money(r.mid)}</p>
                   <RangeBar low={r.low} mid={r.mid} high={r.high} />
-                  <p className="mt-3 text-[13px] text-ink/50">
-                    Confidence: <span className="font-medium text-ink/75">{r.confidence}</span> · ±{Math.round(r.spread * 100)}%.
-                    {r.confidence !== "Good" ? " Bank and POS records narrow it." : ""}
-                  </p>
+                  <div className="mt-4 flex flex-wrap items-center justify-between gap-3 border-t border-dashed border-ink/15 pt-4">
+                    <p className="text-[13px] text-ink/50">
+                      Confidence: <span className="font-medium text-ink/75">{r.confidence}</span> · ±{Math.round(r.spread * 100)}%.
+                      {r.confidence !== "Good" ? " Bank and POS records narrow it." : ""}
+                    </p>
+                    <button type="button" onClick={share} className="btn btn-s btn-sm shrink-0">
+                      <WhatsAppIcon />
+                      Share on WhatsApp
+                    </button>
+                  </div>
+                  <Seal key={settled} id="calc" className="stamp-in pointer-events-none absolute right-5 top-9 h-[76px] w-[76px] text-seal md:h-[84px] md:w-[84px]" />
                 </div>
                 <ResultRow
                   title="Earnings view"
@@ -264,7 +291,7 @@ export default function ValuationPlayground() {
 
             {r.ok && tab === "report" && (
               <>
-                <ResultRow title="What the full valuation adds" value="" detail="Your real numbers from bank statements, so the range narrows" />
+                <ResultRow title="What the full valuation adds" value="" detail="Your real sales and costs from bank statements, so the range narrows" />
                 <ResultRow title="Debts and assets" value="" detail="Loans netted out; equipment, stock and property counted" />
                 <ResultRow title="Three methods, not one" value="" detail="Market, earnings over time and assets, blended by how sure we are" />
                 <ResultRow title="Your business model" value="" detail="Customers, suppliers and risks that move the multiple" />
@@ -479,6 +506,14 @@ function ChatIcon() {
     <svg viewBox="0 0 20 20" className="h-[18px] w-[18px] text-[#1d7a3a]" fill="none" aria-hidden>
       <path d="M4 4.5h12a1.5 1.5 0 011.5 1.5v7a1.5 1.5 0 01-1.5 1.5H9l-3.5 3v-3H4A1.5 1.5 0 012.5 13V6A1.5 1.5 0 014 4.5z" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round" />
       <path d="M6.5 8.5h7M6.5 11h4.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+    </svg>
+  );
+}
+
+function WhatsAppIcon() {
+  return (
+    <svg viewBox="0 0 24 24" className="h-4 w-4 text-[#1d7a3a]" fill="currentColor" aria-hidden>
+      <path d="M12 2a10 10 0 00-8.6 15.1L2 22l5-1.3A10 10 0 1012 2zm0 18.2a8.2 8.2 0 01-4.2-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1112 20.2zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8s-.4-.1-.6.1-.7.8-.8 1-.3.2-.5.1a6.7 6.7 0 01-3.3-2.9c-.3-.4.3-.4.7-1.4.1-.2 0-.3 0-.4l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 00-.7.3 3 3 0 00-.9 2.2 5.2 5.2 0 001.1 2.7 11.8 11.8 0 004.5 4c1.7.7 2.3.8 3.2.6a2.7 2.7 0 001.8-1.2 2.2 2.2 0 00.1-1.3c0-.1-.2-.2-.5-.3z" />
     </svg>
   );
 }

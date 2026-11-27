@@ -557,3 +557,27 @@ main em,
   .doc-cycle { animation: none; transform: translateY(-30%) rotate(4deg); }
   .doc-cycle .doc-stamp { animation: none; }
 }
+
+/* the hero cover's name and value, swapping to the next business */
+.lid-swap { animation: lidSwap 420ms cubic-bezier(0.22, 1, 0.36, 1) both; }
+@keyframes lidSwap { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: reduce) { .lid-swap { animation: none; } }
+
+/* A seal coming down on paper: big and light, hits, settles at an angle. Used by the calculator's file card
+   (re-stamps when the number settles) and the loud band (stamps as it scrolls in). */
+@keyframes stampDown {
+  0% { opacity: 0; transform: scale(1.9) rotate(-2deg); }
+  55% { opacity: 1; transform: scale(0.93) rotate(-12deg); }
+  100% { opacity: 0.95; transform: scale(1) rotate(-12deg); }
+}
+.stamp-in { animation: stampDown 520ms cubic-bezier(0.2, 1, 0.4, 1) both; }
+.band-stamp { opacity: 0; }
+.is-visible .band-stamp { animation: stampDown 600ms cubic-bezier(0.2, 1, 0.4, 1) 550ms both; }
+@media (prefers-reduced-motion: reduce) {
+  .stamp-in, .is-visible .band-stamp { animation: none; opacity: 0.95; transform: rotate(-12deg); }
+}
+
+/* the file wall: other businesses' files drifting past, right to left */
+@keyframes fileWall { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+.file-wall { animation: fileWall 60s linear infinite; }
+@media (prefers-reduced-motion: reduce) { .file-wall { animation: none; } }

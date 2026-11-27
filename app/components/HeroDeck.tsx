@@ -99,8 +99,8 @@ export default function HeroDeck() {
 
           <div className={`hero-word relative z-20 flex max-w-[27rem] flex-col gap-6 lg:justify-self-end lg:pt-2 ${open ? "is-in" : ""}`} data-side="right">
             <p className="text-[17px] leading-[1.6] text-ink/70">
-              Answer a few plain questions about your business. Get a valuation range in Naira, with every reason written down.
-              No spreadsheets, no finance words, right from your phone.
+              Answer a few simple questions about your business and get a value range in Naira, with every reason explained.
+              The same method brokers use, in words you already use. No spreadsheets, right from your phone.
             </p>
             <div className="flex flex-wrap items-center gap-3">
               <a href="#estimate" className="btn btn-p btn-lg">

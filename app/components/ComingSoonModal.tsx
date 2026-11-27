@@ -75,8 +75,8 @@ export default function ComingSoonModal({ open, onClose }: { open: boolean; onCl
               The full valuation is almost ready
             </h3>
             <p className="mt-3 text-[15px] leading-[1.6] text-ink/65">
-              One question at a time, you&rsquo;ll open a file for your business, add your numbers at your own pace and
-              get a valuation with every reason written down. Join the waitlist to be first in.
+              One question at a time, you&rsquo;ll open a file for your business, add your sales and costs at your own pace and
+              see what it&rsquo;s worth, with every reason explained. Join the waitlist to be first in.
             </p>
             <form
               onSubmit={(e) => {

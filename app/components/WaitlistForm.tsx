@@ -74,7 +74,7 @@ export default function WaitlistForm({ id, className = "" }: Props) {
           required
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          placeholder="Enter your email..."
+          placeholder="Your email"
           aria-label="Email address"
           className="min-w-0 flex-1 bg-transparent px-4 py-3 text-[15px] text-ink placeholder:text-[#9c9c9c] focus:outline-none"
         />
@@ -82,7 +82,7 @@ export default function WaitlistForm({ id, className = "" }: Props) {
           type="submit"
           className="shrink-0 rounded-[10px] bg-green px-5 py-3 text-[14px] font-medium text-lime transition-colors hover:bg-green-mid"
         >
-          Get Notified
+          Get notified
         </button>
       </form>
 
@@ -117,10 +117,10 @@ export default function WaitlistForm({ id, className = "" }: Props) {
                   id="waitlist-modal-title"
                   className="display mt-5 text-[34px] text-ink"
                 >
-                  Thank you
+                  You&rsquo;re on the list
                 </h3>
                 <p className="mt-3 text-[14px] leading-relaxed text-ink/70">
-                  We will notify you as soon as we are live.
+                  We&rsquo;ll let you know as soon as Capstack opens.
                 </p>
                 <button
                   type="button"

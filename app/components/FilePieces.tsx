@@ -75,10 +75,10 @@ export function Arrow({ className = "" }: { className?: string }) {
 }
 
 /** The seal: "Valued · on file · Capstack" around the arrow. Pass a unique id per page. */
-export function Seal({ id, className = "" }: { id: string; className?: string }) {
+export function Seal({ id, className = "", style }: { id: string; className?: string; style?: React.CSSProperties }) {
   const ring = `seal-ring-${id}`;
   return (
-    <svg viewBox="0 0 100 100" className={className} role="img" aria-label="Valued, on file, Capstack">
+    <svg viewBox="0 0 100 100" className={className} style={style} role="img" aria-label="Valued, on file, Capstack">
       <defs>
         <path id={ring} d="M50 50 m-35 0 a35 35 0 1 1 70 0 a35 35 0 1 1 -70 0" />
       </defs>

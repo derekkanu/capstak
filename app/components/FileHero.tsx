@@ -3,19 +3,44 @@
 import { useEffect, useState } from "react";
 import { Folder, Seal, TILT } from "./FilePieces";
 import Conveyor from "./Conveyor";
+import { quickEstimate, type QuickInput } from "../lib/quickEstimate";
 
 /* The hero's living file: back folders, the owner's photo clipped in as the first page, and the dark
    green lid with the value. In the hero (intro) bundles of paperwork flow into it (Conveyor) and the lid
    opens a touch and closes behind each one. Outside the hero it plays the older loop (receipt in, report
    up, stamp). The figures are an illustration; the same business appears across the page. */
 
-// the owners pinned in as the first page, one per bundle filed
-const PHOTOS = [
-  { src: "/maker.jpg", pos: "50% 12%", grade: false },
-  { src: "/owners/caterer.jpg", pos: "50% 12%", grade: true },
-  { src: "/owners/florist.jpg", pos: "50% 12%", grade: true },
-  { src: "/owners/trader.jpg", pos: "50% 12%", grade: true },
-];
+// the owners pinned in as the first page, one per bundle filed. Each is a different (illustrative) business,
+// valued with the same method as the free calculator, so the cover's name and range change with the photo.
+const OWNERS = [
+  {
+    // the workshop photo the hero was built around; it already has the green cast, so no grade on top
+    src: "/maker.jpg", pos: "50% 12%", name: "Okafor Woodworks", file: "0142", grade: false,
+    q: { sector: "making", monthlySales: 3_500_000, monthlyLeft: 890_000, tenure: "established", trend: "growing", withoutYou: "partly", records: "bank" },
+  },
+  {
+    src: "/owners/consultant.jpg", pos: "55% 62%", name: "Adaeze Consulting", file: "0143", grade: true,
+    q: { sector: "services", monthlySales: 6_000_000, monthlyLeft: 1_800_000, tenure: "mid", trend: "growing", withoutYou: "partly", records: "bank" },
+  },
+  {
+    src: "/owners/landscaper.jpg", grade: true, pos: "45% 6%", name: "Greenline Gardens", file: "0144",
+    q: { sector: "services", monthlySales: 2_500_000, monthlyLeft: 600_000, tenure: "mid", trend: "growing", withoutYou: "no", records: "some" },
+  },
+  {
+    src: "/owners/designer.jpg", grade: true, pos: "35% 50%", name: "Pixelhaus Studio", file: "0145",
+    q: { sector: "tech", monthlySales: 5_000_000, monthlyLeft: 1_750_000, tenure: "mid", trend: "growing", withoutYou: "partly", records: "bank" },
+  },
+  {
+    src: "/owners/events.jpg", grade: true, pos: "55% 38%", name: "Amara Events", file: "0146",
+    q: { sector: "services", monthlySales: 8_000_000, monthlyLeft: 1_600_000, tenure: "established", trend: "growing", withoutYou: "yes", records: "some" },
+  },
+] as const satisfies readonly { src: string; pos: string; name: string; file: string; grade: boolean; q: QuickInput }[];
+
+const fmt = (n: number) => `₦${Math.round(n / 1_000_000)}M`;
+const RANGES = OWNERS.map((o) => {
+  const r = quickEstimate(o.q);
+  return r.ok ? `${fmt(r.low)} – ${fmt(r.high)}` : "";
+});
 
 // the inner folder's colour
 const INNER = "#93b99b"; // sage: quiet, now that the documents carry the colour
@@ -42,7 +67,8 @@ export default function FileHero({ intro = false }: { intro?: boolean }) {
     window.addEventListener("capstack:cover", onCover);
     return () => window.removeEventListener("capstack:cover", onCover);
   }, [intro]);
-  const shown = tint % PHOTOS.length;
+  const shown = tint % OWNERS.length;
+  const owner = OWNERS[shown];
 
   // the lid: opens slightly when a bundle arrives, closes once it is in
   const [lidOpen, setLidOpen] = useState(false);
@@ -65,7 +91,7 @@ export default function FileHero({ intro = false }: { intro?: boolean }) {
   return (
     <div
       className="relative mx-auto aspect-[10/9.4] w-full max-w-[560px] [clip-path:inset(-400px_-2400px_0_-2400px)]"
-      aria-label="An example valuation file for Okafor Woodworks, valued at ₦24M to ₦35M"
+      aria-label="Example valuation files for small businesses, each valued in Naira"
       role="img"
     >
       {/* back folders */}
@@ -89,11 +115,11 @@ export default function FileHero({ intro = false }: { intro?: boolean }) {
       >
         <span aria-hidden className="absolute -top-3 left-6 h-11 w-4 rounded-[10px] border-[2.5px] border-[#9aa39c]" />
         <span className="relative block h-full w-full overflow-hidden rounded-[2px]">
-          {PHOTOS.map((ph, n) => (
+          {OWNERS.map((ph, n) => (
             <span key={ph.src} className="absolute inset-0 transition-opacity duration-200 ease-out" style={{ opacity: n === shown ? 1 : 0 }}>
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src={ph.src} alt="" className="h-full w-full object-cover" style={{ objectPosition: ph.pos, filter: ph.grade ? "saturate(0.8) contrast(1.06) brightness(0.97)" : undefined }} />
-              {/* the same green cast as the first photo, so the set feels shot together */}
+              {/* the workshop photo's green cast, laid over the others so the set feels shot together */}
               {ph.grade ? <span aria-hidden className="absolute inset-0 bg-[#1f6b3f] mix-blend-soft-light opacity-70" /> : null}
             </span>
           ))}
@@ -136,11 +162,14 @@ export default function FileHero({ intro = false }: { intro?: boolean }) {
         >
           <Folder w={560} h={250} tx={0.06} tw={0.34} th={40} fill="#042e1b" />
           <div className="absolute inset-0 flex flex-col justify-between px-6 pb-5 pt-[54px] text-cream">
-            <div className="flex justify-between text-sage-soft">
-              <span className="tab-label">( Okafor Woodworks )</span>
-              <span className="tab-label">File №0142</span>
+            {/* the cover is relabelled for each business as its paperwork is filed */}
+            <div key={`h${shown}`} className="lid-swap flex justify-between gap-3 text-sage-soft">
+              <span className="tab-label truncate">( {intro ? owner.name : "Okafor Woodworks"} )</span>
+              <span className="tab-label shrink-0">File №{intro ? owner.file : "0142"}</span>
             </div>
-            <span className="num font-mono text-[clamp(24px,4vw,34px)] font-medium tracking-[-0.03em] text-white">₦24M – ₦35M</span>
+            <span key={`v${shown}`} className="lid-swap num font-mono text-[clamp(24px,4vw,34px)] font-medium tracking-[-0.03em] text-white">
+              {intro ? RANGES[shown] : "₦24M – ₦35M"}
+            </span>
           </div>
         </div>
       </Tilt>

@@ -6,7 +6,8 @@ import ValuationMethod from "./components/ValuationMethod";
 import HeroDeck from "./components/HeroDeck";
 import FileTabs from "./components/FileTabs";
 import Shelf from "./components/Shelf";
-import { Arrow, Folder, Seal, Stop } from "./components/FilePieces";
+import FileWall from "./components/FileWall";
+import { Arrow, Seal, Stop } from "./components/FilePieces";
 
 /* Capstack landing page, "On file" direction (docs/brand/on-file, docs/capstack-spec.html).
    Example business across the page: Okafor Woodworks, a furniture workshop, ₦24M–₦35M (illustrative). */
@@ -18,6 +19,7 @@ export default function Home() {
       <Hero />
       <Estimate />
       <HowItWorks />
+      <FileWall />
       <InYourFile />
       <FadeIn amount={0.08}>
         <ValuationMethod />
@@ -51,7 +53,7 @@ function Header() {
   return (
     <div className="entrance-nav sticky top-0 z-40 w-full">
       <a href="#waitlist" className="group block bg-green px-4 py-2 text-center text-[13px] text-cream/80 transition-colors hover:text-cream">
-        <span className="hidden sm:inline">Capstack is opening early access for business owners and brokers.</span>
+        <span className="hidden sm:inline">Early access opens soon for business owners and brokers.</span>
         <span className="sm:hidden">Early access is opening.</span>
         <span className="tab-label ml-2 text-lime">( Get notified )</span>
       </a>
@@ -128,15 +130,15 @@ function Estimate() {
         <SectionHead
           align="center"
           label="Free · quick estimate"
-          title={<>Try a rough number <em>right now</em></>}
-          sub="Seven plain answers, the same way small businesses are priced when they change hands: what's left for you each year, times what buyers pay in your trade."
+          title={<>See what your business is worth, <em>right now</em></>}
+          sub="Seven quick questions. We use the method brokers use for small businesses: what's left for you each year, times what buyers typically pay in your trade."
         />
         <FadeIn className="mt-12 md:mt-16">
           <ValuationPlayground />
         </FadeIn>
         <p className="mx-auto mt-6 max-w-[60ch] text-center text-[13px] leading-[1.6] text-ink/45">
-          Multiples start from small-business sale data, adjusted down for Nigeria&rsquo;s higher risk, and will be sharpened
-          with real sale prices from our broker partners. Debts aren&rsquo;t included. A quick estimate is a guide, not a formal valuation.
+          Our starting figures come from small-business sale data, adjusted for the extra risk of doing business in Nigeria, and
+          will be refined with real sale prices from our broker partners. Debts are not included. This is a quick guide, not a formal valuation.
         </p>
       </div>
     </section>
@@ -152,8 +154,8 @@ function HowItWorks() {
         <Shelf
           head={
             <SectionHead
-              title={<>Four steps to your number</>}
-              sub="About twenty minutes in all, spread over as many sittings as you like. Rough numbers are welcome."
+              title={<>Four steps to knowing what it&rsquo;s worth</>}
+              sub="About twenty minutes in all, spread over as many sittings as you like."
             />
           }
         />
@@ -170,8 +172,8 @@ function InYourFile() {
       <div className="mx-auto max-w-[1320px]">
         <SectionHead
           label="Your file"
-          title={<>Five tabs. <em>Everything a buyer asks about</em></>}
-          sub="Your dashboard is your business's file. Each tab is a short set of everyday questions, and each one leaves you with something useful, even before the valuation."
+          title={<>Your whole business, <em>in one file</em></>}
+          sub="Five short sections of everyday questions, covering what a buyer, a bank or a broker will want to know. Each one gives you something useful along the way."
         />
         <FadeIn className="mt-12 md:mt-16">
           <FileTabs />
@@ -187,19 +189,19 @@ function BothSides() {
   const cols = [
     {
       who: "For owners",
-      title: <>Know your number <em>before</em> you negotiate</>,
+      title: <>Know what it&rsquo;s worth <em>before</em> you negotiate</>,
       body: "Walk into a conversation with a buyer, a bank or a partner knowing what your business is worth, and why.",
     },
     {
       id: "brokers",
       who: "For brokers",
       title: <>Price listings with <em>proof</em></>,
-      body: "Value every client the same way, hand buyers a report they can read, and keep all your files in one place. Partner pricing for early brokers.",
+      body: "Value every client with the same method, give buyers a clear report with the working shown, and keep every file in one place. Early partners get preferred pricing.",
     },
     {
       who: "For investors",
       title: <>Compare businesses <em>on the same terms</em></>,
-      body: "Every valuation uses the same benchmarks and the same checks, so opportunities line up side by side.",
+      body: "Every business is valued against the same benchmarks and checks, so you can compare opportunities side by side.",
     },
   ];
   return (
@@ -208,8 +210,8 @@ function BothSides() {
         <div className="flex flex-col gap-10">
           <SectionHead
             label="The deal table"
-            title={<>The number <em>both sides</em> can trust</>}
-            sub="The seller hopes for one number. The buyer offers another. Capstack brings the receipts."
+            title={<>A value <em>both sides</em> can trust</>}
+            sub="The seller hopes for one price. The buyer offers another. Capstack brings the receipts."
           />
           <div className="flex flex-col border-t border-ink/10">
             {cols.map((c, i) => (
@@ -262,45 +264,59 @@ type Plan = {
   cta: "demo" | "waitlist";
   dark?: boolean;
   fill: string;
-  tabFill: string; // the tab carries the plan's colour, like coloured folder tabs in a cabinet
+  // the tab is a separate piece tucked behind the card, in a colour that stands against the card's own
+  tabFill: string;
+  tabInk: string;
 };
 
 const PLANS: Plan[] = [
   {
     tab: "Free",
     name: "Quick estimate",
-    who: "For anyone curious about their number.",
+    who: "For anyone curious what their business is worth.",
     price: "₦0",
     period: "always free",
-    features: ["The quick estimate calculator", "A rough range for your trade, with every step shown", "No sign-up needed"],
+    features: ["The quick estimate calculator", "A rough value range, with every step shown", "No sign-up needed"],
     cta: "demo",
     fill: "#fbfaf6",
-    tabFill: "#93b99b",
+    tabFill: "var(--ink)",
+    tabInk: "var(--cream)",
   },
   {
     tab: "Owners",
     name: "Full valuation",
-    who: "For owners valuing their own business, once or now and then.",
+    who: "For owners who want a full value of their business they can share.",
     price: "At launch",
     period: "priced per valuation, in Naira",
-    features: ["The guided conversation", "Your business model, on one page", "Range, confidence score and every reason", "A report to share with a buyer or bank"],
+    features: ["Guided, one easy question at a time", "A one-page picture of your business", "A value range, how sure we are, and every reason", "A report to share with a buyer or bank"],
     cta: "waitlist",
     fill: "#c9dccb",
-    tabFill: "#d4ed6f",
+    tabFill: "var(--green)",
+    tabInk: "var(--lime)",
   },
   {
     tab: "Brokers",
     name: "Broker desk",
-    who: "For brokers and advisers valuing many businesses a year.",
+    who: "For brokers and advisers who value businesses for clients.",
     price: "At launch",
     period: "monthly, with partner pricing",
-    features: ["Every client's file in one place", "Reports with your own brand", "Compare businesses side by side", "Early-partner discount"],
+    features: ["Every client's file in one place", "Reports with your own branding", "Compare businesses side by side", "Early-partner pricing"],
     cta: "waitlist",
     dark: true,
     fill: "#042e1b",
     tabFill: "#ff6a1a",
+    tabInk: "var(--green)",
   },
 ];
+
+/** A folder tab on its own: rounded shoulders on top, the foot running on below the card's edge. */
+function Tab({ fill }: { fill: string }) {
+  return (
+    <svg viewBox="0 0 150 48" preserveAspectRatio="none" className="block h-full w-full" aria-hidden>
+      <path d="M0 48 L17 7 Q20 0 29 0 H121 Q130 0 133 7 L150 48 Z" fill={fill} />
+    </svg>
+  );
+}
 
 function Check({ className = "" }: { className?: string }) {
   return (
@@ -317,20 +333,24 @@ function Pricing() {
         <SectionHead
           label="Pricing"
           title={<>Start free. <em>Pay when it matters</em></>}
-          sub="The quick estimate is free today. Full valuations and the broker desk open with early access, priced in Naira. The waitlist hears first."
+          sub="The quick estimate is free, always. Full valuations and the broker desk open with early access, priced in Naira. Waitlist members hear first."
         />
         <div className="mt-14 grid grid-cols-1 gap-x-5 gap-y-12 md:mt-20 lg:grid-cols-3">
           {PLANS.map((p, i) => (
-            <FadeIn key={p.name} delay={i * 80} className="relative pt-9">
-              {/* the plan is a folder: the tab names who it's for */}
-              <div className="absolute inset-0">
-                <Folder w={420} h={560} tx={0.06} tw={0.34} th={36} fill={p.fill} stroke={p.dark ? undefined : "#1d2a22"} />
+            <FadeIn key={p.name} delay={i * 80} className="group relative pt-9">
+              {/* the tab names who it's for. It sits behind the card, so the card's edge runs across its foot,
+                  and it rises a little when the card is hovered, like pulling a file from the cabinet */}
+              <div className="absolute left-[6%] top-0 h-12 w-[150px] transition-transform duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:-translate-y-2 motion-reduce:transition-none">
+                <Tab fill={p.tabFill} />
+                <span className="tab-label absolute inset-x-0 top-[18px] -translate-y-1/2 text-center font-semibold" style={{ color: p.tabInk }}>
+                  {p.tab}
+                </span>
               </div>
-              {/* the same folder again in the tab's colour, cut to the tab's height, so only the tab is coloured */}
-              <div className="absolute inset-0 [clip-path:inset(0_0_93.6%_0)]">
-                <Folder w={420} h={560} tx={0.06} tw={0.34} th={36} fill={p.tabFill} stroke={p.dark ? undefined : "#1d2a22"} />
-              </div>
-              <span className="tab-label absolute left-[23%] top-[3.5%] -translate-x-1/2 -translate-y-1/2 whitespace-nowrap font-semibold text-green">{p.tab}</span>
+              {/* the card body; only the light cards need an outline to hold their edge on the cream page */}
+              <div
+                className={`absolute inset-x-0 bottom-0 top-9 rounded-[16px] ${p.dark ? "" : "border border-[#1d2a22]"}`}
+                style={{ background: p.fill }}
+              />
               <div className={`relative flex h-full flex-col px-7 pb-8 pt-8 md:px-9 ${p.dark ? "text-cream" : "text-ink"}`}>
                 <h3 className={`text-[20px] font-semibold ${p.dark ? "text-cream" : "text-green"}`}>{p.name}</h3>
                 <p className={`mt-2 max-w-[32ch] text-[15px] leading-[1.55] ${p.dark ? "text-cream/65" : "text-ink/60"}`}>{p.who}</p>
@@ -406,7 +426,7 @@ function Footer() {
           <Stop />
         </h2>
         <p className="mt-6 max-w-[34rem] text-[16px] leading-[1.6] text-cream/65 md:text-[18px]">
-          Capstack opens to business owners and brokers soon. Join the waitlist and you&rsquo;ll be first in.
+          Capstack opens to business owners and brokers soon. Join the waitlist and we&rsquo;ll let you in first.
         </p>
         <div className="mt-10 flex flex-col gap-4 sm:flex-row sm:items-center">
           <WaitlistForm id="waitlist" className="max-w-[460px] scroll-mt-40" />
