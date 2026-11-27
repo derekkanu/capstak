@@ -113,6 +113,11 @@ export default function ChapterPage() {
         cash: Number(n.cash ?? 0),
         owed: Number(n.owed ?? 0),
         records: (n.records as Numbers["records"]) ?? "some",
+        // an answer that is exactly the estimate we offered counts as ours, not the owner's
+        estimated: ["lastMonthCosts", "fixedCosts", "lastYearSales", "stock"].filter((id) => {
+          const s = suggestFor(id, { basics: file?.basics ?? null, answers: given });
+          return s !== null && given[id] === s.value;
+        }),
       };
       updateFile((f) => ({ ...f, numbers, chapterUpdatedAt: stamp(f) }));
     }

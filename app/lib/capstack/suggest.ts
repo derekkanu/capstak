@@ -7,16 +7,18 @@ import type { Basics } from "./types";
    Each is a rough rule for the trade, said plainly, and the owner can take it or type their own. Only for
    questions earlier answers can genuinely answer; never for what only the owner can know (equipment, cash, debts).
 
-   Typical shares by trade, for Nigerian small businesses (starting points, to tune with real files):
+   Typical shares by trade (sources and confidence for each: docs/valuation-benchmarks.md). Food, shops and
+   pharmacies are set from published sector benchmarks; the rest are reasoned from cost structure and still need
+   checking against real Nigerian files:
    - kept: what's left for the owner out of each ₦1 of sales
    - fixed: the part of monthly costs that doesn't move with sales (rent, salaries)
    - stockMonths: stock usually on hand, in months of the costs that move with sales */
 const TRADE: Record<SectorKey, { kept: number; fixed: number; stockMonths: number; noun: string }> = {
-  food: { kept: 0.2, fixed: 0.35, stockMonths: 0.3, noun: "food businesses" },
-  trade: { kept: 0.15, fixed: 0.2, stockMonths: 1.5, noun: "shops and traders" },
+  food: { kept: 0.15, fixed: 0.45, stockMonths: 0.25, noun: "food businesses" },
+  trade: { kept: 0.1, fixed: 0.15, stockMonths: 1, noun: "shops and traders" },
   beauty: { kept: 0.3, fixed: 0.45, stockMonths: 1, noun: "fashion and beauty businesses" },
   services: { kept: 0.35, fixed: 0.65, stockMonths: 0, noun: "service businesses" },
-  health: { kept: 0.2, fixed: 0.3, stockMonths: 1.5, noun: "pharmacies and clinics" },
+  health: { kept: 0.12, fixed: 0.15, stockMonths: 1.2, noun: "pharmacies" },
   education: { kept: 0.3, fixed: 0.7, stockMonths: 0, noun: "schools" },
   construction: { kept: 0.2, fixed: 0.3, stockMonths: 0.5, noun: "building businesses" },
   logistics: { kept: 0.15, fixed: 0.4, stockMonths: 0, noun: "transport businesses" },

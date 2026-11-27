@@ -169,6 +169,7 @@ function Report({ file }: { file: OwnerFile }) {
           <BusinessChart numbers={n} />
           <p className="m-0 text-[14px] leading-[1.55] text-[#5d6a61]">
             {naira(v.yearlySales)} of sales a year, {naira(v.yearlyLeft)} left for you before paying yourself.{" "}
+            {n.estimated?.some((id) => id === "lastMonthCosts" || id === "fixedCosts") ? "Your costs are our estimate for your trade. " : ""}
             {v.trend === "growing" ? "Sales are growing faster than prices." : v.trend === "shrinking" ? "Sales have been falling." : "Sales are holding steady."}
           </p>
         </div>

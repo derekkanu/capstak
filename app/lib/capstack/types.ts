@@ -35,6 +35,8 @@ export type Numbers = {
   /** loans, supplier debts, anything the business owes */
   owed: number;
   records: Records;
+  /** answers that are exactly the estimate we offered (the owner tapped "Use"): they count as rough, not as known */
+  estimated?: string[];
 };
 
 /** Chapter 03: how the business makes money, asked as plain questions. Each answer can move the value. */

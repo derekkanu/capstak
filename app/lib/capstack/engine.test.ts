@@ -120,3 +120,24 @@ describe("how sure we are", () => {
     expect(boosts(file()).some((x) => x.key === "numbers")).toBe(false);
   });
 });
+
+describe("our estimates count as rough", () => {
+  test("estimated costs don't raise how sure we are like the owner's own figures", () => {
+    const own = confidenceOf(file());
+    const est = confidenceOf(file({ numbers: { ...numbers, estimated: ["lastMonthCosts", "fixedCosts"] } }));
+    expect(est).toBe(own - 12);
+  });
+
+  test("an estimated last year's sales is treated as not given: no income method, no credit", () => {
+    const v = valuate(file({ numbers: { ...numbers, estimated: ["lastYearSales"] } }));
+    if (v.stage !== "full") throw new Error("expected full");
+    expect(v.methods.find((m) => m.key === "income")?.used).toBe(false);
+    expect(confidenceOf(file({ numbers: { ...numbers, estimated: ["lastYearSales"] } }))).toBe(confidenceOf(file()) - 8);
+  });
+
+  test("suggests checking estimated costs against records", () => {
+    const b = boosts(file({ numbers: { ...numbers, estimated: ["lastMonthCosts"] } }));
+    expect(b.find((x) => x.key === "costs")?.gain).toBe(6);
+    expect(boosts(file()).some((x) => x.key === "costs")).toBe(false);
+  });
+});

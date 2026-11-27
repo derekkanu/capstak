@@ -15,9 +15,9 @@ import { MODEL_KEYS, type Basics, type Model, type Numbers, type OwnerFile, type
  *
  * 2. Income (future earnings), runs with 2+ years trading and last year's sales. Earnings after paying a manager
  *    to run it (a buyer has to replace the owner) are capitalised: value = E × (1 + g) / (d − g). The discount rate
- *    d is built up: Nigerian government bonds (~16.5%, Nov 2026) + an equity premium (6%) + a small-business
- *    premium (15%: buyers of Nigerian small businesses expect their money back in about 2–4 years) + a
- *    specific-risk premium (0–10%) from the answers. g is a cautious 10% a year in Naira, well under inflation,
+ *    d is built up: the naira bond yield (~16.5%, Nov 2026) less Nigeria's default spread (5.5%), plus Nigeria's
+ *    equity risk premium (12.6%), plus a small-business premium (12%), plus a specific-risk premium (0–10%) from
+ *    the answers: about 36–46%, so buyers get their money back in roughly 2–4 years. g is a cautious 10% a year in Naira, well under inflation,
  *    so real growth isn't assumed. Like comparison, it's held under the trade's share of a year's sales.
  *
  * 3. Assets, the floor, runs once the numbers are in. What the equipment would sell for plus stock at 80% (a buyer
@@ -29,9 +29,15 @@ import { MODEL_KEYS, type Basics, type Model, type Numbers, type OwnerFile, type
  * How sure we are is a score out of 100 from what's been given and backed up; the range narrows as it rises.
  */
 
-export const RISK_FREE = 0.165;
-export const EQUITY_PREMIUM = 0.06;
-export const SMALL_BUSINESS_PREMIUM = 0.15;
+// the return a buyer would want, built the way valuers do in a local currency (docs/valuation-benchmarks.md):
+// the naira bond yield without its default spread, plus Nigeria's equity risk premium (Damodaran, Jan 2026),
+// plus a premium for a small private business that's hard to sell
+export const NAIRA_BOND_YIELD = 0.165;
+export const NIGERIA_DEFAULT_SPREAD = 0.0552;
+export const NIGERIA_EQUITY_PREMIUM = 0.1264;
+export const SMALL_BUSINESS_PREMIUM = 0.12;
+export const RISK_FREE = NAIRA_BOND_YIELD - NIGERIA_DEFAULT_SPREAD;
+export const EQUITY_PREMIUM = NIGERIA_EQUITY_PREMIUM;
 export const LONG_RUN_GROWTH = 0.1;
 const STOCK_RECOVERY = 0.8;
 
@@ -76,6 +82,14 @@ export function firstLook(b: Basics) {
   else if (tenure === "established") mid *= 1.1;
   return { low: nice(mid * 0.55), mid: nice(mid), high: nice(mid * 1.45) };
 }
+
+// ---------- what the owner gave vs what we estimated ----------
+
+export const isEstimated = (n: Numbers, id: string) => !!n.estimated?.includes(id);
+
+/** an estimated "last year's sales" is only six months doubled: it tells us nothing new, so it's treated as not
+ *  given (no growth evidence, no income method) */
+export const known = (n: Numbers): Numbers => (isEstimated(n, "lastYearSales") ? { ...n, lastYearSales: null } : n);
 
 // ---------- monthly picture ----------
 
@@ -159,10 +173,15 @@ export function confidenceOf(f: Pick<OwnerFile, "basics" | "numbers" | "model" |
   let s = 0;
   if (f.basics) s += 20;
   if (f.numbers) {
+    const n = known(f.numbers);
     s += 25;
-    if (f.numbers.records === "bank") s += 10;
-    else if (f.numbers.records === "some") s += 5;
-    if (f.numbers.lastYearSales) s += 8;
+    // our estimates fill a gap, but we haven't learned anything: they don't count as the owner's own figures
+    if (isEstimated(n, "lastMonthCosts")) s -= 6;
+    if (isEstimated(n, "fixedCosts")) s -= 6;
+    if (isEstimated(n, "stock")) s -= 2;
+    if (n.records === "bank") s += 10;
+    else if (n.records === "some") s += 5;
+    if (n.lastYearSales) s += 8;
   }
   s += Math.round((modelAnswered(f.model) / MODEL_KEYS.length) * 15);
   if (f.docs.some((d) => d.kind === "bank")) s += 15;
@@ -197,7 +216,11 @@ export function boosts(f: Pick<OwnerFile, "basics" | "numbers" | "model" | "docs
       gain: Math.round((left / MODEL_KEYS.length) * 15),
       href: "/app/file/model",
     });
-  if (f.numbers && !f.numbers.lastYearSales)
+  if (f.numbers) {
+    const rough = ["lastMonthCosts", "fixedCosts"].filter((id) => isEstimated(f.numbers!, id)).length;
+    if (rough) out.push({ key: "costs", label: "Check your costs against your records", gain: rough * 6, href: "/app/file/numbers" });
+  }
+  if (f.numbers && !known(f.numbers).lastYearSales)
     out.push({ key: "lastyear", label: "Add last year's sales, even rough", gain: 8, href: "/app/file/numbers" });
   if (f.docs.filter((d) => d.kind !== "bank").length < 3)
     out.push({ key: "docs", label: "Add POS slips, receipts or a stock list", gain: 7, href: "/app/documents" });
@@ -210,7 +233,7 @@ export function valuate(f: Pick<OwnerFile, "basics" | "numbers" | "model" | "doc
   if (!f.numbers) return { stage: "first-look", ...firstLook(f.basics), confidence };
 
   const b = f.basics;
-  const n = f.numbers;
+  const n = known(f.numbers);
   const m = f.model;
   const sector = sectorOf(b.sector);
   const { sales, left } = monthly(n);
