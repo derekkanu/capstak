@@ -15,9 +15,10 @@ import {
 import { Arrowhead, SarahAvatar } from "../../../components/product/Bits";
 import { openSarah } from "../../../components/product/SarahPanel";
 import { confidenceLabel, valuate } from "../../../lib/capstack/engine";
-import { nairaRange } from "../../../lib/capstack/format";
+import { naira, nairaRange } from "../../../lib/capstack/format";
 import { CHAPTERS, type ChapterKey, type Question } from "../../../lib/capstack/questions";
 import { audience } from "../../../lib/capstack/sarah";
+import { suggestFor } from "../../../lib/capstack/suggest";
 import { updateFile, useOwnerFile } from "../../../lib/capstack/store";
 import type { Basics, Model, Numbers, OwnerFile } from "../../../lib/capstack/types";
 
@@ -78,6 +79,8 @@ export default function ChapterPage() {
   const q = qs[i];
   const value = current[q.id];
   const ok = answered(q, value);
+  // where earlier answers can work this one out, offer it: owners shouldn't need an accountant to answer
+  const suggestion = suggestFor(q.id, { basics: file.basics, answers: current });
 
   const set = (v: unknown) => {
     const next = { ...current, [q.id]: v };
@@ -178,6 +181,23 @@ export default function ChapterPage() {
             />
           )}
         </div>
+
+        {suggestion && (
+          <div className="-mt-2 flex flex-wrap items-center justify-between gap-x-4 gap-y-3 rounded-[14px] bg-[#f3f3ed] px-4 py-3.5">
+            <span className="flex max-w-[44ch] flex-col gap-0.5">
+              <span className="text-[13px] text-[#5d6a61]">Based on what you&rsquo;ve told us</span>
+              <span className="text-[17px]">About {naira(suggestion.value)}</span>
+              <span className="text-[13px] leading-[1.45] text-[#5d6a61]">{suggestion.why}</span>
+            </span>
+            {value === suggestion.value ? (
+              <span className="text-[13px] text-[#3d4a42]">Using this estimate</span>
+            ) : (
+              <button type="button" onClick={() => set(suggestion.value)} className="min-h-10 rounded-full bg-ink px-4 text-[13px] font-medium text-cream">
+                Use {naira(suggestion.value)}
+              </button>
+            )}
+          </div>
+        )}
 
         <div>
           <button type="button" onClick={() => setHelp(!help)} aria-expanded={help} className="text-[14px] text-[#3d4a42] underline">
