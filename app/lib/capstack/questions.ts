@@ -1,4 +1,4 @@
-import { SECTORS } from "../quickEstimate";
+import { SECTORS, type SectorKey } from "../quickEstimate";
 import { naira } from "./format";
 
 /* Every chapter's questions, one at a time, in the owner's words. Each has a plain "What do you mean?"
@@ -17,6 +17,8 @@ export type Question = {
   picks?: string[]; // quick picks under a text field
   placeholder?: string;
   optional?: boolean;
+  /** for money questions: a one-tap answer of ₦0 ("No, we don't keep any") */
+  none?: string;
   /** Sarah's one-line reaction to the answer, shown as the next question arrives */
   react?: (answer: unknown) => string | null;
 };
@@ -119,10 +121,12 @@ export const NUMBERS: Question[] = [
   },
   {
     id: "stock",
+    // worded for the trade picked in chapter 01 (see forBusiness): a service business has no shelves
     prompt: "What's the stock on your shelves worth?",
-    help: "Goods or materials waiting to be sold or used, at what you paid for them. Put 0 if you don't keep stock.",
+    help: "Goods or materials waiting to be sold or used, at what you paid for them.",
     kind: "money",
     placeholder: "1,100,000",
+    none: "We don't keep any stock",
   },
   {
     id: "cash",
@@ -137,6 +141,7 @@ export const NUMBERS: Question[] = [
     help: "Loans, money owed to suppliers, equipment on credit. Put 0 if not. It comes off what you'd keep, not off what the business is worth.",
     kind: "money",
     placeholder: "0",
+    none: "No, we don't owe anything",
     react: (a) => (a === 0 ? "No debts. That's a clean file." : null),
   },
   {
@@ -263,6 +268,67 @@ export const MODEL: Question[] = [
     ],
   },
 ];
+
+/* What "stock" means in each trade. Trades that don't usually hold stock are asked about supplies instead, and can
+   answer "none" in one tap. */
+const STOCK: Record<SectorKey, { prompt: string; help: string; none: string }> = {
+  food: {
+    prompt: "What are the ingredients and drinks you have in worth?",
+    help: "Food, drinks, packaging: what you've bought and not yet used or sold, at what you paid for it.",
+    none: "We don't keep any",
+  },
+  trade: {
+    prompt: "What are the goods on your shelves worth?",
+    help: "Everything waiting to be sold, in the shop and the store room, at what you paid for it.",
+    none: "We don't keep any stock",
+  },
+  beauty: {
+    prompt: "What are the products and fabric you have in worth?",
+    help: "Products for sale or use on customers, fabric and materials, at what you paid for them.",
+    none: "We don't keep any",
+  },
+  services: {
+    prompt: "Do you keep any supplies or materials?",
+    help: "Things you buy to do the work and haven't used yet: parts, materials, consumables. Most service businesses keep little or none.",
+    none: "No, we don't keep any",
+  },
+  health: {
+    prompt: "What are the medicines and supplies you have in worth?",
+    help: "Everything waiting to be sold or used, at what you paid for it. Leave out anything expired.",
+    none: "We don't keep any stock",
+  },
+  education: {
+    prompt: "Do you keep any books, uniforms or supplies for sale?",
+    help: "Things you sell to pupils or parents and haven't sold yet, at what you paid for them.",
+    none: "No, we don't keep any",
+  },
+  construction: {
+    prompt: "What are the building materials you have on hand worth?",
+    help: "Cement, rods, tiles, timber: anything bought and not yet used on a job, at what you paid for it.",
+    none: "We don't keep any",
+  },
+  logistics: {
+    prompt: "Do you keep any spare parts, tyres or fuel in stock?",
+    help: "Things bought for the vehicles and not yet used, at what you paid for them.",
+    none: "No, we don't keep any",
+  },
+  making: {
+    prompt: "What are your materials and finished goods worth?",
+    help: "Raw materials, work in progress and finished goods not yet sold, at what they cost you.",
+    none: "We don't keep any",
+  },
+  tech: {
+    prompt: "Do you keep any devices or hardware for sale?",
+    help: "Hardware or devices you've bought to sell or install and haven't yet. Most software businesses keep none.",
+    none: "No, we don't keep any",
+  },
+};
+
+/** a question as this owner should see it: some are worded for their trade */
+export function forBusiness(q: Question, basics: { sector: SectorKey } | null): Question {
+  if (q.id === "stock" && basics) return { ...q, ...STOCK[basics.sector] };
+  return q;
+}
 
 export const CHAPTERS = {
   basics: { no: "01", title: "About your business", questions: BASICS },

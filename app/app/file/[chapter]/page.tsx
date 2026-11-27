@@ -16,7 +16,7 @@ import { Arrowhead, SarahAvatar } from "../../../components/product/Bits";
 import { openSarah } from "../../../components/product/SarahPanel";
 import { confidenceLabel, valuate } from "../../../lib/capstack/engine";
 import { naira, nairaRange } from "../../../lib/capstack/format";
-import { CHAPTERS, type ChapterKey, type Question } from "../../../lib/capstack/questions";
+import { CHAPTERS, forBusiness, type ChapterKey, type Question } from "../../../lib/capstack/questions";
 import { audience } from "../../../lib/capstack/sarah";
 import { suggestFor } from "../../../lib/capstack/suggest";
 import { updateFile, useOwnerFile } from "../../../lib/capstack/store";
@@ -76,7 +76,7 @@ export default function ChapterPage() {
   if (finished) return <Finished chapterKey={key} file={file} />;
 
   const qs = chapter.questions;
-  const q = qs[i];
+  const q = forBusiness(qs[i], file.basics);
   const value = current[q.id];
   const ok = answered(q, value);
   // where earlier answers can work this one out, offer it: owners shouldn't need an accountant to answer
@@ -157,7 +157,21 @@ export default function ChapterPage() {
           {q.kind === "text" && <TextAnswer q={q} value={(value as string) ?? ""} onChange={set} onEnter={() => next()} />}
           {q.kind === "number" && <NumberAnswer q={q} value={value as number | undefined} onChange={set} onEnter={() => next()} />}
           {q.kind === "money" && (
-            <MoneyField autoFocus value={value as number | undefined} onChange={set} onEnter={() => next()} label={q.prompt} placeholder={q.placeholder} />
+            <div className="flex flex-col gap-3">
+              <MoneyField autoFocus value={value as number | undefined} onChange={set} onEnter={() => next()} label={q.prompt} placeholder={q.placeholder} />
+              {q.none && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    set(0);
+                    next({ ...current, [q.id]: 0 });
+                  }}
+                  className={`min-h-11 self-start rounded-full px-4 text-[14px] ${value === 0 ? "bg-ink text-cream" : "bg-[#ecebe2] hover:bg-[#e0e0d6]"}`}
+                >
+                  {q.none}
+                </button>
+              )}
+            </div>
           )}
           {q.kind === "months" && <MonthsAnswer value={(value as (number | undefined)[]) ?? Array(6).fill(undefined)} onChange={set} />}
           {q.kind === "choice" && (

@@ -30,3 +30,16 @@ describe("estimates from what the owner already told us", () => {
     expect(suggestFor("equipment", { basics: SAMPLE_BASICS, answers: { months } })).toBeNull();
   });
 });
+
+describe("questions worded for the business", () => {
+  test("a service business is asked about supplies, not shelves, and can answer none", async () => {
+    const { NUMBERS, forBusiness } = await import("./questions");
+    const stock = NUMBERS.find((q) => q.id === "stock")!;
+    const services = forBusiness(stock, { sector: "services" });
+    expect(services.prompt).toContain("supplies");
+    expect(services.prompt).not.toContain("shelves");
+    expect(services.none).toBeTruthy();
+    expect(forBusiness(stock, { sector: "trade" }).prompt).toContain("shelves");
+    expect(forBusiness(stock, null).prompt).toBe(stock.prompt);
+  });
+});

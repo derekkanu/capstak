@@ -6,6 +6,7 @@ import { Arrowhead, Lock, SarahAvatar, Tick } from "../components/product/Bits";
 import BusinessChart, { ChartLegend } from "../components/product/BusinessChart";
 import { openSarah } from "../components/product/SarahPanel";
 import { confidenceLabel, valuate } from "../lib/capstack/engine";
+import { explainNumbers, explainValue } from "../lib/capstack/explain";
 import { nairaRange } from "../lib/capstack/format";
 import { chapters, nextStep, shortDate, welcomeLine, type Chapter } from "../lib/capstack/sarah";
 import { useOwnerFile } from "../lib/capstack/store";
@@ -47,16 +48,16 @@ function Welcome({ file }: { file: OwnerFile }) {
 function Desk({ file }: { file: OwnerFile }) {
   const v = valuate(file);
   const b = file.basics!;
-  const [first, ...rest] = b.businessName.split(" ");
   return (
     <div className="grid items-start gap-x-16 gap-y-10 md:grid-cols-[minmax(300px,1fr)_minmax(0,1.5fr)]">
       <section aria-labelledby="value-title" className="flex flex-col gap-3.5">
-        <h1 id="value-title" className="display m-0 text-[clamp(34px,3vw,44px)] font-normal leading-[1.08]">
-          {first}
-          {rest.length ? <span className="text-[#7a857c]"> {rest.join(" ")}</span> : null},
-          <br />
-          so far
-        </h1>
+        <div className="flex flex-col gap-1.5">
+          <h1 id="value-title" className="display m-0 text-[clamp(34px,3vw,44px)] font-normal leading-[1.08]">
+            {b.businessName}
+          </h1>
+          {/* the small line says what the page shows: where things stand from the answers so far */}
+          <span className="text-[15px] text-[#5d6a61]">So far, from what you&rsquo;ve told us</span>
+        </div>
         {v.stage !== "none" && (
           <>
             <span className="mt-6 text-[14px] text-[#5d6a61]">{v.stage === "full" ? "What it's worth today" : "A first look at what it's worth"}</span>
@@ -65,6 +66,7 @@ function Desk({ file }: { file: OwnerFile }) {
               How sure we are: <span className="font-medium text-ink">{confidenceLabel(v.confidence).toLowerCase()}</span>
               {v.stage === "first-look" ? ", for now" : ` · ${v.confidence}%`}
             </span>
+            <p className="m-0 mt-1 max-w-[42ch] text-[14px] leading-[1.55] text-[#3d4a42]">{explainValue(file)}</p>
           </>
         )}
       </section>
@@ -77,7 +79,10 @@ function Desk({ file }: { file: OwnerFile }) {
           {file.numbers && <ChartLegend />}
         </div>
         {file.numbers ? (
-          <BusinessChart numbers={file.numbers} />
+          <>
+            <BusinessChart numbers={file.numbers} />
+            <p className="m-0 max-w-[60ch] text-[14px] leading-[1.55] text-[#3d4a42]">{explainNumbers(file)}</p>
+          </>
         ) : (
           // after the basics, the chart's place waits for the sales and costs that fill it
           <div className="relative flex h-[230px] flex-col items-center justify-center gap-3 rounded-[16px] border border-dashed border-[#c9ccc0] text-center">
