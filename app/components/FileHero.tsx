@@ -20,8 +20,8 @@ const OWNERS = [
     q: { sector: "making", monthlySales: 3_500_000, monthlyLeft: 890_000, tenure: "established", trend: "growing", withoutYou: "partly", records: "bank" },
   },
   {
-    src: "/owners/consultant.jpg", pos: "55% 62%", name: "Adaeze Consulting", file: "0143", grade: true,
-    q: { sector: "services", monthlySales: 6_000_000, monthlyLeft: 1_800_000, tenure: "mid", trend: "growing", withoutYou: "partly", records: "bank" },
+    src: "/owners/baker.jpg", pos: "51% 30%", name: "Adaeze Bakes", file: "0143", grade: true,
+    q: { sector: "food", monthlySales: 4_500_000, monthlyLeft: 1_100_000, tenure: "mid", trend: "growing", withoutYou: "partly", records: "bank" },
   },
   {
     src: "/owners/landscaper.jpg", grade: true, pos: "45% 6%", name: "Greenline Gardens", file: "0144",
